@@ -19,17 +19,16 @@ class MemoryStorage(Storage):
     rate limit storage using :class:`collections.Counter`
     as an in memory storage for fixed and elastic window strategies,
     and a simple list to implement moving window strategy.
-
     """
     STORAGE_SCHEME = ["memory"]
 
-    def __init__(self, uri=None, **_):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.storage = Counter()
         self.expirations = {}
         self.events = {}
         self.timer = threading.Timer(0.01, self.__expire_events)
         self.timer.start()
-        super(MemoryStorage, self).__init__(uri)
 
     def __expire_events(self):
         for key in self.events.keys():
@@ -50,7 +49,7 @@ class MemoryStorage(Storage):
             self.timer = threading.Timer(0.01, self.__expire_events)
             self.timer.start()
 
-    def incr(self, key, expiry, elastic_expiry=False):
+    def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
         increments the counter for a given rate limit key
 
@@ -66,7 +65,7 @@ class MemoryStorage(Storage):
             self.expirations[key] = time.time() + expiry
         return self.storage.get(key, 0)
 
-    def get(self, key):
+    def get(self, key: str) -> int:
         """
         :param str key: the key to get the counter value for
         """
@@ -75,7 +74,7 @@ class MemoryStorage(Storage):
             self.expirations.pop(key, None)
         return self.storage.get(key, 0)
 
-    def clear(self, key):
+    def clear(self, key: str):
         """
         :param str key: the key to clear rate limits for
         """
@@ -83,7 +82,7 @@ class MemoryStorage(Storage):
         self.expirations.pop(key, None)
         self.events.pop(key, None)
 
-    def acquire_entry(self, key, limit, expiry, no_add=False):
+    def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
         """
         :param str key: rate limit key to acquire an entry in
         :param int limit: amount of entries allowed
@@ -106,13 +105,13 @@ class MemoryStorage(Storage):
                 self.events[key].insert(0, LockableEntry(expiry))
             return True
 
-    def get_expiry(self, key):
+    def get_expiry(self, key: str) -> int:
         """
         :param str key: the key to get the expiry for
         """
         return int(self.expirations.get(key, -1))
 
-    def get_num_acquired(self, key, expiry):
+    def get_num_acquired(self, key: str, expiry) -> int:
         """
         returns the number of entries already acquired
 
@@ -120,11 +119,14 @@ class MemoryStorage(Storage):
         :param int expiry: expiry of the entry
         """
         timestamp = time.time()
-        return len([
-            k for k in self.events[key] if k.atime >= timestamp - expiry
-        ]) if self.events.get(key) else 0
+        if self.events.get(key):
+            return len([
+                k for k in self.events[key] if k.atime >= timestamp - expiry
+            ])
+        else:
+            return 0
 
-    def get_moving_window(self, key, limit, expiry):
+    def get_moving_window(self, key: str, limit: int, expiry):
         """
         returns the starting point and the number of entries in the moving
         window
@@ -140,7 +142,7 @@ class MemoryStorage(Storage):
                 return int(item.atime), acquired
         return int(timestamp), acquired
 
-    def check(self):
+    def check(self) -> bool:
         """
         check if storage is healthy
         """

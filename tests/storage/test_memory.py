@@ -4,9 +4,9 @@ import unittest
 import hiro
 import pytest
 
-from limits import RateLimitItemPerMinute, RateLimitItemPerSecond
-from limits.storage import MemoryStorage
-from limits.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
+from freiner import RateLimitItemPerMinute, RateLimitItemPerSecond
+from freiner.storage import MemoryStorage
+from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
 
 
 @pytest.mark.unit

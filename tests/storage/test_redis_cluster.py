@@ -4,7 +4,7 @@ import mock
 import pytest
 import rediscluster
 
-from limits.storage import RedisClusterStorage, storage_from_string
+from freiner.storage import RedisClusterStorage, storage_from_string
 from tests.storage.test_redis import SharedRedisTests
 
 
@@ -17,7 +17,7 @@ class RedisClusterStorageTests(SharedRedisTests, unittest.TestCase):
 
     def test_init_options(self):
         with mock.patch(
-            "limits.storage.redis_cluster.get_dependency"
+            "freiner.storage.redis_cluster.get_dependency"
         ) as get_dependency:
             storage_from_string(self.storage_url, connection_timeout=1)
             call_args = get_dependency().RedisCluster.call_args

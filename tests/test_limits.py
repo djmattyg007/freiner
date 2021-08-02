@@ -2,7 +2,7 @@ import unittest
 
 import pytest
 
-from limits import limits
+from freiner import limits
 
 
 @pytest.mark.unit

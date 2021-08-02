@@ -4,16 +4,16 @@ rate limiting strategies
 
 from abc import ABCMeta, abstractmethod
 import weakref
-import six
+
+from .limits import RateLimitItem
 
 
-@six.add_metaclass(ABCMeta)
-class RateLimiter(object):
+class RateLimiter(metaclass=ABCMeta):
     def __init__(self, storage):
         self.storage = weakref.ref(storage)
 
     @abstractmethod
-    def hit(self, item, *identifiers):
+    def hit(self, item: RateLimitItem, *identifiers) -> bool:
         """
         creates a hit on the rate limit and returns True if successful.
 
@@ -25,7 +25,7 @@ class RateLimiter(object):
         raise NotImplementedError
 
     @abstractmethod
-    def test(self, item, *identifiers):
+    def test(self, item: RateLimitItem, *identifiers) -> bool:
         """
         checks  the rate limit and returns True if it is not
         currently exceeded.
@@ -38,7 +38,7 @@ class RateLimiter(object):
         raise NotImplementedError
 
     @abstractmethod
-    def get_window_stats(self, item, *identifiers):
+    def get_window_stats(self, item: RateLimitItem, *identifiers):
         """
         returns the number of requests remaining and reset of this limit.
 
@@ -49,7 +49,7 @@ class RateLimiter(object):
         """
         raise NotImplementedError
 
-    def clear(self, item, *identifiers):
+    def clear(self, item: RateLimitItem, *identifiers):
         return self.storage().clear(item.key_for(*identifiers))
 
 
@@ -70,7 +70,7 @@ class MovingWindowRateLimiter(RateLimiter):
             )
         super(MovingWindowRateLimiter, self).__init__(storage)
 
-    def hit(self, item, *identifiers):
+    def hit(self, item: RateLimitItem, *identifiers) -> bool:
         """
         creates a hit on the rate limit and returns True if successful.
 
@@ -83,7 +83,7 @@ class MovingWindowRateLimiter(RateLimiter):
             item.key_for(*identifiers), item.amount, item.get_expiry()
         )
 
-    def test(self, item, *identifiers):
+    def test(self, item: RateLimitItem, *identifiers) -> bool:
         """
         checks  the rate limit and returns True if it is not
         currently exceeded.
@@ -99,7 +99,7 @@ class MovingWindowRateLimiter(RateLimiter):
             item.get_expiry(),
         )[1] < item.amount
 
-    def get_window_stats(self, item, *identifiers):
+    def get_window_stats(self, item: RateLimitItem, *identifiers):
         """
         returns the number of requests remaining within this limit.
 
@@ -120,7 +120,7 @@ class FixedWindowRateLimiter(RateLimiter):
     Reference: :ref:`fixed-window`
     """
 
-    def hit(self, item, *identifiers):
+    def hit(self, item: RateLimitItem, *identifiers) -> bool:
         """
         creates a hit on the rate limit and returns True if successful.
 
@@ -134,7 +134,7 @@ class FixedWindowRateLimiter(RateLimiter):
             <= item.amount
         )
 
-    def test(self, item, *identifiers):
+    def test(self, item: RateLimitItem, *identifiers) -> bool:
         """
         checks  the rate limit and returns True if it is not
         currently exceeded.
@@ -146,7 +146,7 @@ class FixedWindowRateLimiter(RateLimiter):
         """
         return self.storage().get(item.key_for(*identifiers)) < item.amount
 
-    def get_window_stats(self, item, *identifiers):
+    def get_window_stats(self, item: RateLimitItem, *identifiers):
         """
         returns the number of requests remaining and reset of this limit.
 
@@ -167,7 +167,7 @@ class FixedWindowElasticExpiryRateLimiter(FixedWindowRateLimiter):
     Reference: :ref:`fixed-window-elastic`
     """
 
-    def hit(self, item, *identifiers):
+    def hit(self, item: RateLimitItem, *identifiers) -> bool:
         """
         creates a hit on the rate limit and returns True if successful.
 

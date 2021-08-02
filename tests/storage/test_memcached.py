@@ -5,9 +5,9 @@ import mock
 import pytest
 import pymemcache.client
 
-from limits import RateLimitItemPerSecond, RateLimitItemPerMinute
-from limits.storage import storage_from_string, MemcachedStorage
-from limits.strategies import (
+from freiner import RateLimitItemPerSecond, RateLimitItemPerMinute
+from freiner.storage import storage_from_string, MemcachedStorage
+from freiner.strategies import (
     FixedWindowRateLimiter,
     FixedWindowElasticExpiryRateLimiter
 )
@@ -22,7 +22,7 @@ class MemcachedStorageTests(unittest.TestCase):
 
     def test_options(self):
         with mock.patch(
-            "limits.storage.memcached.get_dependency"
+            "freiner.storage.memcached.get_dependency"
         ) as get_dependency:
             storage_from_string(self.storage_url, connect_timeout=1).check()
             self.assertEqual(

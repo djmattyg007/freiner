@@ -1,9 +1,9 @@
-.. currentmodule:: limits
+.. currentmodule:: freiner
 
 Custom storage backends
 -----------------------
 
-The **limits** package ships with a few storage implementations which allow you
+The **Freiner** package ships with a few storage implementations which allow you
 to get started with some common data stores (redis & memcached) used for rate limiting.
 
 To accommodate customizations to either the default storage backends or
@@ -13,8 +13,8 @@ to the package itself).
 
 Creating a custom backend requires:
 
-    #. Subclassing :class:`limits.storage.Storage`
-    #. Providing implementations for the abstractmethods of :class:`limits.storage.Storage`
+    #. Subclassing :class:`freiner.storage.Storage`
+    #. Providing implementations for the abstract methods of :class:`freiner.storage.Storage`
     #. If the storage can support the :ref:`moving-window` strategy - additionally implementing
        the `acquire_entry` instance method.
     #. Providing naming *schemes* that can be used to lookup the custom storage in the storage registry.
@@ -27,21 +27,22 @@ The following example shows two backend stores: one which doesn't implement the
 variables which result in the classes getting registered with the **limits** storage registry::
 
 
-    import urlparse
-    from limits.storage import Storage
+    from urllib.parse import urlparse
+    from freiner.storage import Storage
     import time
 
     class AwesomeStorage(Storage):
         STORAGE_SCHEME = ["awesomedb"]
-        def __init__(self, uri, **options):
+        def __init__(self, uri: str, **options):
             self.awesomesness = options.get("awesomeness", None)
-            self.host = urlparse.urlparse(uri).netloc
-            self.port = urlparse.urlparse(uri).port
+            parsed_uri = urlparse(uri)
+            self.host = parsed_uri.netloc
+            self.port = parsed_uri.port
 
-        def check(self):
+        def check(self) -> bool:
             return True
 
-        def get_expiry(self, key):
+        def get_expiry(self, key) -> int:
             return int(time.time())
 
         def incr(self, key, expiry, elastic_expiry=False):
@@ -53,15 +54,16 @@ variables which result in the classes getting registered with the **limits** sto
 
     class AwesomerStorage(Storage):
         STORAGE_SCHEME = ["awesomerdb"]
-        def __init__(self, uri, **options):
+        def __init__(self, uri: str, **options):
             self.awesomesness = options.get("awesomeness", None)
-            self.host = urlparse.urlparse(uri).netloc
-            self.port = urlparse.urlparse(uri).port
+            parsed_uri = urlparse(uri)
+            self.host = parsed_uri.netloc
+            self.port = parsed_uri.port
 
-        def check(self):
+        def check(self) -> bool:
             return True
 
-        def get_expiry(self, key):
+        def get_expiry(self, key) -> int:
             return int(time.time())
 
         def incr(self, key, expiry, elastic_expiry=False):
@@ -71,7 +73,7 @@ variables which result in the classes getting registered with the **limits** sto
             return 0
 
         def acquire_entry(
-                self, key, limit, expiry, no_add=False
+            self, key, limit, expiry, no_add=False
         ):
             return True
 
@@ -79,7 +81,7 @@ variables which result in the classes getting registered with the **limits** sto
 Once the above implementations are declared you can look them up
 using the factory method described in :ref:`storage-scheme` in the following manner::
 
-    from limits.storage import storage_from_string
+    from freiner.storage import storage_from_string
 
     awesome = storage_from_string("awesomedb://localhoax:42", awesomeness=0)
     awesomer = storage_from_string("awesomerdb://localhoax:42", awesomeness=1)

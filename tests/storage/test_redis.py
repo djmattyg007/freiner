@@ -5,9 +5,9 @@ import mock
 import pytest
 import redis
 
-from limits import RateLimitItemPerSecond, RateLimitItemPerMinute
-from limits.storage import RedisStorage, storage_from_string
-from limits.strategies import (
+from freiner import RateLimitItemPerSecond, RateLimitItemPerMinute
+from freiner.storage import RedisStorage, storage_from_string
+from freiner.strategies import (
     FixedWindowRateLimiter, MovingWindowRateLimiter
 )
 
@@ -76,7 +76,7 @@ class RedisStorageTests(SharedRedisTests, unittest.TestCase):
 
     def test_init_options(self):
         with mock.patch(
-            "limits.storage.redis.get_dependency"
+            "freiner.storage.redis.get_dependency"
         ) as get_dependency:
             storage_from_string(self.storage_url, connection_timeout=1)
             self.assertEqual(
@@ -87,13 +87,13 @@ class RedisStorageTests(SharedRedisTests, unittest.TestCase):
 @pytest.mark.unit
 class RedisUnixSocketStorageTests(SharedRedisTests, unittest.TestCase):
     def setUp(self):
-        self.storage_url = "redis+unix:///tmp/limits.redis.sock"
+        self.storage_url = "redis+unix:///tmp/freiner.redis.sock"
         self.storage = RedisStorage(self.storage_url)
-        redis.from_url('unix:///tmp/limits.redis.sock').flushall()
+        redis.from_url('unix:///tmp/freiner.redis.sock').flushall()
 
     def test_init_options(self):
         with mock.patch(
-            "limits.storage.redis.get_dependency"
+            "freiner.storage.redis.get_dependency"
         ) as get_dependency:
             storage_from_string(self.storage_url, connection_timeout=1)
             self.assertEqual(

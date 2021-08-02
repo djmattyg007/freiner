@@ -1,6 +1,7 @@
-from six.moves import urllib
+from typing import Optional
+from urllib.parse import urlparse
 
-from ..errors import ConfigurationError
+from ..errors import FreinerConfigurationError
 from ..util import get_dependency
 from .redis import RedisStorage
 
@@ -14,7 +15,7 @@ class RedisSentinelStorage(RedisStorage):
 
     STORAGE_SCHEME = ["redis+sentinel"]
 
-    def __init__(self, uri, service_name=None, **options):
+    def __init__(self, uri: str, service_name: Optional[str] = None, **options):
         """
         :param str uri: url of the form
          `redis+sentinel://host:port,host:port/service_name`
@@ -26,24 +27,24 @@ class RedisSentinelStorage(RedisStorage):
          or if the redis master host cannot be pinged.
         """
         if not get_dependency("redis"):
-            raise ConfigurationError(
+            raise FreinerConfigurationError(
                 "redis prerequisite not available"
             )  # pragma: no cover
 
-        parsed = urllib.parse.urlparse(uri)
+        parsed_uri = urlparse(uri)
         sentinel_configuration = []
         password = None
-        if parsed.password:
-            password = parsed.password
-        for loc in parsed.netloc[parsed.netloc.find("@") + 1:].split(","):
+        if parsed_uri.password:
+            password = parsed_uri.password
+        for loc in parsed_uri.netloc[parsed_uri.netloc.find("@") + 1:].split(","):
             host, port = loc.split(":")
             sentinel_configuration.append((host, int(port)))
         self.service_name = (
-            parsed.path.replace("/", "")
-            if parsed.path else service_name
+            parsed_uri.path.replace("/", "")
+            if parsed_uri.path else service_name
         )
         if self.service_name is None:
-            raise ConfigurationError("'service_name' not provided")
+            raise FreinerConfigurationError("'service_name' not provided")
 
         options.setdefault('socket_timeout', 0.2)
 
@@ -57,19 +58,19 @@ class RedisSentinelStorage(RedisStorage):
         self.initialize_storage(uri)
         super(RedisStorage, self).__init__()
 
-    def get(self, key):
+    def get(self, key: str) -> int:
         """
         :param str key: the key to get the counter value for
         """
         return super(RedisStorage, self).get(key, self.storage_slave)
 
-    def get_expiry(self, key):
+    def get_expiry(self, key: str) -> int:
         """
         :param str key: the key to get the expiry for
         """
         return super(RedisStorage, self).get_expiry(key, self.storage_slave)
 
-    def check(self):
+    def check(self) -> bool:
         """
         check if storage is healthy
         """

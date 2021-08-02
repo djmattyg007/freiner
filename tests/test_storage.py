@@ -8,33 +8,27 @@ import redis.sentinel
 import rediscluster
 import unittest
 
-from limits.errors import ConfigurationError
-from limits.storage import (
+from freiner.errors import FreinerConfigurationError
+from freiner.storage import (
     MemoryStorage, RedisStorage, MemcachedStorage, RedisSentinelStorage,
-    RedisClusterStorage, Storage, GAEMemcachedStorage, storage_from_string
+    RedisClusterStorage, Storage, storage_from_string
 )
-from limits.strategies import (
+from freiner.strategies import (
     MovingWindowRateLimiter
 )
-from tests import RUN_GAE
 
-
+# TODO: reset registry during setup
 @pytest.mark.unit
 class BaseStorageTests(unittest.TestCase):
     def setUp(self):
         pymemcache.client.Client(('localhost', 22122)).flush_all()
-        redis.from_url('unix:///tmp/limits.redis.sock').flushall()
+        redis.from_url('unix:///tmp/freiner.redis.sock').flushall()
         redis.from_url("redis://localhost:7379").flushall()
         redis.from_url("redis://:sekret@localhost:7389").flushall()
         redis.sentinel.Sentinel([
             ("localhost", 26379)
         ]).master_for("localhost-redis-sentinel").flushall()
         rediscluster.RedisCluster("localhost", 7000).flushall()
-        if RUN_GAE:
-            from google.appengine.ext import testbed
-            tb = testbed.Testbed()
-            tb.activate()
-            tb.init_memcache_stub()
 
     def test_storage_string(self):
         self.assertTrue(
@@ -47,14 +41,14 @@ class BaseStorageTests(unittest.TestCase):
         )
         self.assertTrue(
             isinstance(
-                storage_from_string("redis+unix:///tmp/limits.redis.sock"),
+                storage_from_string("redis+unix:///tmp/freiner.redis.sock"),
                 RedisStorage
             )
         )
 
         self.assertTrue(
             isinstance(
-                storage_from_string("redis+unix://:password/tmp/limits.redis.sock"),  # noqa: E501
+                storage_from_string("redis+unix://:password/tmp/freiner.redis.sock"),  # noqa: E501
                 RedisStorage
             )
         )
@@ -75,7 +69,7 @@ class BaseStorageTests(unittest.TestCase):
 
         self.assertTrue(
             isinstance(
-                storage_from_string("memcached:///tmp/limits.memcached.sock"),
+                storage_from_string("memcached:///tmp/freiner.memcached.sock"),
                 MemcachedStorage
             )
         )
@@ -101,20 +95,14 @@ class BaseStorageTests(unittest.TestCase):
                 RedisClusterStorage
             )
         )
-        if RUN_GAE:
-            self.assertTrue(
-                isinstance(
-                    storage_from_string("gaememcached://"),
-                    GAEMemcachedStorage
-                )
-            )
-        self.assertRaises(ConfigurationError, storage_from_string, "blah://")
+
+        self.assertRaises(FreinerConfigurationError, storage_from_string, "blah://")
         self.assertRaises(
-            ConfigurationError, storage_from_string,
+            FreinerConfigurationError, storage_from_string,
             "redis+sentinel://localhost:26379"
         )
         with mock.patch(
-                "limits.storage.redis_sentinel.get_dependency"
+                "freiner.storage.redis_sentinel.get_dependency"
         ) as get_dependency:
             self.assertTrue(
                 isinstance(
@@ -138,7 +126,7 @@ class BaseStorageTests(unittest.TestCase):
         )
         self.assertTrue(
             storage_from_string(
-                "redis+unix:///tmp/limits.redis.sock"
+                "redis+unix:///tmp/freiner.redis.sock"
             ).check()
         )
         self.assertTrue(
@@ -151,7 +139,7 @@ class BaseStorageTests(unittest.TestCase):
         )
         self.assertTrue(
             storage_from_string(
-                "memcached:///tmp/limits.memcached.sock"
+                "memcached:///tmp/freiner.memcached.sock"
             ).check()
         )
         self.assertTrue(
@@ -163,35 +151,33 @@ class BaseStorageTests(unittest.TestCase):
         self.assertTrue(
             storage_from_string("redis+cluster://localhost:7000").check()
         )
-        if RUN_GAE:
-            self.assertTrue(storage_from_string("gaememcached://").check())
 
     def test_pluggable_storage_invalid_construction(self):
         def cons():
             class _(Storage):
-                def incr(self, key, expiry, elastic_expiry=False):
-                    return
+                def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
+                    return 1
 
-                def get(self, key):
+                def get(self, key: str) -> int:
                     return 0
 
-                def get_expiry(self, key):
-                    return time.time()
+                def get_expiry(self, key: str) -> int:
+                    return int(time.time())
 
-        self.assertRaises(ConfigurationError, cons)
+        self.assertRaises(FreinerConfigurationError, cons)
 
     def test_pluggable_storage_no_moving_window(self):
         class MyStorage(Storage):
             STORAGE_SCHEME = ["mystorage"]
 
-            def incr(self, key, expiry, elastic_expiry=False):
-                return
+            def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
+                return 1
 
-            def get(self, key):
+            def get(self, key: str) -> int:
                 return 0
 
-            def get_expiry(self, key):
-                return time.time()
+            def get_expiry(self, key) -> int:
+                return int(time.time())
 
         storage = storage_from_string("mystorage://")
         self.assertTrue(isinstance(storage, MyStorage))
@@ -203,16 +189,16 @@ class BaseStorageTests(unittest.TestCase):
         class MyStorage(Storage):
             STORAGE_SCHEME = ["mystorage"]
 
-            def incr(self, key, expiry, elastic_expiry=False):
-                return
+            def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
+                return 1
 
-            def get(self, key):
+            def get(self, key: str) -> int:
                 return 0
 
-            def get_expiry(self, key):
-                return time.time()
+            def get_expiry(self, key: str) -> int:
+                return int(time.time())
 
-            def acquire_entry(self, *a, **k):
+            def acquire_entry(self, *a, **k) -> bool:
                 return True
 
             def get_moving_window(self, *a, **k):

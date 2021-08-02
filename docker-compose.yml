@@ -1,4 +1,4 @@
-version: '3.2'
+version: "3.8"
 
 services:
   # memcached
@@ -14,11 +14,12 @@ services:
       - 22123:22123
   memcached-uds:
     image: memcached
-    command: sh -c "test ${HOST_OS} = \"Darwin\" && exit || memcached -s /sockets/limits.memcached.sock -a 777"
+    command: memcached -s /sockets/freiner.memcached.sock -a 777
     volumes:
       - type: bind
         source: /tmp/
         target: /sockets/
+
   # redis sentinel
   redis-sentinel-master:
     image: redis
@@ -27,20 +28,23 @@ services:
       - '6380:6380'
   redis-sentinel-slave:
     image: redis
-    depends_on: [redis-sentinel-master]
+    depends_on:
+      - redis-sentinel-master
     command: redis-server --port 6381 --slaveof ${HOST_IP} 6380 --slave-announce-ip ${HOST_IP}
     ports:
       - '6381:6381'
   redis-sentinel:
     image: 'bitnami/redis-sentinel:latest'
-    depends_on: [redis-sentinel-slave]
+    depends_on:
+      - redis-sentinel-slave
     environment:
       - REDIS_MASTER_SET=localhost-redis-sentinel
       - REDIS_MASTER_HOST=${HOST_IP}
       - REDIS_MASTER_PORT_NUMBER=6380
     ports:
       - '26379:26379'
-  # cluster
+
+  # redis cluster
   redis-cluster-0:
     image: redis
     command: redis-server --port 7000 --protected-mode no --cluster-enabled yes --loglevel verbose --cluster-announce-ip ${HOST_IP}
@@ -77,6 +81,7 @@ services:
     ports:
       - '7005:7005'
       - '17005:17005'
+
   redis-basic:
     image: redis
     command: redis-server --port 7379
@@ -89,7 +94,7 @@ services:
       - '7389:7389'
   redis-uds:
     image: redis
-    command: sh -c "test ${HOST_OS} = \"Darwin\" && exit || redis-server --port 0 --unixsocket /sockets/limits.redis.sock --unixsocketperm 777"
+    command: redis-server --port 0 --unixsocket /sockets/freiner.redis.sock --unixsocketperm 777
     volumes:
       - type: bind
         source: /tmp/

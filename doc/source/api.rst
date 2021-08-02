@@ -1,4 +1,4 @@
-.. currentmodule:: limits
+.. currentmodule:: freiner
 
 API
 ----
@@ -9,7 +9,7 @@ Storage
 ======================
 Abstract storage class
 ======================
-.. autoclass:: limits.storage.Storage
+.. autoclass:: freiner.storage.Storage
 
 .. _backend-implementation:
 
@@ -19,39 +19,35 @@ Backend Implementations
 
 In-Memory
 ^^^^^^^^^
-.. autoclass:: limits.storage.MemoryStorage
+.. autoclass:: freiner.storage.MemoryStorage
 
 Redis
 ^^^^^
-.. autoclass:: limits.storage.RedisStorage
+.. autoclass:: freiner.storage.RedisStorage
 
 Redis Cluster
 ^^^^^^^^^^^^^
-.. autoclass:: limits.storage.RedisClusterStorage
+.. autoclass:: freiner.storage.RedisClusterStorage
 
 Redis Sentinel
 ^^^^^^^^^^^^^^
-.. autoclass:: limits.storage.RedisSentinelStorage
+.. autoclass:: freiner.storage.RedisSentinelStorage
 
 Memcached
 ^^^^^^^^^
-.. autoclass:: limits.storage.MemcachedStorage
-
-Google App Engine Memcached
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. autoclass:: limits.storage.GAEMemcachedStorage
+.. autoclass:: freiner.storage.MemcachedStorage
 
 ===============
 Utility Methods
 ===============
-.. autofunction:: limits.storage.storage_from_string
+.. autofunction:: freiner.storage.storage_from_string
 
 Strategies
 ==========
-.. autoclass:: limits.strategies.RateLimiter
-.. autoclass:: limits.strategies.FixedWindowRateLimiter
-.. autoclass:: limits.strategies.FixedWindowElasticExpiryRateLimiter
-.. autoclass:: limits.strategies.MovingWindowRateLimiter
+.. autoclass:: freiner.strategies.RateLimiter
+.. autoclass:: freiner.strategies.FixedWindowRateLimiter
+.. autoclass:: freiner.strategies.FixedWindowElasticExpiryRateLimiter
+.. autoclass:: freiner.strategies.MovingWindowRateLimiter
 
 Rate Limits
 ===========
@@ -77,5 +73,5 @@ Utility Methods
 
 Exceptions
 ==========
-.. autoexception:: limits.errors.ConfigurationError
+.. autoexception:: freiner.errors.FreinerConfigurationError
 

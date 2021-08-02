@@ -5,14 +5,13 @@ from uuid import uuid4
 
 import pytest
 
-from limits.limits import RateLimitItemPerSecond
-from limits.storage import MemoryStorage
-from limits.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
+from freiner.limits import RateLimitItemPerSecond
+from freiner.storage import MemoryStorage
+from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
 
 
 @pytest.mark.integration
 class ConcurrencyTests(unittest.TestCase):
-
     def test_memory_storage_fixed_window(self):
         storage = MemoryStorage()
         limiter = FixedWindowRateLimiter(storage)

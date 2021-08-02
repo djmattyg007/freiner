@@ -3,7 +3,7 @@ import unittest
 import mock
 import redis.sentinel
 
-from limits.storage import RedisSentinelStorage, storage_from_string
+from freiner.storage import RedisSentinelStorage, storage_from_string
 from tests.storage.test_redis import SharedRedisTests
 
 
@@ -21,7 +21,7 @@ class RedisSentinelStorageTests(SharedRedisTests, unittest.TestCase):
 
     def test_init_options(self):
         with mock.patch(
-            "limits.storage.redis_sentinel.get_dependency"
+            "freiner.storage.redis_sentinel.get_dependency"
         ) as get_dependency:
             storage_from_string(
                 self.storage_url + '/' + self.service_name,

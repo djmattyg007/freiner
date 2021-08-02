@@ -1,7 +1,7 @@
-limits Documentation
+Freiner Documentation
 --------------------
 
-**limits** provides utilities to implement rate limiting using various strategies
+**Freiner** provides utilities to implement rate limiting using various strategies
 and storage backends such as redis & memcached.
 
 .. toctree::
@@ -14,56 +14,56 @@ and storage backends such as redis & memcached.
     api
     changelog
 
-.. currentmodule:: limits
+.. currentmodule:: freiner
 
 Quickstart
 ----------
 
 Initialize the storage backend::
 
-    from limits import storage
+    from freiner import storage
     memory_storage = storage.MemoryStorage()
 
 Initialize a rate limiter with the :ref:`moving-window` strategy::
 
-    from limits import strategies
+    from freiner import strategies
     moving_window = strategies.MovingWindowRateLimiter(memory_storage)
 
 
 Initialize a rate limit using the :ref:`ratelimit-string`::
 
-    from limits import parse
+    from freiner import parse
     one_per_minute = parse("1/minute")
 
 Initialize a rate limit explicitly using a subclass of :class:`RateLimitItem`::
 
-    from limits import RateLimitItemPerSecond
+    from freiner import RateLimitItemPerSecond
     one_per_second = RateLimitItemPerSecond(1, 1)
 
 Test the limits::
 
-    assert True == moving_window.hit(one_per_minute, "test_namespace", "foo")
-    assert False == moving_window.hit(one_per_minute, "test_namespace", "foo")
-    assert True == moving_window.hit(one_per_minute, "test_namespace", "bar")
+    assert moving_window.hit(one_per_minute, "test_namespace", "foo") == True
+    assert moving_window.hit(one_per_minute, "test_namespace", "foo") == False
+    assert moving_window.hit(one_per_minute, "test_namespace", "bar") == True
 
-    assert True == moving_window.hit(one_per_second, "test_namespace", "foo")
-    assert False == moving_window.hit(one_per_second, "test_namespace", "foo")
+    assert moving_window.hit(one_per_second, "test_namespace", "foo") == True
+    assert moving_window.hit(one_per_second, "test_namespace", "foo") == False
     time.sleep(1)
-    assert True == moving_window.hit(one_per_second, "test_namespace", "foo")
+    assert moving_window.hit(one_per_second, "test_namespace", "foo") == True
 
 Check specific limits without hitting them::
 
-    assert True == moving_window.hit(one_per_second, "test_namespace", "foo")
+    assert moving_window.hit(one_per_second, "test_namespace", "foo") == True
     while not moving_window.test(one_per_second, "test_namespace", "foo"):
         time.sleep(0.01)
-    assert True == moving_window.hit(one_per_second, "test_namespace", "foo")
+    assert moving_window.hit(one_per_second, "test_namespace", "foo") == True
 
 Clear a limit::
 
-    assert True == moving_window.hit(one_per_minute, "test_namespace", "foo")
-    assert False == moving_window.hit(one_per_minute, "test_namespace", "foo")
+    assert moving_window.hit(one_per_minute, "test_namespace", "foo") == True
+    assert moving_window.hit(one_per_minute, "test_namespace", "foo") == False
     moving_window.clear(one_per_minute", "test_namespace", "foo")
-    assert True == moving_window.hit(one_per_minute, "test_namespace", "foo")
+    assert moving_window.hit(one_per_minute, "test_namespace", "foo") == True
 
 
 Development
@@ -78,7 +78,7 @@ docker installation. Additionally on OSX you will require the ``memcached`` and
     make setup-test-backends
     # hack hack hack
     # run tests
-    nosetests tests
+    python3 -m pytest
 
 Projects using *limits*
 -------------------------
@@ -89,7 +89,5 @@ Projects using *limits*
 
 References
 ----------
-* `Redis rate limiting pattern #2 <http://redis.io/commands/INCR>`_
+* `Redis rate limiting pattern #2 <https://redis.io/commands/INCR>`_
 * `DomainTools redis rate limiter <https://github.com/DomainTools/rate-limit>`_
-
-.. include:: ../../CONTRIBUTIONS.rst

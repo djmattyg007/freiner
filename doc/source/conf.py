@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-#
-
 import sys
 import os
 
 sys.path.insert(0, os.path.abspath('../../'))
-import limits
+import freiner
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -16,7 +13,7 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 
 autodoc_default_options = {
     "members": True,
-    "show-inheritance": True
+    "show-inheritance": True,
 }
 
 autoclass_content = 'both'
@@ -30,17 +27,17 @@ extensions = [
 
 source_suffix = '.rst'
 master_doc = 'index'
-project = u'limits'
-copyright = u'2015, Ali-Akber Saifee'
+project = 'Freiner'
+copyright = '2021, Matthew Gamble'
 
-version = release = limits.__version__
+version = release = freiner.__version__
 exclude_patterns = []
 pygments_style = 'sphinx'
-htmlhelp_basename = 'limitsdoc'
+htmlhelp_basename = 'freinerdoc'
 
 latex_documents = [
-    ('index', 'limits.tex', u'limits Documentation',
-     u'Ali-Akber Saifee', 'manual'),
+    ('index', 'limits.tex', u'Freiner Documentation',
+     'Matthew Gamble', 'manual'),
 ]
 man_pages = [
     ('index', 'flask-limiter', u'limits Documentation',
@@ -48,13 +45,13 @@ man_pages = [
 ]
 
 texinfo_documents = [
-    ('index', 'limits', u'limits Documentation',
-     u'Ali-Akber Saifee', 'limits', 'One line description of project.',
+    ('index', 'freiner', u'Freiner Documentation',
+     'Matthew Gamble', 'limits', 'One line description of project.',
      'Miscellaneous'),
 ]
 
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/', None),
+    'python': ('https://docs.python.org/', None),
     'rediscluster': ('https://redis-py-cluster.readthedocs.io/en/latest/', None),
     'redis': ('https://redis-py.readthedocs.io/en/latest/', None),
     'pymemcache': ('https://pymemcache.readthedocs.io/en/latest/', None)

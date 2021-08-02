@@ -1,23 +1,24 @@
 import threading
 from abc import ABCMeta, abstractmethod
+from typing import Optional
 
-import six
+from six import add_metaclass
 
-from limits.storage.registry import StorageRegistry
+from freiner.storage.registry import StorageRegistry
 
 
-@six.add_metaclass(StorageRegistry)
-@six.add_metaclass(ABCMeta)
+@add_metaclass(StorageRegistry)
+@add_metaclass(ABCMeta)
 class Storage(object):
     """
     Base class to extend when implementing a storage backend.
     """
 
-    def __init__(self, uri=None, **options):
+    def __init__(self, uri: Optional[str] = None, **kwargs):
         self.lock = threading.RLock()
 
     @abstractmethod
-    def incr(self, key, expiry, elastic_expiry=False):
+    def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
         increments the counter for a given rate limit key
 
@@ -29,21 +30,21 @@ class Storage(object):
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, key):
+    def get(self, key: str) -> int:
         """
         :param str key: the key to get the counter value for
         """
         raise NotImplementedError
 
     @abstractmethod
-    def get_expiry(self, key):
+    def get_expiry(self, key: str) -> int:
         """
         :param str key: the key to get the expiry for
         """
         raise NotImplementedError
 
     @abstractmethod
-    def check(self):
+    def check(self) -> bool:
         """
         check if storage is healthy
         """
@@ -57,7 +58,7 @@ class Storage(object):
         raise NotImplementedError
 
     @abstractmethod
-    def clear(self, key):
+    def clear(self, key: str):
         """
         resets the rate limit key
         :param str key: the key to clear rate limits for

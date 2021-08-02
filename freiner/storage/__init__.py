@@ -1,6 +1,6 @@
-from six.moves import urllib
+from urllib.parse import urlparse
 
-from limits.errors import ConfigurationError
+from freiner.errors import FreinerConfigurationError
 from .memory import MemoryStorage
 
 from .base import Storage
@@ -9,7 +9,6 @@ from .redis import RedisStorage
 from .redis_cluster import RedisClusterStorage
 from .redis_sentinel import RedisSentinelStorage
 from .memcached import MemcachedStorage
-from .gae_memcached import GAEMemcachedStorage
 
 
 def storage_from_string(storage_string, **options):
@@ -20,9 +19,9 @@ def storage_from_string(storage_string, **options):
     :param storage_string: a string of the form method://host:port
     :return: an instance of :class:`flask_limiter.storage.Storage`
     """
-    scheme = urllib.parse.urlparse(storage_string).scheme
+    scheme = urlparse(storage_string).scheme
     if scheme not in SCHEMES:
-        raise ConfigurationError(
+        raise FreinerConfigurationError(
             "unknown storage scheme : %s" % storage_string
         )
     return SCHEMES[scheme](storage_string, **options)
@@ -36,5 +35,4 @@ __all__ = [
     "RedisClusterStorage",
     "RedisSentinelStorage",
     "MemcachedStorage",
-    "GAEMemcachedStorage"
 ]

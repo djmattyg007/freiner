@@ -10,18 +10,22 @@
    :alt: Join the chat at https://gitter.im/alisaifee/limits
    :target: https://gitter.im/alisaifee/limits?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content
 
-*************
-limits
-*************
+*******
+Freiner
+*******
 |ci| |codecov| |pypi| |gitter| |license|
 
 *limits* provides utilities to implement rate limiting using
 various strategies and storage backends such as redis & memcached.
 
-*****
+History
+-------
+
+Freiner is a fork of a project named `limits <https://github.com/alisaifee/limits>`_. I forked it
+to add type hints, and to merge some of the outstanding PRs at the time.
+
 Links
-*****
+-----
 
 * `Documentation <http://limits.readthedocs.org>`_
 * `Changelog <http://limits.readthedocs.org/en/stable/changelog.html>`_
-

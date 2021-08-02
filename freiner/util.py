@@ -1,26 +1,26 @@
-"""
-
-"""
 import re
 import sys
+from typing import Sequence, Type
 
-import six
+from .limits import RateLimitItem, GRANULARITIES
 
-from .limits import GRANULARITIES
 
+# TODO: Remove {1}
 SEPARATORS = re.compile(r"[,;|]{1}")
+# TODO: Mark second group as non-capturing, adjust parse_many to remove _ variable
 SINGLE_EXPR = re.compile(
     r"""
     \s*([0-9]+)
     \s*(/|\s*per\s*)
     \s*([0-9]+)
     *\s*(hour|minute|second|day|month|year)s?\s*""",
-    re.IGNORECASE | re.VERBOSE
+    re.IGNORECASE | re.VERBOSE,
 )
 EXPR = re.compile(
     r"^{SINGLE}(:?{SEPARATORS}{SINGLE})*$".format(
         SINGLE=SINGLE_EXPR.pattern, SEPARATORS=SEPARATORS.pattern
-    ), re.IGNORECASE | re.VERBOSE
+    ),
+    re.IGNORECASE | re.VERBOSE,
 )
 
 
@@ -36,7 +36,7 @@ def get_dependency(dep):
         return None
 
 
-def parse_many(limit_string):
+def parse_many(limit_string: str) -> Sequence[RateLimitItem]:
     """
     parses rate limits in string notation containing multiple rate limits
     (e.g. '1/second; 5/minute')
@@ -44,15 +44,15 @@ def parse_many(limit_string):
     :param string limit_string: rate limit string using :ref:`ratelimit-string`
     :raise ValueError: if the string notation is invalid.
     :return: a list of :class:`RateLimitItem` instances.
-
     """
     if not (
-        isinstance(limit_string, six.string_types)
+        isinstance(limit_string, str)
         and EXPR.match(limit_string)
     ):
         raise ValueError(
             "couldn't parse rate limit string '%s'" % limit_string
         )
+
     limits = []
     for limit in SEPARATORS.split(limit_string):
         amount, _, multiples, granularity_string = SINGLE_EXPR.match(
@@ -60,10 +60,10 @@ def parse_many(limit_string):
         ).groups()
         granularity = granularity_from_string(granularity_string)
         limits.append(granularity(amount, multiples))
-    return limits
+    return tuple(limits)
 
 
-def parse(limit_string):
+def parse(limit_string: str) -> RateLimitItem:
     """
     parses a single rate limit in string notation
     (e.g. '1/second' or '1 per second'
@@ -71,14 +71,12 @@ def parse(limit_string):
     :param string limit_string: rate limit string using :ref:`ratelimit-string`
     :raise ValueError: if the string notation is invalid.
     :return: an instance of :class:`RateLimitItem`
-
     """
-    return list(parse_many(limit_string))[0]
+    return parse_many(limit_string)[0]
 
 
-def granularity_from_string(granularity_string):
+def granularity_from_string(granularity_string: str) -> Type[RateLimitItem]:
     """
-
     :param granularity_string:
     :return: a subclass of :class:`RateLimitItem`
     :raise ValueError:

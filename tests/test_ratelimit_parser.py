@@ -2,8 +2,8 @@ import unittest
 
 import pytest
 
-from limits.util import parse, parse_many, granularity_from_string
-from limits import limits
+from freiner.util import parse, parse_many, granularity_from_string
+from freiner import limits
 
 
 @pytest.mark.unit

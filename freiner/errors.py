@@ -3,7 +3,7 @@ errors and exceptions
 """
 
 
-class ConfigurationError(Exception):
+class FreinerConfigurationError(Exception):
     """
     exception raised when a configuration problem
     is encountered

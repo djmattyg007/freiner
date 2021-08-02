@@ -1,5 +1,2 @@
 exclude_paths:
-  - limits/backports/*
-  - versioneer.py
-  - limits/_version.py
   - tests/*

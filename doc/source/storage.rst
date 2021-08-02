@@ -1,4 +1,4 @@
-.. currentmodule:: limits
+.. currentmodule:: freiner
 
 Storage Backends
 ----------------
@@ -7,7 +7,7 @@ Storage Backends
 
 Storage scheme
 ==============
-**limits** uses a url style storage scheme notation (similar to the JDBC driver
+**Freiner** uses a url style storage scheme notation (similar to the JDBC driver
 connection string notation) for configuring and initializing
 storage backends. This notation additionally provides a simple
 mechanism to both identify and configure the backend implementation based on
@@ -15,13 +15,13 @@ a single string argument.
 
 The storage scheme follows the format :code:`{scheme}://{parameters}`
 
-:func:`limits.storage.storage_from_string` is provided to
+:func:`freiner.storage.storage_from_string` is provided to
 lookup and construct an instance of a storage based on the storage scheme. For example::
 
- import limits.storage
+ import freiner.storage
  uri = "redis://localhost:9999"
  options = {}
- redis_storage = limits.storage.storage_from_string(uri, **options)
+ redis_storage = freiner.storage.storage_from_string(uri, **options)
 
 The additional `options` key-word arguments are passed as is to the constructor of the storage
 and handled differently by each implementation. Please refer to the class documentation of
@@ -33,7 +33,7 @@ Examples
 =========
 In-Memory
 =========
-The in-memory storage (:class:`limits.storage.MemoryStorage`) takes no parameters so the only relevant value is :code:`memory://`
+The in-memory storage (:class:`freiner.storage.MemoryStorage`) takes no parameters so the only relevant value is :code:`memory://`
 
 .. _memcached:
 
@@ -49,15 +49,6 @@ Memcached
 
  Depends on: `pymemcache <https://pymemcache.readthedocs.io/en/latest/>`__
 
-.. _gae-memcached:
-
-==============================
-Memcached on Google App Engine
-==============================
-
-  Requires that you are working in the GAE SDK and have those API libraries available.
-  :code: `gaememcached://`
-
 
 .. _redis:
 
@@ -72,7 +63,8 @@ Redis
  or :code:`redis+unix:///path/to/socket?db=n` (for database `n`).
 
  If the database is password protected the password can be provided in the url, for example
- :code:`redis://:foobared@localhost:6379` or :code:`redis+unix//:foobered/path/to/socket` if using a UDS..
+ :code:`redis://:foobared@localhost:6379` or :code:`redis+unix//:foobered/path/to/socket` if using
+ a Unix domain socket (UDS).
 
  Depends on: `redis-py <https://redis-py.readthedocs.io/en/latest/>`_
 

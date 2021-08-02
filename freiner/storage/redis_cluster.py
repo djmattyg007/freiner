@@ -1,6 +1,6 @@
-from six.moves import urllib
+from urllib.parse import urlparse
 
-from ..errors import ConfigurationError
+from ..errors import FreinerConfigurationError
 from ..util import get_dependency
 from .redis import RedisStorage
 
@@ -11,9 +11,10 @@ class RedisClusterStorage(RedisStorage):
 
     Depends on `redis-py-cluster` library
     """
+
     STORAGE_SCHEME = ["redis+cluster"]
 
-    def __init__(self, uri, **options):
+    def __init__(self, uri: str, **options):
         """
         :param str uri: url of the form
          `redis+cluster://[:password]@host:port,host:port`
@@ -23,12 +24,12 @@ class RedisClusterStorage(RedisStorage):
          available or if the redis host cannot be pinged.
         """
         if not get_dependency("rediscluster"):
-            raise ConfigurationError(
+            raise FreinerConfigurationError(
                 "redis-py-cluster prerequisite not available"
             )  # pragma: no cover
-        parsed = urllib.parse.urlparse(uri)
+        parsed_uri = urlparse(uri)
         cluster_hosts = []
-        for loc in parsed.netloc.split(","):
+        for loc in parsed_uri.netloc.split(","):
             host, port = loc.split(":")
             cluster_hosts.append({"host": host, "port": int(port)})
 

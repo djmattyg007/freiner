@@ -1,10 +1,9 @@
 import inspect
 import threading
 import time
+from urllib.parse import urlparse
 
-from six.moves import urllib
-
-from ..errors import ConfigurationError
+from ..errors import FreinerConfigurationError
 from ..util import get_dependency
 from .base import Storage
 
@@ -18,7 +17,7 @@ class MemcachedStorage(Storage):
     MAX_CAS_RETRIES = 10
     STORAGE_SCHEME = ["memcached"]
 
-    def __init__(self, uri, **options):
+    def __init__(self, uri: str, **options):
         """
         :param str uri: memcached location of the form
          `memcached://host:port,host:port`, `memcached:///var/tmp/path/to/sock`
@@ -26,17 +25,17 @@ class MemcachedStorage(Storage):
          directly to the constructor of :class:`pymemcache.client.base.Client`
         :raise ConfigurationError: when `pymemcache` is not available
         """
-        parsed = urllib.parse.urlparse(uri)
+        parsed_uri = urlparse(uri)
         self.hosts = []
-        for loc in parsed.netloc.strip().split(","):
+        for loc in parsed_uri.netloc.strip().split(","):
             if not loc:
                 continue
             host, port = loc.split(":")
             self.hosts.append((host, int(port)))
         else:
             # filesystem path to UDS
-            if parsed.path and not parsed.netloc and not parsed.port:
-                self.hosts = [parsed.path]
+            if parsed_uri.path and not parsed_uri.netloc and not parsed_uri.port:
+                self.hosts = [parsed_uri.path]
 
         self.library = options.pop('library', 'pymemcache.client')
         self.cluster_library = options.pop('library', 'pymemcache.client.hash')
@@ -44,7 +43,7 @@ class MemcachedStorage(Storage):
         self.options = options
 
         if not get_dependency(self.library):
-            raise ConfigurationError(
+            raise FreinerConfigurationError(
                 "memcached prerequisite not available."
                 " please install %s" % self.library
             )  # pragma: no cover
@@ -89,7 +88,7 @@ class MemcachedStorage(Storage):
 
         return self.local_storage.storage
 
-    def get(self, key):
+    def get(self, key) -> int:
         """
         :param str key: the key to get the counter value for
         """
@@ -101,7 +100,7 @@ class MemcachedStorage(Storage):
         """
         self.storage.delete(key)
 
-    def incr(self, key, expiry, elastic_expiry=False):
+    def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
         increments the counter for a given rate limit key
 
@@ -143,13 +142,13 @@ class MemcachedStorage(Storage):
         )
         return 1
 
-    def get_expiry(self, key):
+    def get_expiry(self, key: str) -> int:
         """
         :param str key: the key to get the expiry for
         """
         return int(float(self.storage.get(key + "/expires") or time.time()))
 
-    def check(self):
+    def check(self) -> bool:
         """
         check if storage is healthy
         """

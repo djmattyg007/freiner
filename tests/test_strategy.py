@@ -9,15 +9,14 @@ import redis.sentinel
 import rediscluster
 import hiro
 
-from limits.limits import RateLimitItemPerSecond, RateLimitItemPerMinute
-from limits.storage import (
+from freiner.limits import RateLimitItemPerSecond, RateLimitItemPerMinute
+from freiner.storage import (
     MemoryStorage, RedisStorage, MemcachedStorage, RedisSentinelStorage
 )
-from limits.strategies import (
+from freiner.strategies import (
     MovingWindowRateLimiter, FixedWindowElasticExpiryRateLimiter,
     FixedWindowRateLimiter
 )
-from tests import skip_if_pypy
 
 
 @pytest.mark.unit
@@ -142,7 +141,6 @@ class WindowTests(unittest.TestCase):
             timeline.forward(31)
             self.assertEqual(limiter.get_window_stats(limit)[1], 10)
 
-    @skip_if_pypy
     def test_moving_window_redis(self):
         storage = RedisStorage("redis://localhost:7379")
         limiter = MovingWindowRateLimiter(storage)
