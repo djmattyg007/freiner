@@ -1,7 +1,7 @@
 import time
 import unittest
+import unittest.mock
 
-import mock
 import pytest
 import redis
 
@@ -75,7 +75,7 @@ class RedisStorageTests(SharedRedisTests, unittest.TestCase):
         redis.from_url(self.storage_url).flushall()
 
     def test_init_options(self):
-        with mock.patch(
+        with unittest.mock.patch(
             "freiner.storage.redis.get_dependency"
         ) as get_dependency:
             storage_from_string(self.storage_url, connection_timeout=1)
@@ -92,7 +92,7 @@ class RedisUnixSocketStorageTests(SharedRedisTests, unittest.TestCase):
         redis.from_url('unix:///tmp/freiner.redis.sock').flushall()
 
     def test_init_options(self):
-        with mock.patch(
+        with unittest.mock.patch(
             "freiner.storage.redis.get_dependency"
         ) as get_dependency:
             storage_from_string(self.storage_url, connection_timeout=1)

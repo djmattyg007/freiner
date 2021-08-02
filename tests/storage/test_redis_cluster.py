@@ -1,6 +1,6 @@
 import unittest
+import unittest.mock
 
-import mock
 import pytest
 import rediscluster
 
@@ -16,7 +16,7 @@ class RedisClusterStorageTests(SharedRedisTests, unittest.TestCase):
         self.storage = RedisClusterStorage("redis+cluster://localhost:7000")
 
     def test_init_options(self):
-        with mock.patch(
+        with unittest.mock.patch(
             "freiner.storage.redis_cluster.get_dependency"
         ) as get_dependency:
             storage_from_string(self.storage_url, connection_timeout=1)

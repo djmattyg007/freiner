@@ -1,7 +1,7 @@
 import time
 import unittest
+import unittest.mock
 
-import mock
 import pytest
 import pymemcache.client
 
@@ -21,7 +21,7 @@ class MemcachedStorageTests(unittest.TestCase):
         self.storage_url = 'memcached://localhost:22122'
 
     def test_options(self):
-        with mock.patch(
+        with unittest.mock.patch(
             "freiner.storage.memcached.get_dependency"
         ) as get_dependency:
             storage_from_string(self.storage_url, connect_timeout=1).check()

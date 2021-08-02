@@ -44,7 +44,8 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
      (e.g. 'n' per 'm' seconds)
     :param string namespace: category for the specific rate limit
     """
-    __slots__ = ["namespace", "amount", "multiples", "granularity"]
+
+    granularity = (0, "")
 
     def __init__(self, amount: int, multiples: int = 1, namespace: str = 'LIMITER'):
         self.namespace = namespace

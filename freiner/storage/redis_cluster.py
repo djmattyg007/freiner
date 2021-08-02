@@ -39,7 +39,7 @@ class RedisClusterStorage(RedisStorage):
             startup_nodes=cluster_hosts,
             **options
         )
-        self.initialize_storage(uri)
+        self.initialize_storage(self.storage)
         super(RedisStorage, self).__init__()
 
     def reset(self):

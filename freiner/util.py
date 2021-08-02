@@ -1,6 +1,6 @@
 import re
 import sys
-from typing import Sequence, Type
+from typing import cast, Sequence, Type
 
 from .limits import RateLimitItem, GRANULARITIES
 
@@ -55,11 +55,13 @@ def parse_many(limit_string: str) -> Sequence[RateLimitItem]:
 
     limits = []
     for limit in SEPARATORS.split(limit_string):
-        amount, _, multiples, granularity_string = SINGLE_EXPR.match(
-            limit
-        ).groups()
+        # This cast is fine because we already verified that it will match
+        # in the EXPR.match check above.
+        limit_match = cast(re.Match, SINGLE_EXPR.match(limit))
+        amount, _, multiples, granularity_string = limit_match.groups()
         granularity = granularity_from_string(granularity_string)
         limits.append(granularity(amount, multiples))
+
     return tuple(limits)
 
 

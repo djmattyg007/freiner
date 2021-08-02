@@ -55,23 +55,23 @@ class RedisSentinelStorage(RedisStorage):
         )
         self.storage = self.sentinel.master_for(self.service_name)
         self.storage_slave = self.sentinel.slave_for(self.service_name)
-        self.initialize_storage(uri)
+        self.initialize_storage(self.storage)
         super(RedisStorage, self).__init__()
 
     def get(self, key: str) -> int:
         """
         :param str key: the key to get the counter value for
         """
-        return super(RedisStorage, self).get(key, self.storage_slave)
+        return self._get(key, self.storage_slave)
 
     def get_expiry(self, key: str) -> int:
         """
         :param str key: the key to get the expiry for
         """
-        return super(RedisStorage, self).get_expiry(key, self.storage_slave)
+        return self._get_expiry(key, self.storage_slave)
 
     def check(self) -> bool:
         """
         check if storage is healthy
         """
-        return super(RedisStorage, self).check(self.storage_slave)
+        return self._check(self.storage_slave)

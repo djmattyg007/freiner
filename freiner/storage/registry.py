@@ -13,12 +13,13 @@ class StorageRegistry(type):
                 "it must specify a STORAGE_SCHEME class attribute"
                 % name
             )
+
         cls = super(StorageRegistry, mcs).__new__(mcs, name, bases, dct)
         if storage_scheme:
             if isinstance(storage_scheme, str):
-                schemes = [storage_scheme]
+                SCHEMES[storage_scheme] = cls
             else:
-                schemes = storage_scheme
-            for scheme in schemes:
-                SCHEMES[scheme] = cls
+                for scheme in storage_scheme:
+                    SCHEMES[scheme] = cls
+
         return cls

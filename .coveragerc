@@ -1,6 +1,6 @@
 [run]
 include =
-    limits/*
+    freiner/*
 omit =
     /*/tests/*
     setup.py

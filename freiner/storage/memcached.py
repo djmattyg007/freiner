@@ -1,6 +1,7 @@
 import inspect
 import threading
 import time
+from typing import List, Tuple, Union
 from urllib.parse import urlparse
 
 from ..errors import FreinerConfigurationError
@@ -26,7 +27,7 @@ class MemcachedStorage(Storage):
         :raise ConfigurationError: when `pymemcache` is not available
         """
         parsed_uri = urlparse(uri)
-        self.hosts = []
+        self.hosts: List[Union[Tuple[str, int], str]] = []
         for loc in parsed_uri.netloc.strip().split(","):
             if not loc:
                 continue
@@ -47,6 +48,7 @@ class MemcachedStorage(Storage):
                 "memcached prerequisite not available."
                 " please install %s" % self.library
             )  # pragma: no cover
+
         self.local_storage = threading.local()
         self.local_storage.storage = None
 
@@ -64,6 +66,7 @@ class MemcachedStorage(Storage):
 
     def call_memcached_func(self, func, *args, **kwargs):
         if 'noreply' in kwargs:
+            # TODO: fix this if possible, otherwise strongly consider dropping memcached integration
             argspec = inspect.getargspec(func)
             if not ('noreply' in argspec.args or argspec.keywords):
                 kwargs.pop('noreply')  # noqa
@@ -75,8 +78,8 @@ class MemcachedStorage(Storage):
         lazily creates a memcached client instance using a thread local
         """
         if not (
-                hasattr(self.local_storage, "storage")
-                and self.local_storage.storage
+            hasattr(self.local_storage, "storage")
+            and self.local_storage.storage
         ):
             self.local_storage.storage = self.client_getter(
                 get_dependency(

@@ -33,8 +33,8 @@ variables which result in the classes getting registered with the **limits** sto
 
     class AwesomeStorage(Storage):
         STORAGE_SCHEME = ["awesomedb"]
-        def __init__(self, uri: str, **options):
-            self.awesomesness = options.get("awesomeness", None)
+        def __init__(self, uri: str, **kwargs):
+            self.awesomesness = kwargs.get("awesomeness", None)
             parsed_uri = urlparse(uri)
             self.host = parsed_uri.netloc
             self.port = parsed_uri.port
@@ -42,20 +42,20 @@ variables which result in the classes getting registered with the **limits** sto
         def check(self) -> bool:
             return True
 
-        def get_expiry(self, key) -> int:
+        def get_expiry(self, key: str) -> int:
             return int(time.time())
 
-        def incr(self, key, expiry, elastic_expiry=False):
-            return
+        def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
+            return 1
 
-        def get(self, key):
+        def get(self, key: str) -> int:
             return 0
 
 
     class AwesomerStorage(Storage):
         STORAGE_SCHEME = ["awesomerdb"]
-        def __init__(self, uri: str, **options):
-            self.awesomesness = options.get("awesomeness", None)
+        def __init__(self, uri: str, **kwargs):
+            self.awesomesness = kwargs.get("awesomeness", None)
             parsed_uri = urlparse(uri)
             self.host = parsed_uri.netloc
             self.port = parsed_uri.port
@@ -63,18 +63,16 @@ variables which result in the classes getting registered with the **limits** sto
         def check(self) -> bool:
             return True
 
-        def get_expiry(self, key) -> int:
+        def get_expiry(self, key: str) -> int:
             return int(time.time())
 
-        def incr(self, key, expiry, elastic_expiry=False):
-            return
+        def incr(self, key: str, expiry: int, elastic_expiry: bool = False):
+            return 1
 
-        def get(self, key):
+        def get(self, key: str) -> int:
             return 0
 
-        def acquire_entry(
-            self, key, limit, expiry, no_add=False
-        ):
+        def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
             return True
 
 
@@ -85,4 +83,3 @@ using the factory method described in :ref:`storage-scheme` in the following man
 
     awesome = storage_from_string("awesomedb://localhoax:42", awesomeness=0)
     awesomer = storage_from_string("awesomerdb://localhoax:42", awesomeness=1)
-

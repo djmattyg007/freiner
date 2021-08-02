@@ -1,6 +1,6 @@
 import time
+import unittest.mock
 
-import mock
 import pymemcache.client
 import pytest
 import redis
@@ -101,8 +101,8 @@ class BaseStorageTests(unittest.TestCase):
             FreinerConfigurationError, storage_from_string,
             "redis+sentinel://localhost:26379"
         )
-        with mock.patch(
-                "freiner.storage.redis_sentinel.get_dependency"
+        with unittest.mock.patch(
+            "freiner.storage.redis_sentinel.get_dependency"
         ) as get_dependency:
             self.assertTrue(
                 isinstance(

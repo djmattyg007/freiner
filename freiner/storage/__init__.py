@@ -17,7 +17,7 @@ def storage_from_string(storage_string, **options):
     on the uri of the storage
 
     :param storage_string: a string of the form method://host:port
-    :return: an instance of :class:`flask_limiter.storage.Storage`
+    :return: an instance of :class:`freiner.storage.Storage`
     """
     scheme = urlparse(storage_string).scheme
     if scheme not in SCHEMES:

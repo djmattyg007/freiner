@@ -1,6 +1,6 @@
 import unittest
+import unittest.mock
 
-import mock
 import redis.sentinel
 
 from freiner.storage import RedisSentinelStorage, storage_from_string
@@ -20,7 +20,7 @@ class RedisSentinelStorageTests(SharedRedisTests, unittest.TestCase):
         ]).master_for(self.service_name).flushall()
 
     def test_init_options(self):
-        with mock.patch(
+        with unittest.mock.patch(
             "freiner.storage.redis_sentinel.get_dependency"
         ) as get_dependency:
             storage_from_string(
