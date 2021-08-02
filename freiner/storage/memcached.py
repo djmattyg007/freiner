@@ -16,7 +16,6 @@ class MemcachedStorage(Storage):
     Depends on the `pymemcache` library.
     """
     MAX_CAS_RETRIES = 10
-    STORAGE_SCHEME = ["memcached"]
 
     def __init__(self, uri: str, **options):
         """

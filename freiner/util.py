@@ -24,6 +24,7 @@ EXPR = re.compile(
 )
 
 
+# TODO: Eliminate this function
 def get_dependency(dep):
     """
     safe function to import a module programmatically

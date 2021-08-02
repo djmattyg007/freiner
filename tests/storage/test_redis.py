@@ -6,7 +6,7 @@ import pytest
 import redis
 
 from freiner import RateLimitItemPerSecond, RateLimitItemPerMinute
-from freiner.storage import RedisStorage, storage_from_string
+from freiner.storage.redis import RedisStorage
 from freiner.strategies import (
     FixedWindowRateLimiter, MovingWindowRateLimiter
 )
@@ -78,7 +78,8 @@ class RedisStorageTests(SharedRedisTests, unittest.TestCase):
         with unittest.mock.patch(
             "freiner.storage.redis.get_dependency"
         ) as get_dependency:
-            storage_from_string(self.storage_url, connection_timeout=1)
+            RedisStorage(self.storage_url, connection_timeout=1)
+            # storage_from_string(self.storage_url, connection_timeout=1)
             self.assertEqual(
                 get_dependency().from_url.call_args[1]['connection_timeout'], 1
             )
@@ -95,7 +96,8 @@ class RedisUnixSocketStorageTests(SharedRedisTests, unittest.TestCase):
         with unittest.mock.patch(
             "freiner.storage.redis.get_dependency"
         ) as get_dependency:
-            storage_from_string(self.storage_url, connection_timeout=1)
+            RedisStorage(self.storage_url, connection_timeout=1)
+            # storage_from_string(self.storage_url, connection_timeout=1)
             self.assertEqual(
                 get_dependency().from_url.call_args[1]['connection_timeout'], 1
             )

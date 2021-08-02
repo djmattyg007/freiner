@@ -2,17 +2,18 @@ import threading
 import time
 import unittest
 
+import hiro
 import pymemcache.client
 import pytest
 import redis
 import redis.sentinel
 import rediscluster
-import hiro
 
 from freiner.limits import RateLimitItemPerSecond, RateLimitItemPerMinute
-from freiner.storage import (
-    MemoryStorage, RedisStorage, MemcachedStorage, RedisSentinelStorage
-)
+from freiner.storage import MemoryStorage
+from freiner.storage.memcached import MemcachedStorage
+from freiner.storage.redis import RedisStorage
+from freiner.storage.redis_sentinel import RedisSentinelStorage
 from freiner.strategies import (
     MovingWindowRateLimiter, FixedWindowElasticExpiryRateLimiter,
     FixedWindowRateLimiter

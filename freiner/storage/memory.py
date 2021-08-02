@@ -20,7 +20,6 @@ class MemoryStorage(Storage):
     as an in memory storage for fixed and elastic window strategies,
     and a simple list to implement moving window strategy.
     """
-    STORAGE_SCHEME = ["memory"]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

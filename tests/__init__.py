@@ -5,9 +5,10 @@ import time
 
 def fixed_start(fn):
     @functools.wraps(fn)
-    def __inner(*a, **k):
+    def _inner(*args, **kwargs):
         start = time.time()
         while time.time() < math.ceil(start):
             time.sleep(0.01)
-        return fn(*a, **k)
-    return __inner
+        return fn(*args, **kwargs)
+
+    return _inner

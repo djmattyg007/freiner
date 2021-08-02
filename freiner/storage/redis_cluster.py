@@ -12,8 +12,6 @@ class RedisClusterStorage(RedisStorage):
     Depends on `redis-py-cluster` library
     """
 
-    STORAGE_SCHEME = ["redis+cluster"]
-
     def __init__(self, uri: str, **options):
         """
         :param str uri: url of the form

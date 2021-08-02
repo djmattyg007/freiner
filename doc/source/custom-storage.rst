@@ -23,16 +23,13 @@ Creating a custom backend requires:
 Example
 =======
 The following example shows two backend stores: one which doesn't implement the
-:ref:`moving-window` strategy and one that does. Do note the :code:`STORAGE_SCHEME` class
-variables which result in the classes getting registered with the **limits** storage registry::
-
+:ref:`moving-window` strategy and one that does.::
 
     from urllib.parse import urlparse
     from freiner.storage import Storage
     import time
 
     class AwesomeStorage(Storage):
-        STORAGE_SCHEME = ["awesomedb"]
         def __init__(self, uri: str, **kwargs):
             self.awesomesness = kwargs.get("awesomeness", None)
             parsed_uri = urlparse(uri)
@@ -53,7 +50,6 @@ variables which result in the classes getting registered with the **limits** sto
 
 
     class AwesomerStorage(Storage):
-        STORAGE_SCHEME = ["awesomerdb"]
         def __init__(self, uri: str, **kwargs):
             self.awesomesness = kwargs.get("awesomeness", None)
             parsed_uri = urlparse(uri)
@@ -66,7 +62,7 @@ variables which result in the classes getting registered with the **limits** sto
         def get_expiry(self, key: str) -> int:
             return int(time.time())
 
-        def incr(self, key: str, expiry: int, elastic_expiry: bool = False):
+        def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
             return 1
 
         def get(self, key: str) -> int:

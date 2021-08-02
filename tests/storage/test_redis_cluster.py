@@ -4,7 +4,7 @@ import unittest.mock
 import pytest
 import rediscluster
 
-from freiner.storage import RedisClusterStorage, storage_from_string
+from freiner.storage.redis_cluster import RedisClusterStorage
 from tests.storage.test_redis import SharedRedisTests
 
 
@@ -19,7 +19,8 @@ class RedisClusterStorageTests(SharedRedisTests, unittest.TestCase):
         with unittest.mock.patch(
             "freiner.storage.redis_cluster.get_dependency"
         ) as get_dependency:
-            storage_from_string(self.storage_url, connection_timeout=1)
+            RedisClusterStorage(self.storage_url, connection_timeout=1)
+            # storage_from_string(self.storage_url, connection_timeout=1)
             call_args = get_dependency().RedisCluster.call_args
             self.assertEqual(
                 call_args[1]['connection_timeout'],

@@ -6,7 +6,7 @@ import pytest
 import pymemcache.client
 
 from freiner import RateLimitItemPerSecond, RateLimitItemPerMinute
-from freiner.storage import storage_from_string, MemcachedStorage
+from freiner.storage.memcached import MemcachedStorage
 from freiner.strategies import (
     FixedWindowRateLimiter,
     FixedWindowElasticExpiryRateLimiter
@@ -24,7 +24,9 @@ class MemcachedStorageTests(unittest.TestCase):
         with unittest.mock.patch(
             "freiner.storage.memcached.get_dependency"
         ) as get_dependency:
-            storage_from_string(self.storage_url, connect_timeout=1).check()
+            storage = MemcachedStorage(self.storage_url, connect_timeout=1)
+            storage.check()
+            # storage_from_string(self.storage_url, connect_timeout=1).check()
             self.assertEqual(
                 get_dependency().Client.call_args[1]['connect_timeout'], 1
             )

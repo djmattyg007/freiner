@@ -1,14 +1,8 @@
 import threading
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 from typing import Optional
 
-from six import add_metaclass
 
-from freiner.storage.registry import StorageRegistry
-
-
-@add_metaclass(StorageRegistry)
-@add_metaclass(ABCMeta)
 class Storage(object):
     """
     Base class to extend when implementing a storage backend.

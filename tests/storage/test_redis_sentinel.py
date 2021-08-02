@@ -3,7 +3,7 @@ import unittest.mock
 
 import redis.sentinel
 
-from freiner.storage import RedisSentinelStorage, storage_from_string
+from freiner.storage.redis_sentinel import RedisSentinelStorage
 from tests.storage.test_redis import SharedRedisTests
 
 
@@ -20,13 +20,11 @@ class RedisSentinelStorageTests(SharedRedisTests, unittest.TestCase):
         ]).master_for(self.service_name).flushall()
 
     def test_init_options(self):
+        url = self.storage_url + "/" + self.service_name
         with unittest.mock.patch(
             "freiner.storage.redis_sentinel.get_dependency"
         ) as get_dependency:
-            storage_from_string(
-                self.storage_url + '/' + self.service_name,
-                connection_timeout=1
-            )
+            RedisSentinelStorage(url, connection_timeout=1)
             self.assertEqual(
                 get_dependency().Sentinel.call_args[1]['connection_timeout'], 1
             )

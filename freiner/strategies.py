@@ -59,16 +59,14 @@ class MovingWindowRateLimiter(RateLimiter):
     """
 
     def __init__(self, storage):
-        if not (
-            hasattr(storage, "acquire_entry")
-            or hasattr(storage, "get_moving_window")
-        ):
+        if not hasattr(storage, "acquire_entry") or not hasattr(storage, "get_moving_window"):
             raise NotImplementedError(
                 "MovingWindowRateLimiting is not implemented for storage "
                 "of type %s"
                 % storage.__class__
             )
-        super(MovingWindowRateLimiter, self).__init__(storage)
+
+        super().__init__(storage)
 
     def hit(self, item: RateLimitItem, *identifiers) -> bool:
         """
@@ -112,7 +110,7 @@ class MovingWindowRateLimiter(RateLimiter):
             item.key_for(*identifiers), item.amount, item.get_expiry()
         )
         reset = window_start + item.get_expiry()
-        return (reset, item.amount - window_items)
+        return reset, item.amount - window_items
 
 
 class FixedWindowRateLimiter(RateLimiter):
@@ -159,7 +157,7 @@ class FixedWindowRateLimiter(RateLimiter):
             0, item.amount - self.storage().get(item.key_for(*identifiers))
         )
         reset = self.storage().get_expiry(item.key_for(*identifiers))
-        return (reset, remaining)
+        return reset, remaining
 
 
 class FixedWindowElasticExpiryRateLimiter(FixedWindowRateLimiter):

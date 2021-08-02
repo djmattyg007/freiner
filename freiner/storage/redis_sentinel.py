@@ -13,8 +13,6 @@ class RedisSentinelStorage(RedisStorage):
     Depends on `redis-py` library
     """
 
-    STORAGE_SCHEME = ["redis+sentinel"]
-
     def __init__(self, uri: str, service_name: Optional[str] = None, **options):
         """
         :param str uri: url of the form

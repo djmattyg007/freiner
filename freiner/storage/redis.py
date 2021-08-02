@@ -157,8 +157,6 @@ class RedisStorage(RedisInteractor, Storage):
     Depends on the `redis-py` library.
     """
 
-    STORAGE_SCHEME = ["redis", "rediss", "redis+unix"]
-
     def __init__(self, uri: str, **options):
         """
         :param str uri: uri of the form `redis://[:password]@host:port`,

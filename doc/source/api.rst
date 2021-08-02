@@ -37,11 +37,6 @@ Memcached
 ^^^^^^^^^
 .. autoclass:: freiner.storage.MemcachedStorage
 
-===============
-Utility Methods
-===============
-.. autofunction:: freiner.storage.storage_from_string
-
 Strategies
 ==========
 .. autoclass:: freiner.strategies.RateLimiter
