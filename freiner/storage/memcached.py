@@ -6,10 +6,9 @@ from urllib.parse import urlparse
 
 from ..errors import FreinerConfigurationError
 from ..util import get_dependency
-from .base import Storage
 
 
-class MemcachedStorage(Storage):
+class MemcachedStorage:
     """
     Rate limit storage with memcached as backend.
 

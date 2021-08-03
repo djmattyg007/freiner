@@ -15,3 +15,17 @@ known_tests = "tests"
 sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,TESTS,LOCALFOLDER"
 lines_after_imports = 2
 lines_between_sections = 1
+
+
+[tool.mypy]
+warn_unused_configs = true
+
+
+[[tool.mypy.overrides]]
+module = [
+    "hiro",
+    "pymemcache",
+    "pymemcache.client",
+    "redis.sentinel",
+]
+ignore_missing_imports = true

@@ -54,7 +54,6 @@ class RedisSentinelStorage(RedisStorage):
         self.storage = self.sentinel.master_for(self.service_name)
         self.storage_slave = self.sentinel.slave_for(self.service_name)
         self.initialize_storage(self.storage)
-        super(RedisStorage, self).__init__()
 
     def get(self, key: str) -> int:
         """

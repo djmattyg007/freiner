@@ -1,8 +1,7 @@
 import threading
 import time
 from collections import Counter
-
-from .base import Storage
+from typing import Tuple
 
 
 class LockableEntry(threading._RLock):
@@ -14,15 +13,14 @@ class LockableEntry(threading._RLock):
         super(LockableEntry, self).__init__()
 
 
-class MemoryStorage(Storage):
+class MemoryStorage:
     """
     rate limit storage using :class:`collections.Counter`
     as an in memory storage for fixed and elastic window strategies,
     and a simple list to implement moving window strategy.
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
         self.storage = Counter()
         self.expirations = {}
         self.events = {}
@@ -126,11 +124,12 @@ class MemoryStorage(Storage):
         else:
             return 0
 
-    def get_moving_window(self, key: str, limit: int, expiry):
+    def get_moving_window(self, key: str, limit: int, expiry) -> Tuple[int, int]:
         """
         returns the starting point and the number of entries in the moving window
 
         :param str key: rate limit key
+        :param int limit: amount of entries allowed
         :param int expiry: expiry of entry
         :return: (start of window, number of acquired entries)
         """

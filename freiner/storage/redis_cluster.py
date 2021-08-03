@@ -38,7 +38,6 @@ class RedisClusterStorage(RedisStorage):
             **options
         )
         self.initialize_storage(self.storage)
-        super(RedisStorage, self).__init__()
 
     def reset(self):
         """

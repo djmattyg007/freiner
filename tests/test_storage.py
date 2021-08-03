@@ -155,7 +155,7 @@ class BaseStorageTests(unittest.TestCase):
 
         storage = MyStorage()
         self.assertRaises(
-            NotImplementedError, MovingWindowRateLimiter, storage
+            TypeError, MovingWindowRateLimiter, storage
         )
 
     def test_pluggable_storage_moving_window(self):

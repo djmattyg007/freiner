@@ -3,13 +3,15 @@ rate limiting strategies
 """
 
 from abc import ABCMeta, abstractmethod
+from typing import TYPE_CHECKING
 
 from .limits import RateLimitItem
+from .storage import MovingWindowStorage, Storage
 
 
 class RateLimiter(metaclass=ABCMeta):
-    def __init__(self, storage):
-        self.storage = storage
+    def __init__(self, storage: Storage):
+        self.storage: Storage = storage
 
     @abstractmethod
     def hit(self, item: RateLimitItem, *identifiers) -> bool:
@@ -17,8 +19,7 @@ class RateLimiter(metaclass=ABCMeta):
         creates a hit on the rate limit and returns True if successful.
 
         :param item: a :class:`RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the
-         limit
+        :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
         raise NotImplementedError
@@ -30,8 +31,7 @@ class RateLimiter(metaclass=ABCMeta):
         currently exceeded.
 
         :param item: a :class:`RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the
-         limit
+        :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
         raise NotImplementedError
@@ -42,8 +42,7 @@ class RateLimiter(metaclass=ABCMeta):
         returns the number of requests remaining and reset of this limit.
 
         :param item: a :class:`RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the
-         limit
+        :param identifiers: variable list of strings to uniquely identify the limit
         :return: tuple (reset time (int), remaining (int))
         """
         raise NotImplementedError
@@ -57,23 +56,23 @@ class MovingWindowRateLimiter(RateLimiter):
     Reference: :ref:`moving-window`
     """
 
-    def __init__(self, storage):
+    def __init__(self, storage: MovingWindowStorage):
+        # When support for python3.7 is dropped, we should be able to use isinstance()
+        # combined with @runtime_checkable
         if not hasattr(storage, "acquire_entry") or not hasattr(storage, "get_moving_window"):
-            raise NotImplementedError(
-                "MovingWindowRateLimiting is not implemented for storage "
-                "of type %s"
-                % storage.__class__
-            )
+            msg = f"MovingWindowRateLimiting is not implemented for storage of type {storage.__class__}"
+            raise TypeError(msg)
 
         super().__init__(storage)
+        if TYPE_CHECKING:
+            self.storage: MovingWindowStorage = storage
 
     def hit(self, item: RateLimitItem, *identifiers) -> bool:
         """
         creates a hit on the rate limit and returns True if successful.
 
         :param item: a :class:`RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the
-         limit
+        :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
         return self.storage.acquire_entry(
@@ -86,8 +85,7 @@ class MovingWindowRateLimiter(RateLimiter):
         currently exceeded.
 
         :param item: a :class:`RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the
-         limit
+        :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
         return self.storage.get_moving_window(
@@ -101,8 +99,7 @@ class MovingWindowRateLimiter(RateLimiter):
         returns the number of requests remaining within this limit.
 
         :param item: a :class:`RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the
-         limit
+        :param identifiers: variable list of strings to uniquely identify the limit
         :return: tuple (reset time (int), remaining (int))
         """
         window_start, window_items = self.storage.get_moving_window(
@@ -122,8 +119,7 @@ class FixedWindowRateLimiter(RateLimiter):
         creates a hit on the rate limit and returns True if successful.
 
         :param item: a :class:`RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the
-         limit
+        :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
         return (
@@ -137,8 +133,7 @@ class FixedWindowRateLimiter(RateLimiter):
         currently exceeded.
 
         :param item: a :class:`RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the
-         limit
+        :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
         return self.storage.get(item.key_for(*identifiers)) < item.amount
@@ -148,8 +143,7 @@ class FixedWindowRateLimiter(RateLimiter):
         returns the number of requests remaining and reset of this limit.
 
         :param item: a :class:`RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the
-         limit
+        :param identifiers: variable list of strings to uniquely identify the limit
         :return: tuple (reset time (int), remaining (int))
         """
         remaining = max(
@@ -169,8 +163,7 @@ class FixedWindowElasticExpiryRateLimiter(FixedWindowRateLimiter):
         creates a hit on the rate limit and returns True if successful.
 
         :param item: a :class:`RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the
-         limit
+        :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
         return (
@@ -178,10 +171,3 @@ class FixedWindowElasticExpiryRateLimiter(FixedWindowRateLimiter):
                 item.key_for(*identifiers), item.get_expiry(), True
             ) <= item.amount
         )
-
-
-STRATEGIES = {
-    "fixed-window": FixedWindowRateLimiter,
-    "fixed-window-elastic-expiry": FixedWindowElasticExpiryRateLimiter,
-    "moving-window": MovingWindowRateLimiter
-}
