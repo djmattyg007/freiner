@@ -1,8 +1,13 @@
 from typing import Optional
 from urllib.parse import urlparse
 
+try:
+    import redis.sentinel
+    HAS_REDIS = True
+except ImportError:
+    HAS_REDIS = False
+
 from ..errors import FreinerConfigurationError
-from ..util import get_dependency
 from .redis import RedisStorage
 
 
@@ -10,7 +15,7 @@ class RedisSentinelStorage(RedisStorage):
     """
     Rate limit storage with redis sentinel as backend
 
-    Depends on `redis-py` library
+    Depends on `redis-sentinel` library
     """
 
     def __init__(self, uri: str, service_name: Optional[str] = None, **options):
@@ -24,10 +29,11 @@ class RedisSentinelStorage(RedisStorage):
         :raise FreinerConfigurationError: when the redis library is not available
          or if the redis master host cannot be pinged.
         """
-        if not get_dependency("redis"):
+
+        if not HAS_REDIS:
             raise FreinerConfigurationError(
-                "redis prerequisite not available"
-            )  # pragma: no cover
+                "redis-sentinel prerequisite not available"
+            )
 
         parsed_uri = urlparse(uri)
         sentinel_configuration = []
@@ -46,7 +52,7 @@ class RedisSentinelStorage(RedisStorage):
 
         options.setdefault('socket_timeout', 0.2)
 
-        self.sentinel = get_dependency("redis.sentinel").Sentinel(
+        self.sentinel = redis.sentinel.Sentinel(
             sentinel_configuration,
             password=password,
             **options

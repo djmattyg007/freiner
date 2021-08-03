@@ -1,7 +1,12 @@
 import time
-from typing import cast, Callable, List, Tuple
+from typing import cast, Callable, Tuple
 
-from ..util import get_dependency
+try:
+    import redis
+    HAS_REDIS = True
+except ImportError:
+    HAS_REDIS = False
+
 from ..errors import FreinerConfigurationError
 
 
@@ -176,13 +181,14 @@ class RedisStorage(RedisInteractor):
          directly to the constructor of :class:`redis.Redis`
         :raise FreinerConfigurationError: when the redis library is not available
         """
-        if not get_dependency("redis"):
+
+        if not HAS_REDIS:
             raise FreinerConfigurationError(
                 "redis prerequisite not available"
-            )  # pragma: no cover
-        uri = uri.replace('redis+unix', 'unix')
+            )
+
         # TODO: rename self.storage to self.connection
-        self.storage = get_dependency("redis").from_url(uri, **options)
+        self.storage: redis.Redis = redis.from_url(uri, **options)
         self.initialize_storage(self.storage)
 
     def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:

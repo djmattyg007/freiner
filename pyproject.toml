@@ -27,5 +27,6 @@ module = [
     "pymemcache",
     "pymemcache.client",
     "redis.sentinel",
+    "rediscluster",
 ]
 ignore_missing_imports = true

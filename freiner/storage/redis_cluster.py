@@ -1,5 +1,11 @@
 from urllib.parse import urlparse
 
+try:
+    import rediscluster
+    HAS_REDISCLUSTER = True
+except ImportError:
+    HAS_REDISCLUSTER = False
+
 from ..errors import FreinerConfigurationError
 from ..util import get_dependency
 from .redis import RedisStorage
@@ -21,10 +27,12 @@ class RedisClusterStorage(RedisStorage):
         :raise FreinerConfigurationError: when the rediscluster library is not
          available or if the redis host cannot be pinged.
         """
-        if not get_dependency("rediscluster"):
+
+        if not HAS_REDISCLUSTER:
             raise FreinerConfigurationError(
                 "redis-py-cluster prerequisite not available"
-            )  # pragma: no cover
+            )
+
         parsed_uri = urlparse(uri)
         cluster_hosts = []
         for loc in parsed_uri.netloc.split(","):
@@ -33,7 +41,7 @@ class RedisClusterStorage(RedisStorage):
 
         options.setdefault('max_connections', 1000)
 
-        self.storage = get_dependency("rediscluster").RedisCluster(
+        self.storage = rediscluster.RedisCluster(
             startup_nodes=cluster_hosts,
             **options
         )
@@ -49,7 +57,8 @@ class RedisClusterStorage(RedisStorage):
         .. warning::
          This operation was not tested with extremely large data sets.
          On a large production based system, care should be taken with its
-         usage as it could be slow on very large data sets"""
+         usage as it could be slow on very large data sets.
+        """
 
         keys = self.storage.keys('LIMITER*')
         return sum([self.storage.delete(k.decode('utf-8')) for k in keys])

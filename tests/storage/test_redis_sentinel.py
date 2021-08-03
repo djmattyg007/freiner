@@ -19,13 +19,15 @@ class RedisSentinelStorageTests(SharedRedisTests, unittest.TestCase):
             ("localhost", 26379)
         ]).master_for(self.service_name).flushall()
 
-    def test_init_options(self):
-        url = self.storage_url + "/" + self.service_name
-        with unittest.mock.patch(
-            "freiner.storage.redis_sentinel.get_dependency"
-        ) as get_dependency:
-            storage = RedisSentinelStorage(url, connection_timeout=1)
-            storage.check()
-            self.assertEqual(
-                get_dependency().Sentinel.call_args[1]['connection_timeout'], 1
-            )
+    # TODO: Re-do this once URIs go to named constructors
+    # Also add a test for "missing dependency" in the named constructor
+    # def test_init_options(self):
+    #     url = self.storage_url + "/" + self.service_name
+    #     with unittest.mock.patch(
+    #         "freiner.storage.redis_sentinel.get_dependency"
+    #     ) as get_dependency:
+    #         storage = RedisSentinelStorage(url, connection_timeout=1)
+    #         storage.check()
+    #         self.assertEqual(
+    #             get_dependency().Sentinel.call_args[1]['connection_timeout'], 1
+    #         )
