@@ -164,7 +164,7 @@ class WindowTests(unittest.TestCase):
         self.assertEqual(limiter.get_window_stats(limit)[1], 0)
 
     def test_moving_window_memcached(self):
-        storage = MemcachedStorage('memcached://localhost:22122')
+        storage = MemcachedStorage.from_uri("memcached://localhost:22122")
         self.assertRaises(
             TypeError, MovingWindowRateLimiter, storage
         )
