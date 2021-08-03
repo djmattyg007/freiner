@@ -1,11 +1,15 @@
-import inspect
 import threading
 import time
 from typing import List, Tuple, Union
 from urllib.parse import urlparse
 
+try:
+    import pymemcache
+    HAS_MEMCACHED = True
+except ImportError:
+    HAS_MEMCACHED = False
+
 from ..errors import FreinerConfigurationError
-from ..util import get_dependency
 
 
 class MemcachedStorage:
@@ -24,6 +28,12 @@ class MemcachedStorage:
          directly to the constructor of :class:`pymemcache.client.base.Client`
         :raise FreinerConfigurationError: when `pymemcache` is not available
         """
+
+        if not HAS_MEMCACHED:
+            raise FreinerConfigurationError(
+                "memcached prerequisite not available"
+            )
+
         parsed_uri = urlparse(uri)
         self.hosts: List[Union[Tuple[str, int], str]] = []
         for loc in parsed_uri.netloc.strip().split(","):
@@ -36,48 +46,24 @@ class MemcachedStorage:
             if parsed_uri.path and not parsed_uri.netloc and not parsed_uri.port:
                 self.hosts = [parsed_uri.path]
 
-        self.library = options.pop('library', 'pymemcache.client')
-        self.cluster_library = options.pop('library', 'pymemcache.client.hash')
-        self.client_getter = options.pop('client_getter', self.get_client)
         self.options = options
-
-        if not get_dependency(self.library):
-            raise FreinerConfigurationError(
-                "memcached prerequisite not available."
-                " please install %s" % self.library
-            )  # pragma: no cover
 
         self.local_storage = threading.local()
         self.local_storage.storage = None
 
-    def get_client(self, module, hosts, **kwargs):
-        """
-        returns a memcached client.
-        :param module: the memcached module
-        :param hosts: list of memcached hosts
-        :return:
-        """
-        return (
-            module.HashClient(hosts, **kwargs)
-            if len(hosts) > 1 else module.Client(*hosts, **kwargs)
-        )
-
+    # TODO: rename storage to connection
     @property
     def storage(self):
         """
         lazily creates a memcached client instance using a thread local
         """
-        if not (
-            hasattr(self.local_storage, "storage")
-            and self.local_storage.storage
-        ):
-            self.local_storage.storage = self.client_getter(
-                get_dependency(
-                    self.cluster_library if len(self.hosts) > 1
-                    else self.library
-                ),
-                self.hosts, **self.options
-            )
+        if not (hasattr(self.local_storage, "storage") and self.local_storage.storage):
+            if len(self.hosts) > 1:
+                client = pymemcache.HashClient(self.hosts, **self.options)
+            else:
+                client = pymemcache.Client(*self.hosts, **self.options)
+
+            self.local_storage.storage = client
 
         return self.local_storage.storage
 

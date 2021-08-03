@@ -67,6 +67,7 @@ class WindowTests(unittest.TestCase):
         limiter = FixedWindowElasticExpiryRateLimiter(storage)
         limit = RateLimitItemPerSecond(10, 2)
         self.assertTrue(all([limiter.hit(limit) for _ in range(0, 10)]))
+        # TODO: Is this supposed to use hiro?
         time.sleep(1)
         self.assertFalse(limiter.hit(limit))
         time.sleep(1)
