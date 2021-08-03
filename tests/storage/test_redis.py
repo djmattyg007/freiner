@@ -7,9 +7,9 @@ import redis
 
 from freiner import RateLimitItemPerSecond, RateLimitItemPerMinute
 from freiner.storage.redis import RedisStorage
-from freiner.strategies import (
-    FixedWindowRateLimiter, MovingWindowRateLimiter
-)
+from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
+
+from tests import DOCKERDIR
 
 
 @pytest.mark.unit
@@ -78,26 +78,28 @@ class RedisStorageTests(SharedRedisTests, unittest.TestCase):
         with unittest.mock.patch(
             "freiner.storage.redis.get_dependency"
         ) as get_dependency:
-            RedisStorage(self.storage_url, connection_timeout=1)
-            # storage_from_string(self.storage_url, connection_timeout=1)
+            storage = RedisStorage(self.storage_url, connection_timeout=1)
+            storage.check()
             self.assertEqual(
-                get_dependency().from_url.call_args[1]['connection_timeout'], 1
+                get_dependency().from_url.call_args[1]["connection_timeout"], 1
             )
 
 
 @pytest.mark.unit
 class RedisUnixSocketStorageTests(SharedRedisTests, unittest.TestCase):
     def setUp(self):
-        self.storage_url = "redis+unix:///tmp/freiner.redis.sock"
+        self.redis_socket_path = DOCKERDIR / "redis" / "freiner.redis.sock"
+
+        self.storage_url = "redis+unix://" + str(self.redis_socket_path)
         self.storage = RedisStorage(self.storage_url)
-        redis.from_url('unix:///tmp/freiner.redis.sock').flushall()
+        redis.from_url("unix://" + str(self.redis_socket_path)).flushall()
 
     def test_init_options(self):
         with unittest.mock.patch(
             "freiner.storage.redis.get_dependency"
         ) as get_dependency:
-            RedisStorage(self.storage_url, connection_timeout=1)
-            # storage_from_string(self.storage_url, connection_timeout=1)
+            storage = RedisStorage(self.storage_url, connection_timeout=1)
+            storage.check()
             self.assertEqual(
-                get_dependency().from_url.call_args[1]['connection_timeout'], 1
+                get_dependency().from_url.call_args[1]["connection_timeout"], 1
             )

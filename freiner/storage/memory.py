@@ -38,6 +38,7 @@ class MemoryStorage(Storage):
                         and event in self.events[key]
                     ):
                         self.events[key].remove(event)
+
         for key in list(self.expirations.keys()):
             if self.expirations[key] <= time.time():
                 self.storage.pop(key, None)
@@ -127,8 +128,7 @@ class MemoryStorage(Storage):
 
     def get_moving_window(self, key: str, limit: int, expiry):
         """
-        returns the starting point and the number of entries in the moving
-        window
+        returns the starting point and the number of entries in the moving window
 
         :param str key: rate limit key
         :param int expiry: expiry of entry

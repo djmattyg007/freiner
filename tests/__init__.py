@@ -1,6 +1,11 @@
 import functools
 import math
 import time
+from pathlib import Path
+
+
+ROOTDIR = Path(__file__).parent.parent
+DOCKERDIR = ROOTDIR / ".docker"
 
 
 def fixed_start(fn):

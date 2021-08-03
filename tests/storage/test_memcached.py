@@ -2,7 +2,6 @@ import time
 import unittest
 import unittest.mock
 
-import pytest
 import pymemcache.client
 
 from freiner import RateLimitItemPerSecond, RateLimitItemPerMinute
@@ -14,7 +13,6 @@ from freiner.strategies import (
 from tests import fixed_start
 
 
-@pytest.mark.unit
 class MemcachedStorageTests(unittest.TestCase):
     def setUp(self):
         pymemcache.client.Client(('localhost', 22122)).flush_all()
@@ -26,7 +24,6 @@ class MemcachedStorageTests(unittest.TestCase):
         ) as get_dependency:
             storage = MemcachedStorage(self.storage_url, connect_timeout=1)
             storage.check()
-            # storage_from_string(self.storage_url, connect_timeout=1).check()
             self.assertEqual(
                 get_dependency().Client.call_args[1]['connect_timeout'], 1
             )

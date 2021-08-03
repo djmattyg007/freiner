@@ -2,14 +2,12 @@ import time
 import unittest
 
 import hiro
-import pytest
 
 from freiner import RateLimitItemPerMinute, RateLimitItemPerSecond
 from freiner.storage import MemoryStorage
 from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
 
 
-@pytest.mark.unit
 class MemoryStorageTests(unittest.TestCase):
     def setUp(self):
         self.storage = MemoryStorage()

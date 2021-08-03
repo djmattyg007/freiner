@@ -24,7 +24,8 @@ class RedisSentinelStorageTests(SharedRedisTests, unittest.TestCase):
         with unittest.mock.patch(
             "freiner.storage.redis_sentinel.get_dependency"
         ) as get_dependency:
-            RedisSentinelStorage(url, connection_timeout=1)
+            storage = RedisSentinelStorage(url, connection_timeout=1)
+            storage.check()
             self.assertEqual(
                 get_dependency().Sentinel.call_args[1]['connection_timeout'], 1
             )

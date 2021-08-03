@@ -1,11 +1,8 @@
 import unittest
 
-import pytest
-
 from freiner import limits
 
 
-@pytest.mark.unit
 class GranularityTests(unittest.TestCase):
     def test_seconds_value(self):
         self.assertEqual(

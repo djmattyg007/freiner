@@ -3,14 +3,11 @@ import time
 import unittest
 from uuid import uuid4
 
-import pytest
-
 from freiner.limits import RateLimitItemPerSecond
 from freiner.storage import MemoryStorage
 from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
 
 
-@pytest.mark.integration
 class ConcurrencyTests(unittest.TestCase):
     def test_memory_storage_fixed_window(self):
         storage = MemoryStorage()

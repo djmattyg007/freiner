@@ -21,15 +21,18 @@ def lint(c):
 
 @task
 def test(c):
-    args = ["pytest", "--cov=freiner", "--cov-branch", "--cov-report=term"]
+    pytest_args = ["pytest", "--cov=freiner", "--cov-branch", "--cov-report=term"]
     if os.environ.get("CI", "false") == "true":
-        args.append("--cov-report=xml")
+        pytest_args.append("--cov-report=xml")
         _pty = False
     else:
-        args.append("--cov-report=html")
+        pytest_args.append("--cov-report=html")
         _pty = pty
 
-    c.run(" ".join(args), pty=_pty)
+    c.run("docker-compose down --remove-orphans --volumes", pty=_pty)
+    c.run("docker-compose up -d", pty=_pty)
+    c.run(" ".join(pytest_args), pty=_pty)
+    c.run("docker-compose down --remove-orphans --volumes", pty=_pty)
 
 
 @task

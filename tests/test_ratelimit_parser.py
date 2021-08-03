@@ -1,12 +1,9 @@
 import unittest
 
-import pytest
-
 from freiner.util import parse, parse_many, granularity_from_string
 from freiner import limits
 
 
-@pytest.mark.unit
 class RatelimitParserTests(unittest.TestCase):
     def test_singles(self):
         for rl_string in ["1 per second", "1/SECOND", "1 / Second"]:

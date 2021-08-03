@@ -4,10 +4,8 @@ import unittest
 
 import hiro
 import pymemcache.client
-import pytest
 import redis
 import redis.sentinel
-import rediscluster
 
 from freiner.limits import RateLimitItemPerSecond, RateLimitItemPerMinute
 from freiner.storage import MemoryStorage
@@ -20,7 +18,6 @@ from freiner.strategies import (
 )
 
 
-@pytest.mark.unit
 class WindowTests(unittest.TestCase):
     def setUp(self):
         pymemcache.client.Client(('localhost', 22122)).flush_all()
@@ -29,7 +26,6 @@ class WindowTests(unittest.TestCase):
         redis.sentinel.Sentinel([
             ("localhost", 26379)
         ]).master_for("localhost-redis-sentinel").flushall()
-        rediscluster.RedisCluster("localhost", 7000).flushall()
 
     def test_fixed_window(self):
         storage = MemoryStorage()

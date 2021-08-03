@@ -15,8 +15,8 @@ Freiner
 *******
 |ci| |codecov| |pypi| |gitter| |license|
 
-*limits* provides utilities to implement rate limiting using
-various strategies and storage backends such as redis & memcached.
+*Freiner* provides utilities to implement rate limiting using
+various strategies and storage backends such as Redis & Memcached.
 
 History
 -------

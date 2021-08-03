@@ -2,8 +2,10 @@
 include =
     freiner/*
 omit =
-    /*/tests/*
+    freiner/storage/redis_cluster.py
+    tests/*
     setup.py
+    tasks.py
 [report]
 exclude_lines =
     pragma: no cover

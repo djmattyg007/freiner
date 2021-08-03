@@ -1,10 +1,8 @@
 import time
 
 import pymemcache.client
-import pytest
 import redis
 import redis.sentinel
-import rediscluster
 import unittest
 
 from freiner.errors import FreinerConfigurationError
@@ -12,21 +10,22 @@ from freiner.storage import Storage, MemoryStorage
 from freiner.storage.memcached import MemcachedStorage
 from freiner.storage.redis import RedisStorage
 from freiner.storage.redis_sentinel import RedisSentinelStorage
-from freiner.storage.redis_cluster import RedisClusterStorage
 from freiner.strategies import MovingWindowRateLimiter
 
-# TODO: reset registry during setup
-@pytest.mark.unit
+from tests import DOCKERDIR
+
+
 class BaseStorageTests(unittest.TestCase):
     def setUp(self):
-        pymemcache.client.Client(('localhost', 22122)).flush_all()
-        redis.from_url('unix:///tmp/freiner.redis.sock').flushall()
+        self.redis_socket_path = DOCKERDIR / "redis" / "freiner.redis.sock"
+
+        pymemcache.client.Client(("localhost", 22122)).flush_all()
+        redis.from_url("unix://" + str(self.redis_socket_path)).flushall()
         redis.from_url("redis://localhost:7379").flushall()
         redis.from_url("redis://:sekret@localhost:7389").flushall()
         redis.sentinel.Sentinel([
             ("localhost", 26379)
         ]).master_for("localhost-redis-sentinel").flushall()
-        rediscluster.RedisCluster("localhost", 7000).flushall()
 
     # TODO: Check to see if these should be moved elsewhere
     # def test_storage_string(self):
@@ -88,12 +87,6 @@ class BaseStorageTests(unittest.TestCase):
     #             ), RedisSentinelStorage
     #         )
     #     )
-    #     self.assertTrue(
-    #         isinstance(
-    #             storage_from_string("redis+cluster://localhost:7000/"),
-    #             RedisClusterStorage
-    #         )
-    #     )
     #
     #     self.assertRaises(FreinerConfigurationError, storage_from_string, "blah://")
     #     self.assertRaises(
@@ -147,9 +140,6 @@ class BaseStorageTests(unittest.TestCase):
     #             "redis+sentinel://localhost:26379",
     #             service_name="localhost-redis-sentinel"
     #         ).check()
-    #     )
-    #     self.assertTrue(
-    #         storage_from_string("redis+cluster://localhost:7000").check()
     #     )
 
     def test_pluggable_storage_no_moving_window(self):
