@@ -1,6 +1,6 @@
 import time
 
-import pymemcache.client
+import pymemcache
 import redis
 import redis.sentinel
 import unittest
@@ -19,7 +19,7 @@ class BaseStorageTests(unittest.TestCase):
     def setUp(self):
         self.redis_socket_path = DOCKERDIR / "redis" / "freiner.redis.sock"
 
-        pymemcache.client.Client(("localhost", 22122)).flush_all()
+        pymemcache.Client(("localhost", 22122)).flush_all()
         redis.from_url("unix://" + str(self.redis_socket_path)).flushall()
         redis.from_url("redis://localhost:7379").flushall()
         redis.from_url("redis://:sekret@localhost:7389").flushall()

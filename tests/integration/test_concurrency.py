@@ -1,56 +1,70 @@
 import threading
 import time
-import unittest
 from uuid import uuid4
+
+import pytest
 
 from freiner.limits import RateLimitItemPerSecond
 from freiner.storage import MemoryStorage
 from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
 
 
-class ConcurrencyTests(unittest.TestCase):
-    def test_memory_storage_fixed_window(self):
-        storage = MemoryStorage()
-        limiter = FixedWindowRateLimiter(storage)
-        per_second = RateLimitItemPerSecond(100)
+@pytest.fixture
+def storage() -> MemoryStorage:
+    return MemoryStorage()
 
-        [limiter.hit(per_second, uuid4().hex) for _ in range(1000)]
 
-        key = uuid4().hex
-        hits = []
+def test_memory_storage_fixed_window(storage: MemoryStorage):
+    limiter = FixedWindowRateLimiter(storage)
+    per_second = RateLimitItemPerSecond(100)
 
-        def hit():
-            if limiter.hit(per_second, key):
-                hits.append(None)
+    for _ in range(1000):
+        limiter.hit(per_second, uuid4().hex)
 
-        start = time.time()
+    key = uuid4().hex
+    hits = []
 
-        threads = [threading.Thread(target=hit) for _ in range(1000)]
-        [t.start() for t in threads]
-        [t.join() for t in threads]
+    def hit():
+        if limiter.hit(per_second, key):
+            hits.append(None)
 
-        self.assertTrue(time.time() - start < 1)
-        self.assertEqual(len(hits), 100)
+    start = time.time()
 
-    def test_memory_storage_moving_window(self):
-        storage = MemoryStorage()
-        limiter = MovingWindowRateLimiter(storage)
-        per_second = RateLimitItemPerSecond(100)
+    threads = [threading.Thread(target=hit) for _ in range(1000)]
 
-        [limiter.hit(per_second, uuid4().hex) for _ in range(100)]
+    for thread in threads:
+        thread.start()
 
-        key = uuid4().hex
-        hits = []
+    for thread in threads:
+        thread.join()
 
-        def hit():
-            if limiter.hit(per_second, key):
-                hits.append(None)
+    assert time.time() - start < 1
+    assert len(hits) == 100
 
-        start = time.time()
 
-        threads = [threading.Thread(target=hit) for _ in range(1000)]
-        [t.start() for t in threads]
-        [t.join() for t in threads]
+def test_memory_storage_moving_window(storage: MemoryStorage):
+    limiter = MovingWindowRateLimiter(storage)
+    per_second = RateLimitItemPerSecond(100)
 
-        self.assertTrue(time.time() - start < 1)
-        self.assertEqual(len(hits), 100)
+    for _ in range(100):
+        limiter.hit(per_second, uuid4().hex)
+
+    key = uuid4().hex
+    hits = []
+
+    def hit():
+        if limiter.hit(per_second, key):
+            hits.append(None)
+
+    start = time.time()
+
+    threads = [threading.Thread(target=hit) for _ in range(1000)]
+
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    assert time.time() - start < 1
+    assert len(hits) == 100

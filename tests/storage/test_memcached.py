@@ -37,12 +37,14 @@ class MemcachedStorageTests(unittest.TestCase):
 
         limiter = FixedWindowRateLimiter(storage)
         per_min = RateLimitItemPerSecond(10)
+
         start = time.time()
         count = 0
         while time.time() - start < 0.5 and count < 10:
             self.assertTrue(limiter.hit(per_min))
             count += 1
         self.assertFalse(limiter.hit(per_min))
+
         while time.time() - start <= 1:
             time.sleep(0.1)
         self.assertTrue(limiter.hit(per_min))
@@ -54,12 +56,14 @@ class MemcachedStorageTests(unittest.TestCase):
 
         limiter = FixedWindowRateLimiter(storage)
         per_min = RateLimitItemPerSecond(10)
+
         start = time.time()
         count = 0
         while time.time() - start < 0.5 and count < 10:
             self.assertTrue(limiter.hit(per_min))
             count += 1
         self.assertFalse(limiter.hit(per_min))
+
         while time.time() - start <= 1:
             time.sleep(0.1)
         self.assertTrue(limiter.hit(per_min))
@@ -73,11 +77,14 @@ class MemcachedStorageTests(unittest.TestCase):
         per_sec = RateLimitItemPerSecond(2, 2)
 
         self.assertTrue(limiter.hit(per_sec))
+
         time.sleep(1)
         self.assertTrue(limiter.hit(per_sec))
         self.assertFalse(limiter.test(per_sec))
+
         time.sleep(1)
         self.assertFalse(limiter.test(per_sec))
+
         time.sleep(1)
         self.assertTrue(limiter.test(per_sec))
 
@@ -90,11 +97,14 @@ class MemcachedStorageTests(unittest.TestCase):
         per_sec = RateLimitItemPerSecond(2, 2)
 
         self.assertTrue(limiter.hit(per_sec))
+
         time.sleep(1)
         self.assertTrue(limiter.hit(per_sec))
         self.assertFalse(limiter.test(per_sec))
+
         time.sleep(1)
         self.assertFalse(limiter.test(per_sec))
+
         time.sleep(1)
         self.assertTrue(limiter.test(per_sec))
 
@@ -104,7 +114,9 @@ class MemcachedStorageTests(unittest.TestCase):
 
         limiter = FixedWindowRateLimiter(storage)
         per_min = RateLimitItemPerMinute(1)
+
         limiter.hit(per_min)
         self.assertFalse(limiter.hit(per_min))
+
         limiter.clear(per_min)
         self.assertTrue(limiter.hit(per_min))
