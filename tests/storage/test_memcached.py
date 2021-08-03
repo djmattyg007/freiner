@@ -16,7 +16,7 @@ from tests import fixed_start
 class MemcachedStorageTests(unittest.TestCase):
     def setUp(self):
         pymemcache.Client(("localhost", 22122)).flush_all()
-        self.storage_url = "memcached://localhost:22122"
+        # self.storage_url = "memcached://localhost:22122"
 
     # TODO: Re-do this once URIs go to named constructors
     # Also add a test for "missing dependency" in the named constructor
@@ -32,7 +32,7 @@ class MemcachedStorageTests(unittest.TestCase):
 
     @fixed_start
     def test_fixed_window(self):
-        storage = MemcachedStorage("memcached://localhost:22122")
+        storage = MemcachedStorage.from_uri("memcached://localhost:22122")
         self.assertTrue(storage.check())
 
         limiter = FixedWindowRateLimiter(storage)
@@ -49,7 +49,7 @@ class MemcachedStorageTests(unittest.TestCase):
 
     @fixed_start
     def test_fixed_window_cluster(self):
-        storage = MemcachedStorage("memcached://localhost:22122,localhost:22123")
+        storage = MemcachedStorage.from_uri("memcached://localhost:22122,localhost:22123")
         self.assertTrue(storage.check())
 
         limiter = FixedWindowRateLimiter(storage)
@@ -66,7 +66,7 @@ class MemcachedStorageTests(unittest.TestCase):
 
     @fixed_start
     def test_fixed_window_with_elastic_expiry(self):
-        storage = MemcachedStorage("memcached://localhost:22122")
+        storage = MemcachedStorage.from_uri("memcached://localhost:22122")
         self.assertTrue(storage.check())
 
         limiter = FixedWindowElasticExpiryRateLimiter(storage)
@@ -83,7 +83,7 @@ class MemcachedStorageTests(unittest.TestCase):
 
     @fixed_start
     def test_fixed_window_with_elastic_expiry_cluster(self):
-        storage = MemcachedStorage("memcached://localhost:22122,localhost:22123")
+        storage = MemcachedStorage.from_uri("memcached://localhost:22122,localhost:22123")
         self.assertTrue(storage.check())
 
         limiter = FixedWindowElasticExpiryRateLimiter(storage)
@@ -99,7 +99,7 @@ class MemcachedStorageTests(unittest.TestCase):
         self.assertTrue(limiter.test(per_sec))
 
     def test_clear(self):
-        storage = MemcachedStorage("memcached://localhost:22122")
+        storage = MemcachedStorage.from_uri("memcached://localhost:22122")
         self.assertTrue(storage.check())
 
         limiter = FixedWindowRateLimiter(storage)

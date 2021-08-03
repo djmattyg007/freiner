@@ -1,9 +1,10 @@
 import threading
 import time
+import traceback
 import unittest
 
 import hiro
-import pymemcache.client
+import pymemcache
 import redis
 import redis.sentinel
 
@@ -20,7 +21,7 @@ from freiner.strategies import (
 
 class WindowTests(unittest.TestCase):
     def setUp(self):
-        pymemcache.client.Client(('localhost', 22122)).flush_all()
+        pymemcache.Client(("localhost", 22122)).flush_all()
         redis.from_url("redis://localhost:7379").flushall()
         redis.from_url("redis://:sekret@localhost:7389").flushall()
         redis.sentinel.Sentinel([
@@ -63,7 +64,7 @@ class WindowTests(unittest.TestCase):
             self.assertEqual(limiter.get_window_stats(limit)[0], start + 2)
 
     def test_fixed_window_with_elastic_expiry_memcache(self):
-        storage = MemcachedStorage('memcached://localhost:22122')
+        storage = MemcachedStorage.from_uri("memcached://localhost:22122")
         limiter = FixedWindowElasticExpiryRateLimiter(storage)
         limit = RateLimitItemPerSecond(10, 2)
         self.assertTrue(all([limiter.hit(limit) for _ in range(0, 10)]))
@@ -74,22 +75,26 @@ class WindowTests(unittest.TestCase):
         self.assertFalse(limiter.hit(limit))
 
     def test_fixed_window_with_elastic_expiry_memcache_concurrency(self):
-        storage = MemcachedStorage('memcached://localhost:22122')
+        storage = MemcachedStorage(pymemcache.PooledClient(("localhost", 22122)))
         limiter = FixedWindowElasticExpiryRateLimiter(storage)
         start = int(time.time())
         limit = RateLimitItemPerSecond(10, 2)
 
         def _c():
             for i in range(0, 5):
-                limiter.hit(limit)
+                try:
+                    limiter.hit(limit)
+                except Exception:
+                    traceback.print_exc()
+                    raise
 
         t1, t2 = threading.Thread(target=_c), threading.Thread(target=_c)
         t1.start(), t2.start()
         t1.join(), t2.join()
-        self.assertEqual(limiter.get_window_stats(limit)[1], 0)
-        self.assertTrue(
-            start + 2 <= limiter.get_window_stats(limit)[0] <= start + 3
-        )
+
+        window_stats = limiter.get_window_stats(limit)
+        self.assertEqual(window_stats[1], 0)
+        self.assertTrue(start + 2 <= window_stats[0] <= start + 3)
         self.assertEqual(storage.get(limit.key_for()), 10)
 
     def test_fixed_window_with_elastic_expiry_redis(self):

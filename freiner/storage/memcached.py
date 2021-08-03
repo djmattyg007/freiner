@@ -1,4 +1,3 @@
-import threading
 import time
 from typing import List, Tuple, Union
 from urllib.parse import urlparse
@@ -12,6 +11,9 @@ except ImportError:
 from ..errors import FreinerConfigurationError
 
 
+MemcachedClients = Union[pymemcache.Client, pymemcache.PooledClient, pymemcache.HashClient]
+
+
 class MemcachedStorage:
     """
     Rate limit storage with memcached as backend.
@@ -20,64 +22,55 @@ class MemcachedStorage:
     """
     MAX_CAS_RETRIES = 10
 
-    def __init__(self, uri: str, **options):
+    def __init__(self, client: MemcachedClients):
+        self._client: MemcachedClients = client
+
+    @classmethod
+    def from_uri(cls, uri: str, **options) -> "MemcachedStorage":
         """
         :param str uri: memcached location of the form
-         `memcached://host:port,host:port`, `memcached:///var/tmp/path/to/sock`
+         `memcached://host:port,host:port`, `memcached:///run/path/to/sock`
         :param options: all remaining keyword arguments are passed
          directly to the constructor of :class:`pymemcache.client.base.Client`
         :raise FreinerConfigurationError: when `pymemcache` is not available
         """
 
         if not HAS_MEMCACHED:
-            raise FreinerConfigurationError(
-                "memcached prerequisite not available"
-            )
+            raise FreinerConfigurationError("Dependency 'pymemcache' is not available.")
 
         parsed_uri = urlparse(uri)
-        self.hosts: List[Union[Tuple[str, int], str]] = []
+        hosts: List[Union[Tuple[str, int], str]] = []
         for loc in parsed_uri.netloc.strip().split(","):
             if not loc:
                 continue
+
             host, port = loc.split(":")
-            self.hosts.append((host, int(port)))
+            hosts.append((host, int(port)))
         else:
             # filesystem path to UDS
             if parsed_uri.path and not parsed_uri.netloc and not parsed_uri.port:
-                self.hosts = [parsed_uri.path]
+                hosts = [parsed_uri.path]
 
-        self.options = options
+        if not hosts:
+            raise FreinerConfigurationError(f"No Memcached hosts parsed from URI: {uri}")
 
-        self.local_storage = threading.local()
-        self.local_storage.storage = None
+        if len(hosts) > 1:
+            client = pymemcache.HashClient(hosts, **options)
+        else:
+            client = pymemcache.Client(*hosts, **options)
+        return cls(client)
 
-    # TODO: rename storage to connection
-    @property
-    def storage(self):
-        """
-        lazily creates a memcached client instance using a thread local
-        """
-        if not (hasattr(self.local_storage, "storage") and self.local_storage.storage):
-            if len(self.hosts) > 1:
-                client = pymemcache.HashClient(self.hosts, **self.options)
-            else:
-                client = pymemcache.Client(*self.hosts, **self.options)
-
-            self.local_storage.storage = client
-
-        return self.local_storage.storage
-
-    def get(self, key) -> int:
+    def get(self, key: str) -> int:
         """
         :param str key: the key to get the counter value for
         """
-        return int(self.storage.get(key) or 0)
+        return int(self._client.get(key) or 0)
 
-    def clear(self, key):
+    def clear(self, key: str):
         """
         :param str key: the key to clear rate limits for
         """
-        self.storage.delete(key)
+        self._client.delete(key)
 
     def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
@@ -89,35 +82,35 @@ class MemcachedStorage:
          window every hit.
         """
 
-        if not self.storage.add(key, 1, expiry, noreply=False):
+        if not self._client.add(key, 1, expiry, noreply=False):
             if elastic_expiry:
-                value, cas = self.storage.gets(key)
+                value, cas = self._client.gets(key)
                 retry = 0
 
-                while not self.storage.cas(key, int(value or 0) + 1, cas, expiry) and retry < self.MAX_CAS_RETRIES:
-                    value, cas = self.storage.gets(key)
+                while not self._client.cas(key, int(value or 0) + 1, cas, expiry) and retry < self.MAX_CAS_RETRIES:
+                    value, cas = self._client.gets(key)
                     retry += 1
 
-                self.storage.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
+                self._client.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
                 return int(value or 0) + 1
             else:
-                return self.storage.incr(key, 1)
+                return self._client.incr(key, 1)
 
-        self.storage.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
+        self._client.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
         return 1
 
     def get_expiry(self, key: str) -> int:
         """
         :param str key: the key to get the expiry for
         """
-        return int(float(self.storage.get(key + "/expires") or time.time()))
+        return int(float(self._client.get(key + "/expires") or time.time()))
 
     def check(self) -> bool:
         """
         check if storage is healthy
         """
         try:
-            self.storage.get("freiner-check")
+            self._client.get("freiner-check")
             return True
         except:  # noqa
             return False
