@@ -174,7 +174,7 @@ class RedisStorage(RedisInteractor):
          case of `redis+unix` where it is replaced with `unix`.
         :param options: all remaining keyword arguments are passed
          directly to the constructor of :class:`redis.Redis`
-        :raise ConfigurationError: when the redis library is not available
+        :raise FreinerConfigurationError: when the redis library is not available
         """
         if not get_dependency("redis"):
             raise FreinerConfigurationError(

@@ -22,7 +22,7 @@ class MemcachedStorage:
          `memcached://host:port,host:port`, `memcached:///var/tmp/path/to/sock`
         :param options: all remaining keyword arguments are passed
          directly to the constructor of :class:`pymemcache.client.base.Client`
-        :raise ConfigurationError: when `pymemcache` is not available
+        :raise FreinerConfigurationError: when `pymemcache` is not available
         """
         parsed_uri = urlparse(uri)
         self.hosts: List[Union[Tuple[str, int], str]] = []

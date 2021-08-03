@@ -21,7 +21,7 @@ class RedisSentinelStorage(RedisStorage):
          (if not provided in `uri`)
         :param options: all remaining keyword arguments are passed
          directly to the constructor of :class:`redis.sentinel.Sentinel`
-        :raise ConfigurationError: when the redis library is not available
+        :raise FreinerConfigurationError: when the redis library is not available
          or if the redis master host cannot be pinged.
         """
         if not get_dependency("redis"):

@@ -18,7 +18,7 @@ class RedisClusterStorage(RedisStorage):
          `redis+cluster://[:password]@host:port,host:port`
         :param options: all remaining keyword arguments are passed
          directly to the constructor of :class:`rediscluster.RedisCluster`
-        :raise ConfigurationError: when the rediscluster library is not
+        :raise FreinerConfigurationError: when the rediscluster library is not
          available or if the redis host cannot be pinged.
         """
         if not get_dependency("rediscluster"):
