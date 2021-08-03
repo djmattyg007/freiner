@@ -6,7 +6,7 @@ import redis.sentinel
 import unittest
 
 from freiner.errors import FreinerConfigurationError
-from freiner.storage import Storage, MemoryStorage
+from freiner.storage import MemoryStorage
 from freiner.storage.memcached import MemcachedStorage
 from freiner.storage.redis import RedisStorage
 from freiner.storage.redis_sentinel import RedisSentinelStorage
@@ -143,7 +143,7 @@ class BaseStorageTests(unittest.TestCase):
     #     )
 
     def test_pluggable_storage_no_moving_window(self):
-        class MyStorage(Storage):
+        class MyStorage:
             def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
                 return 1
 
@@ -159,7 +159,7 @@ class BaseStorageTests(unittest.TestCase):
         )
 
     def test_pluggable_storage_moving_window(self):
-        class MyStorage(Storage):
+        class MyStorage:
             def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
                 return 1
 

@@ -24,9 +24,7 @@ class WindowTests(unittest.TestCase):
         pymemcache.Client(("localhost", 22122)).flush_all()
         redis.from_url("redis://localhost:7379").flushall()
         redis.from_url("redis://:sekret@localhost:7389").flushall()
-        redis.sentinel.Sentinel([
-            ("localhost", 26379)
-        ]).master_for("localhost-redis-sentinel").flushall()
+        redis.sentinel.Sentinel([("localhost", 26379)]).master_for("localhost-redis-sentinel").flushall()
 
     def test_fixed_window(self):
         storage = MemoryStorage()
@@ -125,6 +123,7 @@ class WindowTests(unittest.TestCase):
     def test_moving_window_in_memory(self):
         storage = MemoryStorage()
         limiter = MovingWindowRateLimiter(storage)
+
         with hiro.Timeline().freeze() as timeline:
             limit = RateLimitItemPerMinute(10)
             for i in range(0, 5):
@@ -134,13 +133,16 @@ class WindowTests(unittest.TestCase):
                     limiter.get_window_stats(limit)[1], 10 - ((i + 1) * 2)
                 )
                 timeline.forward(10)
+
             self.assertEqual(limiter.get_window_stats(limit)[1], 0)
             self.assertFalse(limiter.hit(limit))
+
             timeline.forward(20)
             self.assertEqual(limiter.get_window_stats(limit)[1], 2)
             self.assertEqual(
                 limiter.get_window_stats(limit)[0], int(time.time() + 30)
             )
+
             timeline.forward(31)
             self.assertEqual(limiter.get_window_stats(limit)[1], 10)
 
@@ -148,11 +150,14 @@ class WindowTests(unittest.TestCase):
         storage = RedisStorage("redis://localhost:7379")
         limiter = MovingWindowRateLimiter(storage)
         limit = RateLimitItemPerSecond(10, 2)
+
         for i in range(0, 10):
             self.assertTrue(limiter.hit(limit))
             self.assertEqual(limiter.get_window_stats(limit)[1], 10 - (i + 1))
             time.sleep(2 * 0.095)
+
         self.assertFalse(limiter.hit(limit))
+
         time.sleep(0.4)
         self.assertTrue(limiter.hit(limit))
         self.assertTrue(limiter.hit(limit))
@@ -169,6 +174,7 @@ class WindowTests(unittest.TestCase):
             store = MemoryStorage()
             limiter = FixedWindowRateLimiter(store)
             limit = RateLimitItemPerSecond(2, 1)
+
             self.assertTrue(limiter.hit(limit), store)
             self.assertTrue(limiter.test(limit), store)
             self.assertTrue(limiter.hit(limit), store)
@@ -178,8 +184,9 @@ class WindowTests(unittest.TestCase):
     def test_test_moving_window(self):
         with hiro.Timeline().freeze():
             store = MemoryStorage()
-            limit = RateLimitItemPerSecond(2, 1)
             limiter = MovingWindowRateLimiter(store)
+            limit = RateLimitItemPerSecond(2, 1)
+
             self.assertTrue(limiter.hit(limit), store)
             self.assertTrue(limiter.test(limit), store)
             self.assertTrue(limiter.hit(limit), store)
