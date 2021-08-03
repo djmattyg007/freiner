@@ -31,8 +31,10 @@ def test(c):
 
     c.run("docker-compose down --remove-orphans --volumes", pty=_pty)
     c.run("docker-compose up -d", pty=_pty)
-    c.run(" ".join(pytest_args), pty=_pty)
-    c.run("docker-compose down --remove-orphans --volumes", pty=_pty)
+    try:
+        c.run(" ".join(pytest_args), pty=_pty)
+    finally:
+        c.run("docker-compose down --remove-orphans --volumes", pty=_pty)
 
 
 @task
