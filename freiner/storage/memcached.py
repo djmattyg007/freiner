@@ -115,3 +115,9 @@ class MemcachedStorage:
             return True
         except:  # noqa
             return False
+
+    def reset(self):
+        """
+        Not implemented for Memcached.
+        """
+        pass

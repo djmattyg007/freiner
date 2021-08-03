@@ -59,4 +59,5 @@ class RedisClusterStorage(RedisStorage):
         """
 
         keys = self._client.keys("LIMITER*")
-        return sum([self._client.delete(k.decode("utf-8")) for k in keys])
+        for key in keys:
+            self._client.delete(key.decode("utf-8"))

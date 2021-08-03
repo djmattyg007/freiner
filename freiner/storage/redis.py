@@ -126,6 +126,9 @@ class RedisInteractor:
         """
         connection.delete(key)
 
+    def _reset(self):
+        return self.lua_clear_keys(('LIMITER*',))
+
     def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[int, int]:
         """
         returns the starting point and the number of entries in the moving
@@ -264,5 +267,4 @@ class RedisStorage(RedisInteractor):
            could be slow on very large data sets.
         """
 
-        cleared = self.lua_clear_keys(('LIMITER*',))
-        return cleared
+        self._reset()

@@ -25,7 +25,6 @@ warn_unused_configs = true
 module = [
     "hiro",
     "pymemcache",
-    "pymemcache.client",
     "redis.sentinel",
     "rediscluster",
 ]
