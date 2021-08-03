@@ -1,6 +1,7 @@
 from typing import Protocol, Tuple
 
 from freiner.errors import FreinerConfigurationError
+
 from .memory import MemoryStorage
 
 
@@ -42,6 +43,7 @@ class Storage(Protocol):
         :param str key: the key to clear rate limits for
         """
 
+
 class MovingWindowStorage(Storage):
     def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
         """
@@ -62,6 +64,7 @@ class MovingWindowStorage(Storage):
         :param int expiry: expiry of entry
         :return: (start of window, number of acquired entries)
         """
+
 
 __all__ = [
     "FreinerConfigurationError",

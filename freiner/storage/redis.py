@@ -1,13 +1,15 @@
 import time
-from typing import cast, Callable, Tuple
+from typing import Callable, Tuple, cast
+
+from freiner.errors import FreinerConfigurationError
+
 
 try:
     import redis
+
     HAS_REDIS = True
 except ImportError:
     HAS_REDIS = False
-
-from ..errors import FreinerConfigurationError
 
 
 class RedisInteractor:
@@ -67,33 +69,25 @@ class RedisInteractor:
     """
 
     def initialize_storage(self, storage: redis.Redis):
-        moving_window_script = storage.register_script(
-            self.SCRIPT_MOVING_WINDOW
-        )
+        moving_window_script = storage.register_script(self.SCRIPT_MOVING_WINDOW)
         self.lua_moving_window = cast(
             Callable[[Tuple[str], Tuple[int, int]], Tuple[int, int]],
             moving_window_script,
         )
 
-        acquire_window_script = storage.register_script(
-            self.SCRIPT_ACQUIRE_MOVING_WINDOW
-        )
+        acquire_window_script = storage.register_script(self.SCRIPT_ACQUIRE_MOVING_WINDOW)
         self.lua_acquire_window = cast(
             Callable[[Tuple[str], Tuple[float, int, int, int]], bool],
             acquire_window_script,
         )
 
-        clear_keys_script = storage.register_script(
-            self.SCRIPT_CLEAR_KEYS
-        )
+        clear_keys_script = storage.register_script(self.SCRIPT_CLEAR_KEYS)
         self.lua_clear_keys = cast(
             Callable[[Tuple[str]], int],
             clear_keys_script,
         )
 
-        incr_expire_script = storage.register_script(
-            RedisStorage.SCRIPT_INCR_EXPIRE
-        )
+        incr_expire_script = storage.register_script(RedisStorage.SCRIPT_INCR_EXPIRE)
         self.lua_incr_expire = cast(
             Callable[[Tuple[str], Tuple[int]], int],
             incr_expire_script,
@@ -127,7 +121,7 @@ class RedisInteractor:
         connection.delete(key)
 
     def _reset(self):
-        return self.lua_clear_keys(('LIMITER*',))
+        return self.lua_clear_keys(("LIMITER*",))
 
     def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[int, int]:
         """
@@ -143,7 +137,9 @@ class RedisInteractor:
         window = self.lua_moving_window((key,), (int(timestamp - expiry), limit))
         return window or (int(timestamp), 0)
 
-    def _acquire_entry(self, key: str, limit: int, expiry: int, connection, no_add: bool = False) -> bool:
+    def _acquire_entry(
+        self, key: str, limit: int, expiry: int, connection, no_add: bool = False
+    ) -> bool:
         """
         :param str key: rate limit key to acquire an entry in
         :param int limit: amount of entries allowed
@@ -240,9 +236,7 @@ class RedisStorage(RedisInteractor):
          instead serves as a 'check'
         :return: True/False
         """
-        return self._acquire_entry(
-            key, limit, expiry, self._client, no_add=no_add
-        )
+        return self._acquire_entry(key, limit, expiry, self._client, no_add=no_add)
 
     def get_expiry(self, key: str) -> int:
         """

@@ -1,5 +1,5 @@
 from functools import total_ordering
-from typing import cast, Dict, Type
+from typing import Dict, Type, cast
 
 
 def safe_string(value) -> str:
@@ -27,7 +27,9 @@ GRANULARITIES: Dict[str, Type["RateLimitItem"]] = {}
 
 class RateLimitItemMeta(type):
     def __new__(mcs, name, parents, dct):
-        granularity = cast(Type["RateLimitItem"], super(RateLimitItemMeta, mcs).__new__(mcs, name, parents, dct))
+        granularity = cast(
+            Type["RateLimitItem"], super(RateLimitItemMeta, mcs).__new__(mcs, name, parents, dct)
+        )
         if "granularity" in dct:
             GRANULARITIES[dct["granularity"][1]] = granularity
         return granularity
@@ -46,7 +48,7 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
 
     granularity = (0, "")
 
-    def __init__(self, amount: int, multiples: int = 1, namespace: str = 'LIMITER'):
+    def __init__(self, amount: int, multiples: int = 1, namespace: str = "LIMITER"):
         self.namespace = namespace
         self.amount = int(amount)
         self.multiples = int(multiples or 1)
@@ -73,22 +75,17 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
         :return: a string key identifying this resource with
          each identifier appended with a '/' delimiter.
         """
-        remainder = "/".join([safe_string(k) for k in identifiers] + [
-            safe_string(self.amount),
-            safe_string(self.multiples), self.granularity[1]
-        ])
+        remainder = "/".join(
+            [safe_string(k) for k in identifiers]
+            + [safe_string(self.amount), safe_string(self.multiples), self.granularity[1]]
+        )
         return "{}/{}".format(self.namespace, remainder)
 
     def __eq__(self, other) -> bool:
-        return (
-            self.amount == other.amount
-            and self.granularity == other.granularity
-        )
+        return self.amount == other.amount and self.granularity == other.granularity
 
     def __str__(self) -> str:
-        return "{} per {} {}".format(
-            self.amount, self.multiples, self.granularity[1]
-        )
+        return "{} per {} {}".format(self.amount, self.multiples, self.granularity[1])
 
     def __repr__(self) -> str:
         return "{}<{}>".format(self.__class__.__name__, str(self))
@@ -101,6 +98,7 @@ class RateLimitItemPerYear(RateLimitItem):
     """
     per year rate limited resource.
     """
+
     granularity = TIME_TYPES["year"]
 
 
@@ -108,6 +106,7 @@ class RateLimitItemPerMonth(RateLimitItem):
     """
     per month rate limited resource.
     """
+
     granularity = TIME_TYPES["month"]
 
 
@@ -115,6 +114,7 @@ class RateLimitItemPerDay(RateLimitItem):
     """
     per day rate limited resource.
     """
+
     granularity = TIME_TYPES["day"]
 
 
@@ -122,6 +122,7 @@ class RateLimitItemPerHour(RateLimitItem):
     """
     per hour rate limited resource.
     """
+
     granularity = TIME_TYPES["hour"]
 
 
@@ -129,6 +130,7 @@ class RateLimitItemPerMinute(RateLimitItem):
     """
     per minute rate limited resource.
     """
+
     granularity = TIME_TYPES["minute"]
 
 
@@ -136,4 +138,5 @@ class RateLimitItemPerSecond(RateLimitItem):
     """
     per second rate limited resource.
     """
+
     granularity = TIME_TYPES["second"]

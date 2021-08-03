@@ -1,14 +1,17 @@
 from typing import Optional
 from urllib.parse import urlparse
 
+from freiner.errors import FreinerConfigurationError
+
+from .redis import RedisStorage
+
+
 try:
     import redis.sentinel
+
     HAS_REDIS = True
 except ImportError:
     HAS_REDIS = False
-
-from ..errors import FreinerConfigurationError
-from .redis import RedisStorage
 
 
 class RedisSentinelStorage(RedisStorage):
@@ -28,7 +31,9 @@ class RedisSentinelStorage(RedisStorage):
         super().__init__(self._sentinel_master)
 
     @classmethod
-    def from_uri(cls, uri: str, service_name: Optional[str] = None, **options) -> "RedisSentinelStorage":
+    def from_uri(
+        cls, uri: str, service_name: Optional[str] = None, **options
+    ) -> "RedisSentinelStorage":
         """
         :param str uri: url of the form
          `redis+sentinel://host:port,host:port/service_name`
@@ -41,9 +46,7 @@ class RedisSentinelStorage(RedisStorage):
         """
 
         if not HAS_REDIS:
-            raise FreinerConfigurationError(
-                "Dependency 'redis' is not available."
-            )
+            raise FreinerConfigurationError("Dependency 'redis' is not available.")
 
         parsed_uri = urlparse(uri)
         sentinel_configuration = []
@@ -52,24 +55,17 @@ class RedisSentinelStorage(RedisStorage):
         if parsed_uri.password:
             password = parsed_uri.password
 
-        for loc in parsed_uri.netloc[parsed_uri.netloc.find("@") + 1:].split(","):
+        for loc in parsed_uri.netloc[parsed_uri.netloc.find("@") + 1 :].split(","):
             host, port = loc.split(":")
             sentinel_configuration.append((host, int(port)))
 
-        service_name = (
-            parsed_uri.path.replace("/", "")
-            if parsed_uri.path else service_name
-        )
+        service_name = parsed_uri.path.replace("/", "") if parsed_uri.path else service_name
         if service_name is None:
             raise FreinerConfigurationError("'service_name' not provided")
 
         options.setdefault("socket_timeout", 0.2)
 
-        sentinel = redis.sentinel.Sentinel(
-            sentinel_configuration,
-            password=password,
-            **options
-        )
+        sentinel = redis.sentinel.Sentinel(sentinel_configuration, password=password, **options)
         return cls(sentinel, service_name)
 
     def get(self, key: str) -> int:

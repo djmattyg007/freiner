@@ -2,13 +2,15 @@ import time
 from typing import List, Tuple, Union
 from urllib.parse import urlparse
 
+from freiner.errors import FreinerConfigurationError
+
+
 try:
     import pymemcache
+
     HAS_MEMCACHED = True
 except ImportError:
     HAS_MEMCACHED = False
-
-from ..errors import FreinerConfigurationError
 
 
 MemcachedClients = Union[pymemcache.Client, pymemcache.PooledClient, pymemcache.HashClient]
@@ -88,11 +90,16 @@ class MemcachedStorage:
                 value, cas = self._client.gets(key)
                 retry = 0
 
-                while not self._client.cas(key, int(value or 0) + 1, cas, expiry) and retry < self.MAX_CAS_RETRIES:
+                while (
+                    not self._client.cas(key, int(value or 0) + 1, cas, expiry)
+                    and retry < self.MAX_CAS_RETRIES
+                ):
                     value, cas = self._client.gets(key)
                     retry += 1
 
-                self._client.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
+                self._client.set(
+                    key + "/expires", expiry + time.time(), expire=expiry, noreply=False
+                )
                 return int(value or 0) + 1
             else:
                 return self._client.incr(key, 1)

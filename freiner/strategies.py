@@ -88,11 +88,14 @@ class MovingWindowRateLimiter(RateLimiter):
         :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
-        return self.storage.get_moving_window(
-            item.key_for(*identifiers),
-            item.amount,
-            item.get_expiry(),
-        )[1] < item.amount
+        return (
+            self.storage.get_moving_window(
+                item.key_for(*identifiers),
+                item.amount,
+                item.get_expiry(),
+            )[1]
+            < item.amount
+        )
 
     def get_window_stats(self, item: RateLimitItem, *identifiers):
         """
@@ -122,10 +125,7 @@ class FixedWindowRateLimiter(RateLimiter):
         :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
-        return (
-            self.storage.incr(item.key_for(*identifiers), item.get_expiry())
-            <= item.amount
-        )
+        return self.storage.incr(item.key_for(*identifiers), item.get_expiry()) <= item.amount
 
     def test(self, item: RateLimitItem, *identifiers) -> bool:
         """
@@ -146,9 +146,7 @@ class FixedWindowRateLimiter(RateLimiter):
         :param identifiers: variable list of strings to uniquely identify the limit
         :return: tuple (reset time (int), remaining (int))
         """
-        remaining = max(
-            0, item.amount - self.storage.get(item.key_for(*identifiers))
-        )
+        remaining = max(0, item.amount - self.storage.get(item.key_for(*identifiers)))
         reset = self.storage.get_expiry(item.key_for(*identifiers))
         return reset, remaining
 
@@ -166,8 +164,4 @@ class FixedWindowElasticExpiryRateLimiter(FixedWindowRateLimiter):
         :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
-        return (
-            self.storage.incr(
-                item.key_for(*identifiers), item.get_expiry(), True
-            ) <= item.amount
-        )
+        return self.storage.incr(item.key_for(*identifiers), item.get_expiry(), True) <= item.amount

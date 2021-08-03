@@ -31,10 +31,7 @@ class MemoryStorage:
         for key in self.events.keys():
             for event in list(self.events[key]):
                 with event:
-                    if (
-                        event.expiry <= time.time()
-                        and event in self.events[key]
-                    ):
+                    if event.expiry <= time.time() and event in self.events[key]:
                         self.events[key].remove(event)
 
         for key in list(self.expirations.keys()):
@@ -118,9 +115,7 @@ class MemoryStorage:
         """
         timestamp = time.time()
         if self.events.get(key):
-            return len([
-                k for k in self.events[key] if k.atime >= timestamp - expiry
-            ])
+            return len([k for k in self.events[key] if k.atime >= timestamp - expiry])
         else:
             return 0
 

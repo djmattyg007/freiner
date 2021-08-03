@@ -1,13 +1,16 @@
 from urllib.parse import urlparse
 
+from freiner.errors import FreinerConfigurationError
+
+from .redis import RedisStorage
+
+
 try:
     import rediscluster
+
     HAS_REDISCLUSTER = True
 except ImportError:
     HAS_REDISCLUSTER = False
-
-from ..errors import FreinerConfigurationError
-from .redis import RedisStorage
 
 
 class RedisClusterStorage(RedisStorage):
@@ -29,9 +32,7 @@ class RedisClusterStorage(RedisStorage):
         """
 
         if not HAS_REDISCLUSTER:
-            raise FreinerConfigurationError(
-                "Dependency 'redis-py-cluster' is not available."
-            )
+            raise FreinerConfigurationError("Dependency 'redis-py-cluster' is not available.")
 
         parsed_uri = urlparse(uri)
         cluster_hosts = []
