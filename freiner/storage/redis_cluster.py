@@ -7,7 +7,6 @@ except ImportError:
     HAS_REDISCLUSTER = False
 
 from ..errors import FreinerConfigurationError
-from ..util import get_dependency
 from .redis import RedisStorage
 
 

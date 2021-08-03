@@ -24,19 +24,6 @@ EXPR = re.compile(
 )
 
 
-# TODO: Eliminate this function
-def get_dependency(dep):
-    """
-    safe function to import a module programmatically
-    :return: module or None (if not importable)
-    """
-    try:
-        __import__(dep)
-        return sys.modules[dep]
-    except ImportError:  # pragma: no cover
-        return None
-
-
 def parse_many(limit_string: str) -> Sequence[RateLimitItem]:
     """
     parses rate limits in string notation containing multiple rate limits

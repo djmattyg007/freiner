@@ -59,9 +59,9 @@ class RedisInteractor:
 
     SCRIPT_INCR_EXPIRE = """
         local current
-        current = redis.call("incr",KEYS[1])
+        current = redis.call("incr", KEYS[1])
         if tonumber(current) == 1 then
-            redis.call("expire",KEYS[1],ARGV[1])
+            redis.call("expire", KEYS[1], ARGV[1])
         end
         return current
     """
@@ -249,7 +249,6 @@ class RedisStorage(RedisInteractor):
            This operation was designed to be fast, but was not tested
            on a large production based system. Be careful with its usage as it
            could be slow on very large data sets.
-
         """
 
         cleared = self.lua_clear_keys(('LIMITER*',))

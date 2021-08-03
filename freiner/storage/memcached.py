@@ -20,6 +20,7 @@ class MemcachedStorage:
 
     Depends on the `pymemcache` library.
     """
+
     MAX_CAS_RETRIES = 10
 
     def __init__(self, client: MemcachedClients):
@@ -32,7 +33,7 @@ class MemcachedStorage:
          `memcached://host:port,host:port`, `memcached:///run/path/to/sock`
         :param options: all remaining keyword arguments are passed
          directly to the constructor of :class:`pymemcache.client.base.Client`
-        :raise FreinerConfigurationError: when `pymemcache` is not available
+        :raise FreinerConfigurationError: when `pymemcache` dependency is not available
         """
 
         if not HAS_MEMCACHED:
