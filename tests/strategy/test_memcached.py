@@ -79,4 +79,5 @@ def test_fixed_window_with_elastic_expiry_concurrency(pooled_client: pymemcache.
 def test_moving_window(client: pymemcache.Client):
     storage = MemcachedStorage(client)
     with pytest.raises(TypeError):
-        MovingWindowRateLimiter(storage)
+        # Ignore the type error here because that's exactly what we're testing for.
+        MovingWindowRateLimiter(storage)  # type: ignore

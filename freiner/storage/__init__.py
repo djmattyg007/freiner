@@ -1,11 +1,13 @@
-from typing import Protocol, Tuple
+from typing import Tuple
+
+from typing_extensions import Protocol, runtime_checkable
 
 from freiner.errors import FreinerConfigurationError
 
 from .memory import MemoryStorage
 
 
-# When support for python3.7 is dropped, @runtime_checkable should be added to this
+@runtime_checkable
 class Storage(Protocol):
     def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
@@ -32,19 +34,20 @@ class Storage(Protocol):
         check if storage is healthy
         """
 
-    def reset(self):
-        """
-        reset storage to clear limits
-        """
-
     def clear(self, key: str):
         """
         resets the rate limit key
         :param str key: the key to clear rate limits for
         """
 
+    def reset(self):
+        """
+        reset storage to clear limits
+        """
 
-class MovingWindowStorage(Storage):
+
+@runtime_checkable
+class MovingWindowStorage(Storage, Protocol):
     def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
         """
         :param str key: rate limit key to acquire an entry in
@@ -55,7 +58,7 @@ class MovingWindowStorage(Storage):
         :rtype: bool
         """
 
-    def get_moving_window(self, key: str, limit: int, expiry) -> Tuple[int, int]:
+    def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[int, int]:
         """
         returns the starting point and the number of entries in the moving window
 

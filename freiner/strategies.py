@@ -57,9 +57,7 @@ class MovingWindowRateLimiter(RateLimiter):
     """
 
     def __init__(self, storage: MovingWindowStorage):
-        # When support for python3.7 is dropped, we should be able to use isinstance()
-        # combined with @runtime_checkable
-        if not hasattr(storage, "acquire_entry") or not hasattr(storage, "get_moving_window"):
+        if not isinstance(storage, MovingWindowStorage):
             msg = f"MovingWindowRateLimiting is not implemented for storage of type {storage.__class__}"
             raise TypeError(msg)
 
