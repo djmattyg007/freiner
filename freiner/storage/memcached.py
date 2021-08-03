@@ -62,14 +62,6 @@ class MemcachedStorage:
             if len(hosts) > 1 else module.Client(*hosts, **kwargs)
         )
 
-    def call_memcached_func(self, func, *args, **kwargs):
-        if 'noreply' in kwargs:
-            # TODO: fix this if possible, otherwise strongly consider dropping memcached integration
-            argspec = inspect.getargspec(func)
-            if not ('noreply' in argspec.args or argspec.keywords):
-                kwargs.pop('noreply')  # noqa
-        return func(*args, **kwargs)
-
     @property
     def storage(self):
         """
@@ -110,37 +102,22 @@ class MemcachedStorage:
         :param bool elastic_expiry: whether to keep extending the rate limit
          window every hit.
         """
-        if not self.call_memcached_func(
-            self.storage.add, key, 1, expiry, noreply=False
-        ):
+
+        if not self.storage.add(key, 1, expiry, noreply=False):
             if elastic_expiry:
                 value, cas = self.storage.gets(key)
                 retry = 0
-                while (
-                    not self.call_memcached_func(
-                        self.storage.cas, key,
-                        int(value or 0) + 1, cas, expiry
-                    ) and retry < self.MAX_CAS_RETRIES
-                ):
+
+                while not self.storage.cas(key, int(value or 0) + 1, cas, expiry) and retry < self.MAX_CAS_RETRIES:
                     value, cas = self.storage.gets(key)
                     retry += 1
-                self.call_memcached_func(
-                    self.storage.set,
-                    key + "/expires",
-                    expiry + time.time(),
-                    expire=expiry,
-                    noreply=False
-                )
+
+                self.storage.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
                 return int(value or 0) + 1
             else:
                 return self.storage.incr(key, 1)
-        self.call_memcached_func(
-            self.storage.set,
-            key + "/expires",
-            expiry + time.time(),
-            expire=expiry,
-            noreply=False
-        )
+
+        self.storage.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
         return 1
 
     def get_expiry(self, key: str) -> int:
@@ -154,7 +131,7 @@ class MemcachedStorage:
         check if storage is healthy
         """
         try:
-            self.call_memcached_func(self.storage.get, 'limiter-check')
+            self.storage.get("freiner-check")
             return True
         except:  # noqa
             return False
