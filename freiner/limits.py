@@ -77,7 +77,7 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
             safe_string(self.amount),
             safe_string(self.multiples), self.granularity[1]
         ])
-        return "%s/%s" % (self.namespace, remainder)
+        return "{}/{}".format(self.namespace, remainder)
 
     def __eq__(self, other) -> bool:
         return (
@@ -85,11 +85,13 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
             and self.granularity == other.granularity
         )
 
-    def __repr__(self) -> str:
-        # TODO: Move this to __str__, change __repr__ to provide more traditional __repr__ output
-        return "%d per %d %s" % (
+    def __str__(self) -> str:
+        return "{} per {} {}".format(
             self.amount, self.multiples, self.granularity[1]
         )
+
+    def __repr__(self) -> str:
+        return "{}<{}>".format(self.__class__.__name__, str(self))
 
     def __lt__(self, other) -> bool:
         return self.granularity[0] < other.granularity[0]
