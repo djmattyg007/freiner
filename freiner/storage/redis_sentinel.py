@@ -13,16 +13,26 @@ from .redis import RedisStorage
 
 class RedisSentinelStorage(RedisStorage):
     """
-    Rate limit storage with redis sentinel as backend
+    Rate limit storage with redis sentinel as backend.
 
-    Depends on `redis-sentinel` library
+    Depends on `redis` library.
     """
 
-    def __init__(self, uri: str, service_name: Optional[str] = None, **options):
+    def __init__(self, sentinel: redis.sentinel.Sentinel, service_name: str):
+        self._sentinel: redis.sentinel.Sentinel = sentinel
+        self._service_name: str = service_name
+
+        self._sentinel_master: redis.Redis = self._sentinel.master_for(self._service_name)
+        self._sentinel_slave: redis.Redis = self._sentinel.slave_for(self._service_name)
+
+        super().__init__(self._sentinel_master)
+
+    @classmethod
+    def from_uri(cls, uri: str, service_name: Optional[str] = None, **options) -> "RedisSentinelStorage":
         """
         :param str uri: url of the form
          `redis+sentinel://host:port,host:port/service_name`
-        :param str service_name, optional: sentinel service name
+        :param Optional[str] service_name: sentinel service name
          (if not provided in `uri`)
         :param options: all remaining keyword arguments are passed
          directly to the constructor of :class:`redis.sentinel.Sentinel`
@@ -32,49 +42,50 @@ class RedisSentinelStorage(RedisStorage):
 
         if not HAS_REDIS:
             raise FreinerConfigurationError(
-                "redis-sentinel prerequisite not available"
+                "Dependency 'redis' is not available."
             )
 
         parsed_uri = urlparse(uri)
         sentinel_configuration = []
+
         password = None
         if parsed_uri.password:
             password = parsed_uri.password
+
         for loc in parsed_uri.netloc[parsed_uri.netloc.find("@") + 1:].split(","):
             host, port = loc.split(":")
             sentinel_configuration.append((host, int(port)))
-        self.service_name = (
+
+        service_name = (
             parsed_uri.path.replace("/", "")
             if parsed_uri.path else service_name
         )
-        if self.service_name is None:
+        if service_name is None:
             raise FreinerConfigurationError("'service_name' not provided")
 
-        options.setdefault('socket_timeout', 0.2)
+        options.setdefault("socket_timeout", 0.2)
 
-        self.sentinel = redis.sentinel.Sentinel(
+        sentinel = redis.sentinel.Sentinel(
             sentinel_configuration,
             password=password,
             **options
         )
-        self.storage = self.sentinel.master_for(self.service_name)
-        self.storage_slave = self.sentinel.slave_for(self.service_name)
-        self.initialize_storage(self.storage)
+        return cls(sentinel, service_name)
 
     def get(self, key: str) -> int:
         """
         :param str key: the key to get the counter value for
         """
-        return self._get(key, self.storage_slave)
+        return self._get(key, self._sentinel_slave)
 
     def get_expiry(self, key: str) -> int:
         """
         :param str key: the key to get the expiry for
         """
-        return self._get_expiry(key, self.storage_slave)
+        return self._get_expiry(key, self._sentinel_slave)
 
     def check(self) -> bool:
         """
         check if storage is healthy
         """
-        return self._check(self.storage_slave)
+        return self._check(self._sentinel_slave)

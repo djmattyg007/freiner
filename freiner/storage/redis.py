@@ -66,26 +66,38 @@ class RedisInteractor:
         return current
     """
 
-    def initialize_storage(self, storage):
+    def initialize_storage(self, storage: redis.Redis):
         moving_window_script = storage.register_script(
             self.SCRIPT_MOVING_WINDOW
         )
-        self.lua_moving_window = cast(Callable[[Tuple[str], Tuple[int, int]], Tuple[int, int]], moving_window_script)
+        self.lua_moving_window = cast(
+            Callable[[Tuple[str], Tuple[int, int]], Tuple[int, int]],
+            moving_window_script,
+        )
 
         acquire_window_script = storage.register_script(
             self.SCRIPT_ACQUIRE_MOVING_WINDOW
         )
-        self.lua_acquire_window = cast(Callable[[Tuple[str], Tuple[float, int, int, int]], bool], acquire_window_script)
+        self.lua_acquire_window = cast(
+            Callable[[Tuple[str], Tuple[float, int, int, int]], bool],
+            acquire_window_script,
+        )
 
         clear_keys_script = storage.register_script(
             self.SCRIPT_CLEAR_KEYS
         )
-        self.lua_clear_keys = cast(Callable[[Tuple[str]], int], clear_keys_script)
+        self.lua_clear_keys = cast(
+            Callable[[Tuple[str]], int],
+            clear_keys_script,
+        )
 
         incr_expire_script = storage.register_script(
             RedisStorage.SCRIPT_INCR_EXPIRE
         )
-        self.lua_incr_expire = cast(Callable[[Tuple[str], Tuple[int]], int], incr_expire_script)
+        self.lua_incr_expire = cast(
+            Callable[[Tuple[str], Tuple[int]], int],
+            incr_expire_script,
+        )
 
     def _incr(self, key: str, expiry: int, connection, elastic_expiry: bool = False):
         """
@@ -145,7 +157,7 @@ class RedisInteractor:
         )
         return bool(acquired)
 
-    def _get_expiry(self, key: str, connection=None) -> int:
+    def _get_expiry(self, key: str, connection) -> int:
         """
         :param str key: the key to get the expiry for
         :param connection: Redis connection
@@ -167,29 +179,30 @@ class RedisStorage(RedisInteractor):
     """
     Rate limit storage with redis as backend.
 
-    Depends on the `redis-py` library.
+    Depends on the `redis` library.
     """
 
-    def __init__(self, uri: str, **options):
+    def __init__(self, client: redis.Redis):
+        self._client = client
+        self.initialize_storage(self._client)
+
+    @classmethod
+    def from_uri(cls, uri: str, **options) -> "RedisStorage":
         """
         :param str uri: uri of the form `redis://[:password]@host:port`,
          `redis://[:password]@host:port/db`,
-         `rediss://[:password]@host:port`, `redis+unix:///path/to/sock` etc.
-         This uri is passed directly to :func:`redis.from_url` except for the
-         case of `redis+unix` where it is replaced with `unix`.
+         `rediss://[:password]@host:port`, `unix:///path/to/sock` etc.
+         This uri is passed directly to :func:`redis.from_url`.
         :param options: all remaining keyword arguments are passed
          directly to the constructor of :class:`redis.Redis`
-        :raise FreinerConfigurationError: when the redis library is not available
+        :raise FreinerConfigurationError: when `redis` dependency is not available
         """
 
         if not HAS_REDIS:
-            raise FreinerConfigurationError(
-                "redis prerequisite not available"
-            )
+            raise FreinerConfigurationError("Dependency 'redis' is not available.")
 
-        # TODO: rename self.storage to self.connection
-        self.storage: redis.Redis = redis.from_url(uri, **options)
-        self.initialize_storage(self.storage)
+        client: redis.Redis = redis.from_url(uri, **options)
+        return cls(client)
 
     def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
@@ -199,7 +212,7 @@ class RedisStorage(RedisInteractor):
         :param int expiry: amount in seconds for the key to expire in
         """
         if elastic_expiry:
-            return self._incr(key, expiry, self.storage, elastic_expiry)
+            return self._incr(key, expiry, self._client, elastic_expiry)
         else:
             return self.lua_incr_expire((key,), (expiry,))
 
@@ -207,13 +220,13 @@ class RedisStorage(RedisInteractor):
         """
         :param str key: the key to get the counter value for
         """
-        return self._get(key, self.storage)
+        return self._get(key, self._client)
 
     def clear(self, key: str):
         """
         :param str key: the key to clear rate limits for
         """
-        return self._clear(key, self.storage)
+        return self._clear(key, self._client)
 
     def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
         """
@@ -225,20 +238,20 @@ class RedisStorage(RedisInteractor):
         :return: True/False
         """
         return self._acquire_entry(
-            key, limit, expiry, self.storage, no_add=no_add
+            key, limit, expiry, self._client, no_add=no_add
         )
 
     def get_expiry(self, key: str) -> int:
         """
         :param str key: the key to get the expiry for
         """
-        return self._get_expiry(key, self.storage)
+        return self._get_expiry(key, self._client)
 
     def check(self) -> bool:
         """
         check if storage is healthy
         """
-        return self._check(self.storage)
+        return self._check(self._client)
 
     def reset(self):
         """

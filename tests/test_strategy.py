@@ -96,7 +96,7 @@ class WindowTests(unittest.TestCase):
         self.assertEqual(storage.get(limit.key_for()), 10)
 
     def test_fixed_window_with_elastic_expiry_redis(self):
-        storage = RedisStorage('redis://localhost:7379')
+        storage = RedisStorage.from_uri('redis://localhost:7379')
         limiter = FixedWindowElasticExpiryRateLimiter(storage)
         limit = RateLimitItemPerSecond(10, 2)
         self.assertTrue(all([limiter.hit(limit) for _ in range(0, 10)]))
@@ -107,7 +107,7 @@ class WindowTests(unittest.TestCase):
         self.assertEqual(limiter.get_window_stats(limit)[1], 0)
 
     def test_fixed_window_with_elastic_expiry_redis_sentinel(self):
-        storage = RedisSentinelStorage(
+        storage = RedisSentinelStorage.from_uri(
             "redis+sentinel://localhost:26379",
             service_name="localhost-redis-sentinel"
         )
@@ -147,7 +147,7 @@ class WindowTests(unittest.TestCase):
             self.assertEqual(limiter.get_window_stats(limit)[1], 10)
 
     def test_moving_window_redis(self):
-        storage = RedisStorage("redis://localhost:7379")
+        storage = RedisStorage.from_uri("redis://localhost:7379")
         limiter = MovingWindowRateLimiter(storage)
         limit = RateLimitItemPerSecond(10, 2)
 

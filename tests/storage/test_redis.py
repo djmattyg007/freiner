@@ -62,16 +62,14 @@ class SharedRedisTests(object):
         last = time.time()
         while time.time() - last <= 1:
             time.sleep(0.05)
-        self.assertTrue(
-            self.storage.storage.keys("%s/*" % limit.namespace) == []
-        )
+        self.assertTrue(self.storage._client.keys("%s/*" % limit.namespace) == [])
 
 
 @pytest.mark.unit
 class RedisStorageTests(SharedRedisTests, unittest.TestCase):
     def setUp(self):
         self.storage_url = "redis://localhost:7379"
-        self.storage = RedisStorage(self.storage_url)
+        self.storage = RedisStorage.from_uri(self.storage_url)
         redis.from_url(self.storage_url).flushall()
 
     # TODO: Re-do this once URIs go to named constructors
@@ -93,7 +91,7 @@ class RedisUnixSocketStorageTests(SharedRedisTests, unittest.TestCase):
         self.redis_socket_path = DOCKERDIR / "redis" / "freiner.redis.sock"
 
         self.storage_url = "unix://" + str(self.redis_socket_path)
-        self.storage = RedisStorage(self.storage_url)
+        self.storage = RedisStorage.from_uri(self.storage_url)
         redis.from_url("unix://" + str(self.redis_socket_path)).flushall()
 
     # TODO: Re-do this once URIs go to named constructors

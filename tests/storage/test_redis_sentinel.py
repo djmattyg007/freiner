@@ -11,7 +11,7 @@ class RedisSentinelStorageTests(SharedRedisTests, unittest.TestCase):
     def setUp(self):
         self.storage_url = 'redis+sentinel://localhost:26379'
         self.service_name = 'localhost-redis-sentinel'
-        self.storage = RedisSentinelStorage(
+        self.storage = RedisSentinelStorage.from_uri(
             self.storage_url,
             service_name=self.service_name
         )

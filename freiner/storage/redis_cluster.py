@@ -12,12 +12,13 @@ from .redis import RedisStorage
 
 class RedisClusterStorage(RedisStorage):
     """
-    Rate limit storage with redis cluster as backend
+    Rate limit storage with redis cluster as backend.
 
-    Depends on `redis-py-cluster` library
+    Depends on `redis-py-cluster` library.
     """
 
-    def __init__(self, uri: str, **options):
+    @classmethod
+    def from_uri(cls, uri: str, **options) -> "RedisClusterStorage":
         """
         :param str uri: url of the form
          `redis+cluster://[:password]@host:port,host:port`
@@ -29,7 +30,7 @@ class RedisClusterStorage(RedisStorage):
 
         if not HAS_REDISCLUSTER:
             raise FreinerConfigurationError(
-                "redis-py-cluster prerequisite not available"
+                "Dependency 'redis-py-cluster' is not available."
             )
 
         parsed_uri = urlparse(uri)
@@ -38,13 +39,11 @@ class RedisClusterStorage(RedisStorage):
             host, port = loc.split(":")
             cluster_hosts.append({"host": host, "port": int(port)})
 
-        options.setdefault('max_connections', 1000)
+        options.setdefault("max_connections", 1000)
+        options["startup_nodes"] = cluster_hosts
 
-        self.storage = rediscluster.RedisCluster(
-            startup_nodes=cluster_hosts,
-            **options
-        )
-        self.initialize_storage(self.storage)
+        client = rediscluster.RedisCluster(**options)
+        return cls(client)
 
     def reset(self):
         """
@@ -59,5 +58,5 @@ class RedisClusterStorage(RedisStorage):
          usage as it could be slow on very large data sets.
         """
 
-        keys = self.storage.keys('LIMITER*')
-        return sum([self.storage.delete(k.decode('utf-8')) for k in keys])
+        keys = self._client.keys("LIMITER*")
+        return sum([self._client.delete(k.decode("utf-8")) for k in keys])
