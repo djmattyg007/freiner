@@ -3,17 +3,19 @@ version: "3.8"
 services:
   # memcached
   memcached-1:
-    image: memcached
-    command: -p 22122
+    image: bitnami/memcached
+    environment:
+      - MEMCACHED_PORT_NUMBER=22122
     ports:
       - "22122:22122"
   memcached-2:
-    image: memcached
-    command: -p 22123
+    image: bitnami/memcached
+    environment:
+      - MEMCACHED_PORT_NUMBER=22123
     ports:
       - "22123:22123"
   memcached-uds:
-    image: memcached
+    image: bitnami/memcached
     command: memcached -s /sockets/freiner.memcached.sock -a 777
     volumes:
       - type: bind
@@ -42,7 +44,7 @@ services:
     ports:
       - "6381:6381"
   redis-sentinel:
-    image: "bitnami/redis-sentinel:latest"
+    image: bitnami/redis-sentinel
     depends_on:
       - redis-sentinel-master
       - redis-sentinel-slave
@@ -54,6 +56,7 @@ services:
     ports:
       - "26379:26379"
 
+  # redis basic
   redis-basic:
     image: bitnami/redis
     environment:
@@ -68,12 +71,11 @@ services:
       - REDIS_PASSWORD=sekret
     ports:
       - "7389:7389"
-  # TODO: Try to make this work with the bitnami/redis image
   redis-uds:
-    image: redis
+    image: bitnami/redis
     command: redis-server --port 0 --unixsocket /sockets/freiner.redis.sock --unixsocketperm 777
-#    environment:
-#      - ALLOW_EMPTY_PASSWORD=yes
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
     volumes:
       - type: bind
         source: .docker/redis/

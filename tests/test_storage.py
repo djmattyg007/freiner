@@ -178,5 +178,3 @@ class BaseStorageTests(unittest.TestCase):
         storage = MyStorage()
         strategy = MovingWindowRateLimiter(storage)
         assert strategy.storage is storage
-
-
