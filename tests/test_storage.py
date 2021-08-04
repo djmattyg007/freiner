@@ -169,6 +169,15 @@ class BaseStorageTests(unittest.TestCase):
             def get_expiry(self, key: str) -> int:
                 return int(time.time())
 
+            def check(self) -> bool:
+                return True
+
+            def clear(self, key: str):
+                pass
+
+            def reset(self):
+                pass
+
             def acquire_entry(self, *a, **k) -> bool:
                 return True
 
