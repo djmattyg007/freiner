@@ -13,10 +13,9 @@ def client() -> redis.Redis:
     return redis.from_url("redis://localhost:7379")
 
 
-# TODO: This isn't testing anything useful, and should be moved to a more generic "from_uri" test in the storage tests
 @pytest.fixture
-def password_client() -> redis.Redis:
-    return redis.from_url("redis://:sekret@localhost:7389")
+def storage(client: redis.Redis) -> RedisStorage:
+    return RedisStorage(client)
 
 
 @pytest.fixture(autouse=True)
@@ -24,13 +23,7 @@ def flush_client(client: redis.Redis):
     client.flushall()
 
 
-@pytest.fixture(autouse=True)
-def flush_password_client(password_client: redis.Redis):
-    password_client.flushall()
-
-
-def test_fixed_window_with_elastic_expiry(client: redis.Redis):
-    storage = RedisStorage(client)
+def test_fixed_window_with_elastic_expiry(storage: RedisStorage):
     limiter = FixedWindowElasticExpiryRateLimiter(storage)
     limit = RateLimitItemPerSecond(10, 2)
 
@@ -44,8 +37,7 @@ def test_fixed_window_with_elastic_expiry(client: redis.Redis):
     assert limiter.get_window_stats(limit)[1] == 0
 
 
-def test_moving_window(client: redis.Redis):
-    storage = RedisStorage(client)
+def test_moving_window(storage: RedisStorage):
     limiter = MovingWindowRateLimiter(storage)
     limit = RateLimitItemPerSecond(10, 2)
 

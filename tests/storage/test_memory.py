@@ -14,11 +14,6 @@ def storage() -> MemoryStorage:
     return MemoryStorage()
 
 
-class MemoryStorageTests(unittest.TestCase):
-    def setUp(self):
-        self.storage = MemoryStorage()
-
-
 def test_in_memory(storage: MemoryStorage):
     limiter = FixedWindowRateLimiter(storage)
     with hiro.Timeline().freeze() as timeline:

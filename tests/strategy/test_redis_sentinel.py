@@ -18,13 +18,17 @@ def service_name() -> str:
     return "localhost-redis-sentinel"
 
 
+@pytest.fixture
+def storage(client: redis.sentinel.Sentinel, service_name: str) -> RedisSentinelStorage:
+    return RedisSentinelStorage(client, service_name)
+
+
 @pytest.fixture(autouse=True)
 def flush_client(client: redis.sentinel.Sentinel, service_name: str):
     client.master_for(service_name).flushall()
 
 
-def test_fixed_window_with_elastic_expiry_redis_sentinel(client, service_name):
-    storage = RedisSentinelStorage(client, service_name)
+def test_fixed_window_with_elastic_expiry_redis_sentinel(storage: RedisSentinelStorage):
     limiter = FixedWindowElasticExpiryRateLimiter(storage)
     limit = RateLimitItemPerSecond(10, 2)
 
