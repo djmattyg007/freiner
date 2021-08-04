@@ -106,7 +106,7 @@ class MemoryStorage:
         """
         return int(self.expirations.get(key, -1))
 
-    def get_num_acquired(self, key: str, expiry) -> int:
+    def get_num_acquired(self, key: str, expiry: int) -> int:
         """
         returns the number of entries already acquired
 
@@ -119,7 +119,7 @@ class MemoryStorage:
         else:
             return 0
 
-    def get_moving_window(self, key: str, limit: int, expiry) -> Tuple[int, int]:
+    def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[int, int]:
         """
         returns the starting point and the number of entries in the moving window
 

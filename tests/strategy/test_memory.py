@@ -86,6 +86,7 @@ def test_test_fixed_window(storage: MemoryStorage):
     with freeze_time():
         limit = RateLimitItemPerSecond(2, 1)
 
+        assert limiter.test(limit) is True
         assert limiter.hit(limit) is True
         assert limiter.test(limit) is True
         assert limiter.hit(limit) is True
@@ -98,6 +99,7 @@ def test_test_moving_window(storage: MemoryStorage):
     with freeze_time():
         limit = RateLimitItemPerSecond(2, 1)
 
+        assert limiter.test(limit) is True
         assert limiter.hit(limit) is True
         assert limiter.test(limit) is True
         assert limiter.hit(limit) is True

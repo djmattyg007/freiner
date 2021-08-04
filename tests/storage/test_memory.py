@@ -11,7 +11,9 @@ from tests import freeze_time
 
 @pytest.fixture
 def storage() -> MemoryStorage:
-    return MemoryStorage()
+    memory_storage = MemoryStorage()
+    assert memory_storage.check() is True
+    return memory_storage
 
 
 def test_in_memory(storage: MemoryStorage):

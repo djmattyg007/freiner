@@ -25,3 +25,15 @@ def test_comparison():
     assert limits.RateLimitItemPerHour(1) < limits.RateLimitItemPerDay(1)
     assert limits.RateLimitItemPerDay(1) < limits.RateLimitItemPerMonth(1)
     assert limits.RateLimitItemPerMonth(1) < limits.RateLimitItemPerYear(1)
+
+
+def test_no_granularity():
+    def _define_class():
+        class NoGranularity(limits.RateLimitItem):
+            pass
+
+    known_granularities_before = list(limits.GRANULARITIES.keys())
+    _define_class()
+    known_granularities_after = list(limits.GRANULARITIES.keys())
+
+    assert known_granularities_after == known_granularities_before
