@@ -1,122 +1,123 @@
-import time
+from pathlib import Path
+from typing import Tuple
 import unittest
 import unittest.mock
 
 import pytest
 import redis
 
-from freiner import RateLimitItemPerSecond, RateLimitItemPerMinute
 from freiner.storage.redis import RedisStorage
-from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
 
 from tests import DOCKERDIR
 
-
-@pytest.mark.unit
-class SharedRedisTests(object):
-    def test_fixed_window(self):
-        limiter = FixedWindowRateLimiter(self.storage)
-        per_second = RateLimitItemPerSecond(10)
-
-        start = time.time()
-        count = 0
-        while time.time() - start < 0.5 and count < 10:
-            self.assertTrue(limiter.hit(per_second))
-            count += 1
-        self.assertFalse(limiter.hit(per_second))
-
-        while time.time() - start <= 1:
-            time.sleep(0.1)
-        [self.assertTrue(limiter.hit(per_second)) for _ in range(10)]
-
-    # TODO: Redo this test to not care about how many entries were deleted
-    # Instead, we should demonstrate that we can "break" the limit by continuing
-    # to hit after we reset.
-    # def test_reset(self):
-    #     limiter = FixedWindowRateLimiter(self.storage)
-    #
-    #     for i in range(0, 10):
-    #         rate = RateLimitItemPerMinute(i)
-    #         limiter.hit(rate)
-    #
-    #     self.assertEqual(self.storage.reset(), 10)
-
-    def test_fixed_window_clear(self):
-        limiter = FixedWindowRateLimiter(self.storage)
-        per_min = RateLimitItemPerMinute(1)
-
-        limiter.hit(per_min)
-        self.assertFalse(limiter.hit(per_min))
-
-        limiter.clear(per_min)
-        self.assertTrue(limiter.hit(per_min))
-
-    def test_moving_window_clear(self):
-        limiter = MovingWindowRateLimiter(self.storage)
-        per_min = RateLimitItemPerMinute(1)
-
-        limiter.hit(per_min)
-        self.assertFalse(limiter.hit(per_min))
-
-        limiter.clear(per_min)
-        self.assertTrue(limiter.hit(per_min))
-
-    def test_moving_window_expiry(self):
-        limiter = MovingWindowRateLimiter(self.storage)
-        limit = RateLimitItemPerSecond(2)
-
-        self.assertTrue(limiter.hit(limit))
-
-        time.sleep(0.9)
-        self.assertTrue(limiter.hit(limit))
-        self.assertFalse(limiter.hit(limit))
-
-        time.sleep(0.1)
-        self.assertTrue(limiter.hit(limit))
-
-        last = time.time()
-        while time.time() - last <= 1:
-            time.sleep(0.05)
-        self.assertTrue(self.storage._client.keys("%s/*" % limit.namespace) == [])
+from ._redis import _test_fixed_window, _test_fixed_window_clear, _test_moving_window_clear, _test_moving_window_expiry, _test_reset
 
 
-@pytest.mark.unit
-class RedisStorageTests(SharedRedisTests, unittest.TestCase):
-    def setUp(self):
-        self.storage_url = "redis://localhost:7379"
-        self.storage = RedisStorage.from_uri(self.storage_url)
-        redis.from_url(self.storage_url).flushall()
-
-    # TODO: Re-do this once URIs go to named constructors
-    # Also add a test for "missing dependency" in the named constructor
-    # def test_init_options(self):
-    #     with unittest.mock.patch(
-    #         "freiner.storage.redis.get_dependency"
-    #     ) as get_dependency:
-    #         storage = RedisStorage(self.storage_url, connection_timeout=1)
-    #         storage.check()
-    #         self.assertEqual(
-    #             get_dependency().from_url.call_args[1]["connection_timeout"], 1
-    #         )
+Host = Tuple[str, int]
+ProtectedHost = Tuple[str, int, str]
 
 
-@pytest.mark.unit
-class RedisUnixSocketStorageTests(SharedRedisTests, unittest.TestCase):
-    def setUp(self):
-        self.redis_socket_path = DOCKERDIR / "redis" / "freiner.redis.sock"
+@pytest.fixture
+def default_host() -> Host:
+    return "localhost", 7379
 
-        self.storage_url = "unix://" + str(self.redis_socket_path)
-        self.storage = RedisStorage.from_uri(self.storage_url)
-        redis.from_url("unix://" + str(self.redis_socket_path)).flushall()
 
-    # TODO: Re-do this once URIs go to named constructors
-    # Also add a test for "missing dependency" in the named constructor
-    # def test_init_options(self):
-    #     with unittest.mock.patch(
-    #         "freiner.storage.redis.get_dependency"
-    #     ) as get_dependency:
-    #         storage = RedisStorage(self.storage_url, connection_timeout=1)
-    #         storage.check()
-    #         self.assertEqual(
-    #             get_dependency().from_url.call_args[1]["connection_timeout"], 1
-    #         )
+@pytest.fixture
+def protected_host() -> ProtectedHost:
+    return "localhost", 7389, "sekret"
+
+
+@pytest.fixture
+def unix_socket_path() -> Path:
+    return DOCKERDIR / "redis" / "freiner.redis.sock"
+
+
+@pytest.fixture
+def default_host_uri(default_host: Host) -> str:
+    return f"redis://{default_host[0]}:{default_host[1]}"
+
+
+@pytest.fixture
+def protected_host_uri(protected_host: ProtectedHost) -> str:
+    return f"redis://:{protected_host[2]}@{protected_host[0]}:{protected_host[1]}"
+
+
+@pytest.fixture
+def unix_socket_host_uri(unix_socket_path: Path) -> str:
+    return "unix://" + str(unix_socket_path)
+
+
+@pytest.fixture
+def default_client(default_host_uri: str) -> redis.Redis:
+    return redis.from_url(default_host_uri)
+
+
+@pytest.fixture
+def protected_client(protected_host_uri: str) -> redis.Redis:
+    return redis.from_url(protected_host_uri)
+
+
+@pytest.fixture
+def unix_socket_client(unix_socket_host_uri: str) -> redis.Redis:
+    return redis.from_url(unix_socket_host_uri)
+
+
+@pytest.fixture(autouse=True)
+def flush_default_host(default_client: redis.Redis):
+    default_client.flushall()
+
+
+@pytest.fixture(autouse=True)
+def flush_protected_host(protected_client: redis.Redis):
+    protected_client.flushall()
+
+
+@pytest.fixture(autouse=True)
+def flush_unix_socket_host(unix_socket_client: redis.Redis):
+    unix_socket_client.flushall()
+
+
+@pytest.fixture(
+    params=(default_client, protected_client, unix_socket_client)
+)
+def client(request) -> redis.Redis:
+    return request.getfixturevalue(request.param.__name__)
+
+
+def test_from_uri(default_host_uri: str):
+    storage = RedisStorage.from_uri(default_host_uri)
+    assert isinstance(storage, RedisStorage)
+    assert isinstance(storage._client, redis.Redis)
+    assert storage.check() is True
+
+
+def test_from_uri_with_options(default_host_uri: str):
+    with unittest.mock.patch("freiner.storage.redis.redis") as mock_redis:
+        storage = RedisStorage.from_uri(default_host_uri, connection_timeout=1)
+        assert isinstance(storage, RedisStorage)
+        assert mock_redis.from_url.call_args[1]["connection_timeout"] == 1
+
+
+def test_fixed_window(client: redis.Redis):
+    storage = RedisStorage(client)
+    _test_fixed_window(storage)
+
+
+def test_fixed_window_clear(client: redis.Redis):
+    storage = RedisStorage(client)
+    _test_fixed_window_clear(storage)
+
+
+def test_moving_window_expiry(client: redis.Redis):
+    storage = RedisStorage(client)
+    _test_moving_window_expiry(storage)
+
+
+def test_moving_window_clear(client: redis.Redis):
+    storage = RedisStorage(client)
+    _test_moving_window_clear(storage)
+
+
+def test_reset(client: redis.Redis):
+    storage = RedisStorage(client)
+    _test_reset(storage)
