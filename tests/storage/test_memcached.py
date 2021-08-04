@@ -1,3 +1,4 @@
+from pathlib import Path
 import time
 from typing import Tuple
 import unittest.mock
@@ -11,7 +12,7 @@ from freiner.strategies import (
     FixedWindowRateLimiter,
     FixedWindowElasticExpiryRateLimiter
 )
-from tests import fixed_start
+from tests import DOCKERDIR, fixed_start
 
 
 Host = Tuple[str, int]
@@ -33,6 +34,16 @@ def hash_hosts(default_host: Host, secondary_host: Host) -> Tuple[Host, ...]:
 
 
 @pytest.fixture
+def unix_socket_path() -> Path:
+    return DOCKERDIR / "memcached" / "freiner.memcached.sock"
+
+
+@pytest.fixture
+def unix_socket_host_uri(unix_socket_path: Path) -> str:
+    return "unix://" + str(unix_socket_path)
+
+
+@pytest.fixture
 def default_client(default_host: Host) -> pymemcache.Client:
     return pymemcache.Client(default_host)
 
@@ -42,9 +53,24 @@ def hash_client(hash_hosts: Tuple[Host, ...]) -> pymemcache.HashClient:
     return pymemcache.HashClient(hash_hosts)
 
 
+@pytest.fixture
+def unix_socket_client(unix_socket_host_uri: str) -> pymemcache.Client:
+    return pymemcache.Client(unix_socket_host_uri)
+
+
 @pytest.fixture(autouse=True)
 def flush_default_host(default_client: pymemcache.Client):
     default_client.flush_all()
+
+
+@pytest.fixture(autouse=True)
+def flush_hash_host(hash_client: pymemcache.HashClient):
+    hash_client.flush_all()
+
+
+@pytest.fixture(autouse=True)
+def flush_unix_socket_host(unix_socket_client: pymemcache.Client):
+    unix_socket_client.flush_all()
 
 
 def test_from_plain_uri(default_host: Host):
@@ -57,9 +83,9 @@ def test_from_plain_uri(default_host: Host):
 
 def test_from_plain_uri_with_options(default_host: Host):
     plain_uri = f"memcached://{default_host[0]}:{default_host[1]}"
-    with unittest.mock.patch("freiner.storage.memcached.pymemcache") as pymemcache:
+    with unittest.mock.patch("freiner.storage.memcached.pymemcache") as mock_pymemcache:
         MemcachedStorage.from_uri(plain_uri, connect_timeout=1)
-        assert pymemcache.Client.call_args[1]["connect_timeout"] == 1
+        assert mock_pymemcache.Client.call_args[1]["connect_timeout"] == 1
 
 
 def test_from_hash_uri(hash_hosts: Tuple[Host, ...]):
@@ -72,6 +98,13 @@ def test_from_hash_uri(hash_hosts: Tuple[Host, ...]):
     assert isinstance(hash_storage, MemcachedStorage)
     assert isinstance(hash_storage._client, pymemcache.HashClient)
     assert hash_storage.check() is True
+
+
+def test_from_unix_socket_uri(unix_socket_host_uri: str):
+    storage = MemcachedStorage.from_uri(unix_socket_host_uri)
+    assert isinstance(storage, MemcachedStorage)
+    assert isinstance(storage._client, pymemcache.Client)
+    assert storage.check() is True
 
 
 @fixed_start
