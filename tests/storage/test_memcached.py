@@ -196,7 +196,7 @@ def test_clear(default_client: pymemcache.Client):
     limiter = FixedWindowRateLimiter(storage)
     per_min = RateLimitItemPerMinute(1)
 
-    limiter.hit(per_min)
+    assert limiter.hit(per_min) is True
     assert limiter.hit(per_min) is False
 
     limiter.clear(per_min)
@@ -211,7 +211,7 @@ def test_reset(default_client: pymemcache.Client):
     limiter = FixedWindowRateLimiter(storage)
     per_min = RateLimitItemPerMinute(1)
 
-    limiter.hit(per_min)
+    assert limiter.hit(per_min) is True
     assert limiter.hit(per_min) is False
 
     storage.reset()

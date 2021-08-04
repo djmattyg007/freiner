@@ -1,5 +1,4 @@
 import time
-import unittest
 
 import hiro
 import pytest
