@@ -1,5 +1,4 @@
 import re
-import sys
 from typing import Sequence, Type, cast
 
 from .limits import GRANULARITIES, RateLimitItem

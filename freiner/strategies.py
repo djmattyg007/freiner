@@ -86,14 +86,12 @@ class MovingWindowRateLimiter(RateLimiter):
         :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
-        return (
-            self.storage.get_moving_window(
-                item.key_for(*identifiers),
-                item.amount,
-                item.get_expiry(),
-            )[1]
-            < item.amount
+
+        _, acquired_count = self.storage.get_moving_window(
+            item.key_for(*identifiers), item.amount, item.get_expiry()
         )
+
+        return acquired_count < item.amount
 
     def get_window_stats(self, item: RateLimitItem, *identifiers):
         """
@@ -162,7 +160,8 @@ class FixedWindowElasticExpiryRateLimiter(FixedWindowRateLimiter):
         :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
-        return (
-            self.storage.incr(item.key_for(*identifiers), item.get_expiry(), elastic_expiry=True)
-            <= item.amount
+
+        counter = self.storage.incr(
+            item.key_for(*identifiers), item.get_expiry(), elastic_expiry=True
         )
+        return counter <= item.amount

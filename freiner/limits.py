@@ -26,9 +26,9 @@ GRANULARITIES: Dict[str, Type["RateLimitItem"]] = {}
 
 
 class RateLimitItemMeta(type):
-    def __new__(mcs, name, parents, dct):
+    def __new__(cls, name, parents, dct):
         granularity = cast(
-            Type["RateLimitItem"], super(RateLimitItemMeta, mcs).__new__(mcs, name, parents, dct)
+            Type["RateLimitItem"], super(RateLimitItemMeta, cls).__new__(cls, name, parents, dct)
         )
         if "granularity" in dct:
             GRANULARITIES[dct["granularity"][1]] = granularity
@@ -75,10 +75,10 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
         :return: a string key identifying this resource with
          each identifier appended with a '/' delimiter.
         """
-        remainder = "/".join(
-            [safe_string(k) for k in identifiers]
-            + [safe_string(self.amount), safe_string(self.multiples), self.granularity[1]]
-        )
+        identifier_strings = [safe_string(k) for k in identifiers]
+        limit_strings = [safe_string(self.amount), safe_string(self.multiples), self.granularity[1]]
+
+        remainder = "/".join(identifier_strings + limit_strings)
         return "{}/{}".format(self.namespace, remainder)
 
     def __eq__(self, other) -> bool:

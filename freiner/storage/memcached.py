@@ -86,23 +86,21 @@ class MemcachedStorage:
         """
 
         if not self._client.add(key, 1, expiry, noreply=False):
-            if elastic_expiry:
-                value, cas = self._client.gets(key)
-                retry = 0
-
-                while (
-                    not self._client.cas(key, int(value or 0) + 1, cas, expiry)
-                    and retry < self.MAX_CAS_RETRIES
-                ):
-                    value, cas = self._client.gets(key)
-                    retry += 1
-
-                self._client.set(
-                    key + "/expires", expiry + time.time(), expire=expiry, noreply=False
-                )
-                return int(value or 0) + 1
-            else:
+            if not elastic_expiry:
                 return self._client.incr(key, 1)
+
+            value, cas = self._client.gets(key)
+            retry = 0
+
+            while (
+                not self._client.cas(key, int(value or 0) + 1, cas, expiry)
+                and retry < self.MAX_CAS_RETRIES
+            ):
+                value, cas = self._client.gets(key)
+                retry += 1
+
+            self._client.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
+            return int(value or 0) + 1
 
         self._client.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
         return 1

@@ -56,7 +56,7 @@ def test_fixed_window_with_elastic_expiry_concurrency(pooled_client: pymemcache.
     start = int(time.time())
 
     def _c():
-        for i in range(0, 5):
+        for _ in range(0, 5):
             try:
                 limiter.hit(limit)
             except Exception:
