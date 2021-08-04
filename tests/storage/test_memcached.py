@@ -1,17 +1,15 @@
-from pathlib import Path
 import time
-from typing import Tuple
 import unittest.mock
+from pathlib import Path
+from typing import Tuple
 
 import pymemcache
 import pytest
 
-from freiner import RateLimitItemPerSecond, RateLimitItemPerMinute
+from freiner import RateLimitItemPerMinute, RateLimitItemPerSecond
 from freiner.storage.memcached import MemcachedStorage
-from freiner.strategies import (
-    FixedWindowRateLimiter,
-    FixedWindowElasticExpiryRateLimiter
-)
+from freiner.strategies import FixedWindowElasticExpiryRateLimiter, FixedWindowRateLimiter
+
 from tests import DOCKERDIR, fixed_start
 
 

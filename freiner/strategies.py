@@ -162,4 +162,7 @@ class FixedWindowElasticExpiryRateLimiter(FixedWindowRateLimiter):
         :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
-        return self.storage.incr(item.key_for(*identifiers), item.get_expiry(), elastic_expiry=True) <= item.amount
+        return (
+            self.storage.incr(item.key_for(*identifiers), item.get_expiry(), elastic_expiry=True)
+            <= item.amount
+        )

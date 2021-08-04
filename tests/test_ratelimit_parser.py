@@ -1,35 +1,35 @@
 import pytest
 
 from freiner import limits
-from freiner.util import parse, parse_many, granularity_from_string
+from freiner.util import granularity_from_string, parse, parse_many
 
 
-@pytest.mark.parametrize(("rl_string",), (("1 per second",), ("1/SECOND",), ("1 / Second",),))
+@pytest.mark.parametrize("rl_string", ("1 per second", "1/SECOND", "1 / Second"))
 def test_single_seconds(rl_string: str):
     assert parse(rl_string) == limits.RateLimitItemPerSecond(1)
 
 
-@pytest.mark.parametrize(("rl_string",), (("1 per minute",), ("1/MINUTE",), ("1/Minute",)))
+@pytest.mark.parametrize("rl_string", ("1 per minute", "1/MINUTE", "1/Minute"))
 def test_single_minutes(rl_string: str):
     assert parse(rl_string) == limits.RateLimitItemPerMinute(1)
 
 
-@pytest.mark.parametrize(("rl_string",), (("1 per hour",), ("1/HOUR",), ("1/Hour",)))
+@pytest.mark.parametrize("rl_string", ("1 per hour", "1/HOUR", "1/Hour"))
 def test_single_hours(rl_string: str):
     assert parse(rl_string) == limits.RateLimitItemPerHour(1)
 
 
-@pytest.mark.parametrize(("rl_string",), (("1 per day",), ("1/DAY",), ("1 / Day",)))
+@pytest.mark.parametrize("rl_string", ("1 per day", "1/DAY", "1 / Day"))
 def test_single_days(rl_string: str):
     assert parse(rl_string) == limits.RateLimitItemPerDay(1)
 
 
-@pytest.mark.parametrize(("rl_string",), (("1 per month",), ("1/MONTH",), ("1 / Month",)))
+@pytest.mark.parametrize("rl_string", ("1 per month", "1/MONTH", "1 / Month"))
 def test_single_months(rl_string: str):
     assert parse(rl_string) == limits.RateLimitItemPerMonth(1)
 
 
-@pytest.mark.parametrize(("rl_string",), (("1 per year",), ("1/Year",), ("1 / year",)))
+@pytest.mark.parametrize("rl_string", ("1 per year", "1/Year", "1 / year"))
 def test_single_years(rl_string: str):
     assert parse(rl_string) == limits.RateLimitItemPerYear(1)
 

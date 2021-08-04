@@ -1,7 +1,7 @@
-from pathlib import Path
-from typing import Tuple
 import unittest
 import unittest.mock
+from pathlib import Path
+from typing import Tuple
 
 import pytest
 import redis
@@ -10,7 +10,13 @@ from freiner.storage.redis import RedisStorage
 
 from tests import DOCKERDIR
 
-from ._redis import _test_fixed_window, _test_fixed_window_clear, _test_moving_window_clear, _test_moving_window_expiry, _test_reset
+from ._redis import (
+    _test_fixed_window,
+    _test_fixed_window_clear,
+    _test_moving_window_clear,
+    _test_moving_window_expiry,
+    _test_reset,
+)
 
 
 Host = Tuple[str, int]
@@ -77,9 +83,7 @@ def flush_unix_socket_host(unix_socket_client: redis.Redis):
     unix_socket_client.flushall()
 
 
-@pytest.fixture(
-    params=(default_client, protected_client, unix_socket_client)
-)
+@pytest.fixture(params=(default_client, protected_client, unix_socket_client))
 def client(request) -> redis.Redis:
     return request.getfixturevalue(request.param.__name__)
 

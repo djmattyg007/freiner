@@ -1,6 +1,6 @@
 import re
-from typing import Tuple
 import unittest.mock
+from typing import Tuple
 
 import pytest
 import redis.sentinel
@@ -8,7 +8,13 @@ import redis.sentinel
 from freiner.errors import FreinerConfigurationError
 from freiner.storage.redis_sentinel import RedisSentinelStorage
 
-from ._redis import _test_fixed_window, _test_fixed_window_clear, _test_moving_window_clear, _test_moving_window_expiry, _test_reset
+from ._redis import (
+    _test_fixed_window,
+    _test_fixed_window_clear,
+    _test_moving_window_clear,
+    _test_moving_window_expiry,
+    _test_reset,
+)
 
 
 Host = Tuple[str, int]
@@ -39,9 +45,7 @@ def flush_default_host(default_client: redis.sentinel.Sentinel, default_service_
     default_client.master_for(default_service_name).flushall()
 
 
-@pytest.fixture(
-    params=((default_client, default_service_name),)
-)
+@pytest.fixture(params=((default_client, default_service_name),))
 def storage(request) -> RedisSentinelStorage:
     return RedisSentinelStorage(
         request.getfixturevalue(request.param[0].__name__),
@@ -66,7 +70,9 @@ def test_from_default_uri_with_service_name(default_host_uri: str, default_servi
 
 def test_from_default_uri_with_options(default_host_uri: str, default_service_name: str):
     with unittest.mock.patch("freiner.storage.redis_sentinel.redis.sentinel") as mock_sentinel:
-        storage = RedisSentinelStorage.from_uri(default_host_uri, service_name=default_service_name, connection_timeout=1)
+        storage = RedisSentinelStorage.from_uri(
+            default_host_uri, service_name=default_service_name, connection_timeout=1
+        )
         assert isinstance(storage, RedisSentinelStorage)
         assert mock_sentinel.Sentinel.call_args[1]["connection_timeout"] == 1
 

@@ -1,6 +1,6 @@
 import time
 
-from freiner.limits import RateLimitItemPerSecond, RateLimitItemPerMinute
+from freiner.limits import RateLimitItemPerMinute, RateLimitItemPerSecond
 from freiner.storage.redis import RedisStorage
 from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
 
