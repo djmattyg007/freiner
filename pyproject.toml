@@ -23,7 +23,6 @@ warn_unused_configs = true
 
 [[tool.mypy.overrides]]
 module = [
-    "hiro",
     "pymemcache",
     "redis.sentinel",
     "rediscluster",

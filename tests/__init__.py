@@ -2,6 +2,10 @@ import functools
 import math
 import time
 from pathlib import Path
+from typing import ContextManager
+
+from freezegun import freeze_time as _freeze_time
+from freezegun.api import FrozenDateTimeFactory
 
 
 ROOTDIR = Path(__file__).parent.parent
@@ -17,3 +21,10 @@ def fixed_start(fn):
         return fn(*args, **kwargs)
 
     return _inner
+
+
+def freeze_time() -> ContextManager[FrozenDateTimeFactory]:
+    f = _freeze_time()
+    # This is a necessary fix for our testing, and the third-party type hints aren't sufficient
+    f.ignore = tuple(set(f.ignore) - {"threading"})  # type: ignore
+    return f

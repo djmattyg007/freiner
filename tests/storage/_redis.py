@@ -5,6 +5,7 @@ from freiner.storage.redis import RedisStorage
 from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
 
 
+# TODO: Rewrite this to use freezegun. Will require fakeredis.
 def _test_fixed_window(storage: RedisStorage):
     limiter = FixedWindowRateLimiter(storage)
     per_second = RateLimitItemPerSecond(10)
@@ -16,7 +17,6 @@ def _test_fixed_window(storage: RedisStorage):
         count += 1
     assert limiter.hit(per_second) is False
 
-    # TODO: Shouldn't this test be using hiro?
     while time.time() - start <= 1:
         time.sleep(0.1)
 
@@ -35,13 +35,13 @@ def _test_fixed_window_clear(storage: RedisStorage):
     assert limiter.hit(per_min) is True
 
 
+# TODO: Rewrite this to use freezegun. Will require fakeredis.
 def _test_moving_window_expiry(storage: RedisStorage):
     limiter = MovingWindowRateLimiter(storage)
     limit = RateLimitItemPerSecond(2)
 
     assert limiter.hit(limit) is True
 
-    # TODO This test should definitely be using hiro
     time.sleep(0.9)
     assert limiter.hit(limit) is True
     assert limiter.hit(limit) is False

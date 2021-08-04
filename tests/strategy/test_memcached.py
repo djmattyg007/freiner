@@ -41,7 +41,6 @@ def test_fixed_window_with_elastic_expiry(client: pymemcache.Client):
 
     assert all([limiter.hit(limit) for _ in range(0, 10)]) is True
 
-    # TODO: Is this supposed to use hiro?
     time.sleep(1)
     assert limiter.hit(limit) is False
 
