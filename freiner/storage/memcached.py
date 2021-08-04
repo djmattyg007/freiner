@@ -13,7 +13,7 @@ except ImportError:
     HAS_MEMCACHED = False
 
 
-MemcachedClients = Union[pymemcache.Client, pymemcache.PooledClient, pymemcache.HashClient]
+MemcachedClient = Union[pymemcache.Client, pymemcache.PooledClient, pymemcache.HashClient]
 
 
 class MemcachedStorage:
@@ -25,8 +25,8 @@ class MemcachedStorage:
 
     MAX_CAS_RETRIES = 10
 
-    def __init__(self, client: MemcachedClients):
-        self._client: MemcachedClients = client
+    def __init__(self, client: MemcachedClient):
+        self._client: MemcachedClient = client
 
     @classmethod
     def from_uri(cls, uri: str, **options) -> "MemcachedStorage":

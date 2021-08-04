@@ -11,18 +11,21 @@ from freiner.storage.memcached import MemcachedStorage
 from freiner.strategies import FixedWindowElasticExpiryRateLimiter, MovingWindowRateLimiter
 
 
+Host = Tuple[str, int]
+
+
 @pytest.fixture
-def default_host() -> Tuple[str, int]:
+def default_host() -> Host:
     return "localhost", 22122
 
 
 @pytest.fixture
-def client(default_host: Tuple[str, int]) -> pymemcache.Client:
+def client(default_host: Host) -> pymemcache.Client:
     return pymemcache.Client(default_host)
 
 
 @pytest.fixture
-def pooled_client(default_host: Tuple[str, int]) -> pymemcache.PooledClient:
+def pooled_client(default_host: Host) -> pymemcache.PooledClient:
     return pymemcache.PooledClient(default_host)
 
 

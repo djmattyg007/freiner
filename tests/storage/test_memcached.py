@@ -1,8 +1,9 @@
 import time
-import unittest
+from typing import Tuple
 import unittest.mock
 
 import pymemcache
+import pytest
 
 from freiner import RateLimitItemPerSecond, RateLimitItemPerMinute
 from freiner.storage.memcached import MemcachedStorage
@@ -13,110 +14,172 @@ from freiner.strategies import (
 from tests import fixed_start
 
 
-class MemcachedStorageTests(unittest.TestCase):
-    def setUp(self):
-        pymemcache.Client(("localhost", 22122)).flush_all()
-        # self.storage_url = "memcached://localhost:22122"
+Host = Tuple[str, int]
 
-    # TODO: Re-do this once URIs go to named constructors
-    # Also add a test for "missing dependency" in the named constructor
-    # def test_options(self):
-    #     with unittest.mock.patch(
-    #         "freiner.storage.memcached.pymemcache"
-    #     ) as get_dependency:
-    #         storage = MemcachedStorage(self.storage_url, connect_timeout=1)
-    #         storage.check()
-    #         self.assertEqual(
-    #             pymemcache.Client.call_args[1]['connect_timeout'], 1
-    #         )
 
-    @fixed_start
-    def test_fixed_window(self):
-        storage = MemcachedStorage.from_uri("memcached://localhost:22122")
-        self.assertTrue(storage.check())
+@pytest.fixture
+def default_host() -> Host:
+    return "localhost", 22122
 
-        limiter = FixedWindowRateLimiter(storage)
-        per_min = RateLimitItemPerSecond(10)
 
-        start = time.time()
-        count = 0
-        while time.time() - start < 0.5 and count < 10:
-            self.assertTrue(limiter.hit(per_min))
-            count += 1
-        self.assertFalse(limiter.hit(per_min))
+@pytest.fixture
+def secondary_host() -> Host:
+    return "localhost", 22123
 
-        while time.time() - start <= 1:
-            time.sleep(0.1)
-        self.assertTrue(limiter.hit(per_min))
 
-    @fixed_start
-    def test_fixed_window_cluster(self):
-        storage = MemcachedStorage.from_uri("memcached://localhost:22122,localhost:22123")
-        self.assertTrue(storage.check())
+@pytest.fixture
+def hash_hosts(default_host: Host, secondary_host: Host) -> Tuple[Host, ...]:
+    return default_host, secondary_host
 
-        limiter = FixedWindowRateLimiter(storage)
-        per_min = RateLimitItemPerSecond(10)
 
-        start = time.time()
-        count = 0
-        while time.time() - start < 0.5 and count < 10:
-            self.assertTrue(limiter.hit(per_min))
-            count += 1
-        self.assertFalse(limiter.hit(per_min))
+@pytest.fixture
+def default_client(default_host: Host) -> pymemcache.Client:
+    return pymemcache.Client(default_host)
 
-        while time.time() - start <= 1:
-            time.sleep(0.1)
-        self.assertTrue(limiter.hit(per_min))
 
-    @fixed_start
-    def test_fixed_window_with_elastic_expiry(self):
-        storage = MemcachedStorage.from_uri("memcached://localhost:22122")
-        self.assertTrue(storage.check())
+@pytest.fixture
+def hash_client(hash_hosts: Tuple[Host, ...]) -> pymemcache.HashClient:
+    return pymemcache.HashClient(hash_hosts)
 
-        limiter = FixedWindowElasticExpiryRateLimiter(storage)
-        per_sec = RateLimitItemPerSecond(2, 2)
 
-        self.assertTrue(limiter.hit(per_sec))
+@pytest.fixture(autouse=True)
+def flush_default_host(default_client: pymemcache.Client):
+    default_client.flush_all()
 
-        time.sleep(1)
-        self.assertTrue(limiter.hit(per_sec))
-        self.assertFalse(limiter.test(per_sec))
 
-        time.sleep(1)
-        self.assertFalse(limiter.test(per_sec))
+def test_from_plain_uri(default_host: Host):
+    plain_uri = f"memcached://{default_host[0]}:{default_host[1]}"
+    plain_storage = MemcachedStorage.from_uri(plain_uri)
+    assert isinstance(plain_storage, MemcachedStorage)
+    assert isinstance(plain_storage._client, pymemcache.Client)
+    assert plain_storage.check() is True
 
-        time.sleep(1)
-        self.assertTrue(limiter.test(per_sec))
 
-    @fixed_start
-    def test_fixed_window_with_elastic_expiry_cluster(self):
-        storage = MemcachedStorage.from_uri("memcached://localhost:22122,localhost:22123")
-        self.assertTrue(storage.check())
+def test_from_plain_uri_with_options(default_host: Host):
+    plain_uri = f"memcached://{default_host[0]}:{default_host[1]}"
+    with unittest.mock.patch("freiner.storage.memcached.pymemcache") as pymemcache:
+        MemcachedStorage.from_uri(plain_uri, connect_timeout=1)
+        assert pymemcache.Client.call_args[1]["connect_timeout"] == 1
 
-        limiter = FixedWindowElasticExpiryRateLimiter(storage)
-        per_sec = RateLimitItemPerSecond(2, 2)
 
-        self.assertTrue(limiter.hit(per_sec))
+def test_from_hash_uri(hash_hosts: Tuple[Host, ...]):
+    uri_hosts = []
+    for host in hash_hosts:
+        uri_hosts.append(f"{host[0]}:{host[1]}")
 
-        time.sleep(1)
-        self.assertTrue(limiter.hit(per_sec))
-        self.assertFalse(limiter.test(per_sec))
+    hash_uri = f"memcached://{','.join(uri_hosts)}"
+    hash_storage = MemcachedStorage.from_uri(hash_uri)
+    assert isinstance(hash_storage, MemcachedStorage)
+    assert isinstance(hash_storage._client, pymemcache.HashClient)
+    assert hash_storage.check() is True
 
-        time.sleep(1)
-        self.assertFalse(limiter.test(per_sec))
 
-        time.sleep(1)
-        self.assertTrue(limiter.test(per_sec))
+@fixed_start
+def test_fixed_window(default_client: pymemcache.Client):
+    storage = MemcachedStorage(default_client)
+    assert storage.check() is True
 
-    def test_clear(self):
-        storage = MemcachedStorage.from_uri("memcached://localhost:22122")
-        self.assertTrue(storage.check())
+    limiter = FixedWindowRateLimiter(storage)
+    per_min = RateLimitItemPerSecond(10)
 
-        limiter = FixedWindowRateLimiter(storage)
-        per_min = RateLimitItemPerMinute(1)
+    start = time.time()
+    count = 0
+    while time.time() - start < 0.5 and count < 10:
+        assert limiter.hit(per_min) is True
+        count += 1
+    assert limiter.hit(per_min) is False
 
-        limiter.hit(per_min)
-        self.assertFalse(limiter.hit(per_min))
+    while time.time() - start <= 1:
+        time.sleep(0.1)
+    assert limiter.hit(per_min) is True
 
-        limiter.clear(per_min)
-        self.assertTrue(limiter.hit(per_min))
+
+@fixed_start
+def test_fixed_window_cluster(hash_client: pymemcache.HashClient):
+    storage = MemcachedStorage(hash_client)
+    assert storage.check() is True
+
+    limiter = FixedWindowRateLimiter(storage)
+    per_min = RateLimitItemPerSecond(10)
+
+    start = time.time()
+    count = 0
+    while time.time() - start < 0.5 and count < 10:
+        assert limiter.hit(per_min) is True
+        count += 1
+    assert limiter.hit(per_min) is False
+
+    while time.time() - start <= 1:
+        time.sleep(0.1)
+    assert limiter.hit(per_min) is True
+
+
+@fixed_start
+def test_fixed_window_with_elastic_expiry(default_client: pymemcache.Client):
+    storage = MemcachedStorage(default_client)
+    assert storage.check() is True
+
+    limiter = FixedWindowElasticExpiryRateLimiter(storage)
+    per_sec = RateLimitItemPerSecond(2, 2)
+
+    assert limiter.hit(per_sec) is True
+
+    time.sleep(1)
+    assert limiter.hit(per_sec) is True
+    assert limiter.test(per_sec) is False
+
+    time.sleep(1)
+    assert limiter.test(per_sec) is False
+
+    time.sleep(1)
+    assert limiter.test(per_sec) is True
+
+
+@fixed_start
+def test_fixed_window_with_elastic_expiry_cluster(hash_client: pymemcache.HashClient):
+    storage = MemcachedStorage(hash_client)
+    assert storage.check() is True
+
+    limiter = FixedWindowElasticExpiryRateLimiter(storage)
+    per_sec = RateLimitItemPerSecond(2, 2)
+
+    assert limiter.hit(per_sec) is True
+
+    time.sleep(1)
+    assert limiter.hit(per_sec) is True
+    assert limiter.test(per_sec) is False
+
+    time.sleep(1)
+    assert limiter.test(per_sec) is False
+
+    time.sleep(1)
+    assert limiter.test(per_sec) is True
+
+
+def test_clear(default_client: pymemcache.Client):
+    storage = MemcachedStorage(default_client)
+    assert storage.check() is True
+
+    limiter = FixedWindowRateLimiter(storage)
+    per_min = RateLimitItemPerMinute(1)
+
+    limiter.hit(per_min)
+    assert limiter.hit(per_min) is False
+
+    limiter.clear(per_min)
+    assert limiter.hit(per_min) is True
+
+
+@pytest.mark.xfail(reason="Reset isn't implemented for Memcached")
+def test_reset(default_client: pymemcache.Client):
+    storage = MemcachedStorage(default_client)
+    assert storage.check() is True
+
+    limiter = FixedWindowRateLimiter(storage)
+    per_min = RateLimitItemPerMinute(1)
+
+    limiter.hit(per_min)
+    assert limiter.hit(per_min) is False
+
+    storage.reset()
+    assert limiter.hit(per_min) is True
