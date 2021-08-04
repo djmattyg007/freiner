@@ -57,13 +57,13 @@ Redis
 =====
 
  Requires the location of the redis server and optionally the database number.
- :code:`redis://localhost:6379` or :code:`redis://localhost:6379/n` (for database `n`).
+ :code:`redis://localhost:6379` or :code:`redis://localhost:6379/N` (for database `N`).
 
- If the redis server is listening over a unix domain socket you can use :code:`redis+unix:///path/to/sock`
- or :code:`redis+unix:///path/to/socket?db=n` (for database `n`).
+ If the redis server is listening over a unix domain socket you can use :code:`unix:///path/to/sock`
+ or :code:`unix:///path/to/socket?db=N` (for database `N`).
 
  If the database is password protected the password can be provided in the url, for example
- :code:`redis://:foobared@localhost:6379` or :code:`redis+unix//:foobered/path/to/socket` if using
+ :code:`redis://:foobared@localhost:6379` or :code:`unix//:foobered/path/to/socket` if using
  a Unix domain socket (UDS).
 
  Depends on: `redis-py <https://redis-py.readthedocs.io/en/latest/>`_
