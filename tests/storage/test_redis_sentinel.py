@@ -77,6 +77,14 @@ def test_from_default_uri_with_options(default_host_uri: str, default_service_na
         assert mock_sentinel.Sentinel.call_args[1]["connection_timeout"] == 1
 
 
+def test_from_uri_with_password(default_host: Host, default_service_name: str):
+    uri = f"redis+sentinel://:sekret@{default_host[0]}:{default_host[1]}/{default_service_name}"
+    with unittest.mock.patch("freiner.storage.redis_sentinel.redis.sentinel") as mock_sentinel:
+        storage = RedisSentinelStorage.from_uri(uri)
+        assert isinstance(storage, RedisSentinelStorage)
+        assert mock_sentinel.Sentinel.call_args[1]["password"] == "sekret"
+
+
 def test_from_default_uri_with_no_service_name(default_host_uri: str):
     errmsg = re.escape("'service_name' not provided")
     with pytest.raises(FreinerConfigurationError, match=errmsg):

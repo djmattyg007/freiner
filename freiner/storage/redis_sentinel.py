@@ -10,7 +10,7 @@ try:
     import redis.sentinel
 
     HAS_REDIS = True
-except ImportError:
+except ImportError:  # pragma: no cover
     HAS_REDIS = False
 
 

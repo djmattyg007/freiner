@@ -9,7 +9,7 @@ try:
     import pymemcache
 
     HAS_MEMCACHED = True
-except ImportError:
+except ImportError:  # pragma: no cover
     HAS_MEMCACHED = False
 
 

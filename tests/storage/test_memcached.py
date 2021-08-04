@@ -1,3 +1,4 @@
+import re
 import time
 import unittest.mock
 from pathlib import Path
@@ -7,6 +8,7 @@ import pymemcache
 import pytest
 
 from freiner import RateLimitItemPerMinute, RateLimitItemPerSecond
+from freiner.errors import FreinerConfigurationError
 from freiner.storage.memcached import MemcachedStorage
 from freiner.strategies import FixedWindowElasticExpiryRateLimiter, FixedWindowRateLimiter
 
@@ -103,6 +105,13 @@ def test_from_unix_socket_uri(unix_socket_host_uri: str):
     assert isinstance(storage, MemcachedStorage)
     assert isinstance(storage._client, pymemcache.Client)
     assert storage.check() is True
+
+
+def test_uri_with_no_hosts():
+    uri = "memcached://"
+    errmsg = re.escape("No Memcached hosts parsed from URI: memcached://")
+    with pytest.raises(FreinerConfigurationError, match=errmsg):
+        MemcachedStorage.from_uri(uri)
 
 
 @fixed_start

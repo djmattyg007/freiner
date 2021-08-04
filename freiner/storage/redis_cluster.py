@@ -9,7 +9,7 @@ try:
     import rediscluster
 
     HAS_REDISCLUSTER = True
-except ImportError:
+except ImportError:  # pragma: no cover
     HAS_REDISCLUSTER = False
 
 
