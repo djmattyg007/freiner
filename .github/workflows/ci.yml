@@ -15,6 +15,7 @@ jobs:
           - name: "Python 3.9"
             python: "3.9"
             coverage: true
+
     name: ${{ matrix.name }}
     runs-on: "ubuntu-20.04"
 
@@ -42,6 +43,6 @@ jobs:
         continue-on-error: true
       - name: "Run tests"
         run: python -m invoke test
-      - name: "Upload coverage to Codecov"
+      - name: "Upload coverage data to Codecov"
         uses: codecov/codecov-action@v2
         if: ${{ matrix.coverage }}
