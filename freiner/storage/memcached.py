@@ -87,7 +87,7 @@ class MemcachedStorage:
 
         if not self._client.add(key, 1, expiry, noreply=False):
             if not elastic_expiry:
-                return self._client.incr(key, 1)
+                return self._client.incr(key, 1) or 1
 
             value, cas = self._client.gets(key)
             retry = 0
