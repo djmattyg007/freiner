@@ -8,5 +8,6 @@ recursive-include doc/source *
 recursive-include doc *.py Make*
 
 include .coveragerc
+include docker-compose.yml
 include pytest.ini
 recursive-include tests *.py
