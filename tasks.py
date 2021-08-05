@@ -39,6 +39,8 @@ def test(c, onefile=""):
     finally:
         c.run("docker-compose down --remove-orphans --volumes", pty=_pty)
 
+        c.run("rm .docker/memcached/freiner.memcached.sock", pty=_pty, warn=True)
+        c.run("rm .docker/redis/freiner.redis.sock", pty=_pty, warn=True)
 
 @task
 def type_check(c):
