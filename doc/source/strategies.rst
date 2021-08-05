@@ -10,7 +10,7 @@ Fixed Window
 
 This is the most memory efficient strategy to use as it maintains one counter
 per resource and rate limit. It does however have its drawbacks as it allows
-bursts within each window - thus allowing an 'attacker' to by-pass the limits.
+bursts within each window - thus allowing an 'attacker' to bypass the limits.
 The effects of these bursts can be partially circumvented by enforcing multiple
 granularities of windows per resource.
 

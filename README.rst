@@ -1,7 +1,7 @@
 .. |ci| image:: https://github.com/djmattyg007/freiner/workflows/CI/badge.svg?branch=master
     :target: https://github.com/djmattyg007/freiner/actions?query=branch%3Amaster+workflow%3ACI
-.. |codecov| image:: https://codecov.io/gh/alisaifee/limits/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/alisaifee/limits
+.. |codecov| image:: https://codecov.io/gh/djmattyg007/freiner/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/djmattyg007/freiner
 .. |pypi| image:: https://img.shields.io/pypi/v/freiner.svg?style=flat-square
     :target: https://pypi.python.org/pypi/freiner
 .. |license| image:: https://img.shields.io/pypi/l/freiner.svg?style=flat-square
