@@ -10,6 +10,7 @@ First release after the fork from ``limits``.
 
 * Renamed ``HISTORY.rst`` to ``CHANGELOG.rst``.
 * Support only Python 3.7 and above.
+
   * Support for Python 2.7 has been completely removed.
   * Support for pypy may exist, but is not being tested for. Patches are welcome, even if support for some storage backends is missing.
 * Removed code related to Google App Engine (GAE), as I cannot meaningfully maintain it.
@@ -26,6 +27,7 @@ First release after the fork from ``limits``.
 * Eliminated the storage registry. There is no generic URI parsing system or generic storage factory now.
 * Changed the ``Storage`` base class to a ``Protocol``.
 * Storage classes no longer accept URIs to their constructors.
+
   * Most storage classes have a ``from_uri`` class method to parse URIs.
   * Storage class constructors now accept instances of the actual backend client.
     This allows you to initialise the relevant client however you want, rather than being restricted to what the URI parser function is capable of.
