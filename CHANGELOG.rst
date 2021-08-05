@@ -3,6 +3,45 @@
 Changelog
 ---------
 
+v2.0.0 - 2021-08-05
+-------------------
+
+First release after the fork from ``limits``.
+
+* Renamed ``HISTORY.rst`` to ``CHANGELOG.rst``.
+* Support only Python 3.7 and above.
+
+  * Support for Python 2.7 has been completely removed.
+  * Support for pypy may exist, but is not being tested for. Patches are welcome, even if support for some storage backends is missing.
+* Removed code related to Google App Engine (GAE), as I cannot meaningfully maintain it.
+* Removed old references to Flask code from before the original split from Flask-Limiter.
+* Removed tests for Redis Cluster. Support is provided on a best-effort basis. Patches welcome.
+* Removed Dependabot config. This may return at some point.
+* Removed versioneer, CodeQL tooling, and overcommit config.
+* Removed OS-specific stuff for running tests. The new test suite is currently only tested on Linux, with the latest versions of docker and docker-compose.
+  Patches are welcome as long as they don't introduce significant complexity.
+* Removed the primary Makefile. Replaced it with ``invoke``, which is OS-agnostic.
+* Replaced all code quality and formatting tools with ``flake8``, ``black``, and ``isort``.
+* Introduced type annotations and ``mypy``.
+* Moved all configuration out of ``setup.py``, mostly in to ``setup.cfg``.
+* Eliminated the storage registry. There is no generic URI parsing system or generic storage factory now.
+* Changed the ``Storage`` base class to a ``Protocol``.
+* Storage classes no longer accept URIs to their constructors.
+
+  * Most storage classes have a ``from_uri`` class method to parse URIs.
+  * Storage class constructors now accept instances of the actual backend client.
+    This allows you to initialise the relevant client however you want, rather than being restricted to what the URI parser function is capable of.
+* Removed usage of deprecated ``inspect`` functionality.
+* Added many new tests to improve test quality and coverage.
+* Replaced usage of ``hiro`` with ``freezegun`` in tests.
+* Various error types and messages have been improved.
+* Two unmerged PRs submitted to ``limits`` have been applied to this project.
+
+  * https://github.com/alisaifee/limits/pull/69
+  * https://github.com/alisaifee/limits/pull/71
+
+Documentation is still a work in progress at this stage.
+
 v1.5.1 - 2020-02-25
 -------------------
 
