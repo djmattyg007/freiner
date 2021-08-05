@@ -72,12 +72,3 @@ The following example shows two backend stores: one which doesn't implement the
 
         def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
             return True
-
-
-Once the above implementations are declared you can look them up
-using the factory method described in :ref:`storage-scheme` in the following manner::
-
-    from freiner.storage import storage_from_string
-
-    awesome = storage_from_string("awesomedb://localhoax:42", awesomeness=0)
-    awesomer = storage_from_string("awesomerdb://localhoax:42", awesomeness=1)

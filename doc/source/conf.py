@@ -39,7 +39,7 @@ htmlhelp_basename = "freinerdoc"
 latex_documents = [
     ("index", "limits.tex", "Freiner Documentation", "Matthew Gamble", "manual"),
 ]
-man_pages = [("index", "flask-limiter", "limits Documentation", ["Ali-Akber Saifee"], 1)]
+man_pages = [("index", "freiner", "Freiner Documentation", ["Matthew Gamble"], 1)]
 
 texinfo_documents = [
     (
@@ -47,7 +47,7 @@ texinfo_documents = [
         "freiner",
         "Freiner Documentation",
         "Matthew Gamble",
-        "limits",
+        "freiner",
         "One line description of project.",
         "Miscellaneous",
     ),
