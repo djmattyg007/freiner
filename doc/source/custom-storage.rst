@@ -3,11 +3,13 @@
 Custom storage backends
 -----------------------
 
+TODO: This section is out of date. Gotta re-word it to discuss the Protocol classes.
+
 The **Freiner** package ships with a few storage implementations which allow you
 to get started with some common data stores (redis & memcached) used for rate limiting.
 
 To accommodate customizations to either the default storage backends or
-different storage backends altogether, **limits** uses a registry pattern that
+different storage backends altogether, **Freiner** uses a registry pattern that
 makes it painless to add your own custom storage (without having to submit patches
 to the package itself).
 

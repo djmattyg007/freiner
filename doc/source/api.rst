@@ -1,7 +1,7 @@
 .. currentmodule:: freiner
 
 API
-----
+---
 
 Storage
 =======
@@ -9,9 +9,10 @@ Storage
 ======================
 Abstract storage class
 ======================
+
 .. autoclass:: freiner.storage.Storage
 
-.. _backend-implementation:
+.. _storage-backend-implementations:
 
 =======================
 Backend Implementations
@@ -19,26 +20,32 @@ Backend Implementations
 
 In-Memory
 ^^^^^^^^^
+
 .. autoclass:: freiner.storage.MemoryStorage
 
 Redis
 ^^^^^
-.. autoclass:: freiner.storage.RedisStorage
 
-Redis Cluster
-^^^^^^^^^^^^^
-.. autoclass:: freiner.storage.RedisClusterStorage
+.. autoclass:: freiner.storage.redis.RedisStorage
 
 Redis Sentinel
 ^^^^^^^^^^^^^^
-.. autoclass:: freiner.storage.RedisSentinelStorage
+
+.. autoclass:: freiner.storage.redis_sentinel.RedisSentinelStorage
+
+Redis Cluster
+^^^^^^^^^^^^^
+
+.. autoclass:: freiner.storage.redis_cluster.RedisClusterStorage
 
 Memcached
 ^^^^^^^^^
-.. autoclass:: freiner.storage.MemcachedStorage
+
+.. autoclass:: freiner.storage.memcached.MemcachedStorage
 
 Strategies
 ==========
+
 .. autoclass:: freiner.strategies.RateLimiter
 .. autoclass:: freiner.strategies.FixedWindowRateLimiter
 .. autoclass:: freiner.strategies.FixedWindowElasticExpiryRateLimiter
@@ -48,7 +55,7 @@ Rate Limits
 ===========
 
 ========================
-Rate limit granularities
+Rate Limit Granularities
 ========================
 
 .. autoclass:: RateLimitItem
@@ -62,11 +69,12 @@ Rate limit granularities
 ===============
 Utility Methods
 ===============
+
 .. autofunction:: parse
 .. autofunction:: parse_many
 
-
 Exceptions
 ==========
+
 .. autoexception:: freiner.errors.FreinerConfigurationError
 

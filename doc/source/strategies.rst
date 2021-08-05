@@ -7,6 +7,7 @@ Rate limiting strategies
 
 Fixed Window
 ============
+
 This is the most memory efficient strategy to use as it maintains one counter
 per resource and rate limit. It does however have its drawbacks as it allows
 bursts within each window - thus allowing an 'attacker' to by-pass the limits.
@@ -22,6 +23,7 @@ of ``2/second`` on the same route.
 
 Fixed Window with Elastic Expiry
 ================================
+
 This strategy works almost identically to the Fixed Window strategy with the exception
 that each hit results in the extension of the window. This strategy works well for
 creating large penalties for breaching a rate limit.
@@ -35,6 +37,7 @@ circumvent bursts.
 
 Moving Window
 =============
+
 .. warning:: The moving window strategy is only implemented for the ``redis`` and ``in-memory``
     storage backends. The strategy requires using a list with fast random access which
     is not very convenient to implement with a memcached storage.
