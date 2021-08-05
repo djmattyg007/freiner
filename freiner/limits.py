@@ -14,9 +14,9 @@ def safe_string(value) -> str:
 
 
 TIME_TYPES = dict(
-    day=(60 * 60 * 24, "day"),
-    month=(60 * 60 * 24 * 30, "month"),
     year=(60 * 60 * 24 * 30 * 12, "year"),
+    month=(60 * 60 * 24 * 30, "month"),
+    day=(60 * 60 * 24, "day"),
     hour=(60 * 60, "hour"),
     minute=(60, "minute"),
     second=(1, "second"),

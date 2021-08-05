@@ -32,8 +32,11 @@ def parse_many(limit_string: str) -> Sequence[RateLimitItem]:
     :raise ValueError: if the string notation is invalid.
     :return: a list of :class:`RateLimitItem` instances.
     """
-    if not (isinstance(limit_string, str) and EXPR.match(limit_string)):
-        raise ValueError("couldn't parse rate limit string '%s'" % limit_string)
+    if not isinstance(limit_string, str):
+        raise TypeError("Invalid rate limit string supplied.")
+
+    if not EXPR.match(limit_string):
+        raise ValueError(f"Failed to parse rate limit string: {limit_string}")
 
     limits = []
     for limit in SEPARATORS.split(limit_string):
@@ -68,4 +71,5 @@ def granularity_from_string(granularity_string: str) -> Type[RateLimitItem]:
     for granularity in GRANULARITIES.values():
         if granularity.check_granularity_string(granularity_string):
             return granularity
-    raise ValueError("no granularity matched for %s" % granularity_string)
+
+    raise ValueError(f"No granularity matched for: {granularity_string}")
