@@ -2,8 +2,6 @@ from typing import Tuple
 
 from typing_extensions import Protocol, runtime_checkable
 
-from freiner.errors import FreinerConfigurationError
-
 from .memory import MemoryStorage
 
 
@@ -70,7 +68,6 @@ class MovingWindowStorage(Storage, Protocol):
 
 
 __all__ = [
-    "FreinerConfigurationError",
     "Storage",
     "MovingWindowStorage",
     "MemoryStorage",
