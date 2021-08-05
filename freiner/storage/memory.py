@@ -28,7 +28,7 @@ class MemoryStorage:
         self.timer.start()
 
     def __expire_events(self):
-        for key in self.events.keys():
+        for key in list(self.events.keys()):
             for event in list(self.events[key]):
                 with event:
                     if event.expiry <= time.time() and event in self.events[key]:
