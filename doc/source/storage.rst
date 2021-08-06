@@ -3,12 +3,6 @@
 Storage Backends
 ----------------
 
-.. _storage-scheme:
-
-Examples
-========
-
-=========
 In-Memory
 =========
 
@@ -16,7 +10,6 @@ The in-memory storage (:class:`freiner.storage.MemoryStorage`) takes no paramete
 
 .. _redis:
 
-=====
 Redis
 =====
 
@@ -34,7 +27,6 @@ Redis
 
 .. _redis-ssl:
 
-==============
 Redis over SSL
 ==============
 
@@ -47,7 +39,6 @@ Redis over SSL
 
 .. _redis-sentinel:
 
-===================
 Redis with Sentinel
 ===================
 
@@ -63,7 +54,6 @@ Redis with Sentinel
 
 .. _redis-cluster:
 
-=============
 Redis Cluster
 =============
 
@@ -78,7 +68,6 @@ Redis Cluster
 
 .. _memcached:
 
-=========
 Memcached
 =========
 

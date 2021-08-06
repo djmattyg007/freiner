@@ -36,8 +36,9 @@ Initialize a rate limit using the :ref:`ratelimit-string`::
 
 Initialize a rate limit explicitly using a subclass of :class:`RateLimitItem`::
 
-    from freiner import RateLimitItemPerSecond
+    from freiner import RateLimitItemPerSecond, RateLimitPerMinute
     one_per_second = RateLimitItemPerSecond(1, 1)
+    ten_per_five_minutes = RateLimitPerMinute(10, 5)
 
 Test the limits::
 

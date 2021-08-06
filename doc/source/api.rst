@@ -6,11 +6,12 @@ API
 Storage
 =======
 
-======================
-Abstract storage class
-======================
+========================
+Storage Protocol Classes
+========================
 
 .. autoclass:: freiner.storage.Storage
+.. autoclass:: freiner.storage.MovingWindowStorage
 
 .. _storage-backend-implementations:
 
@@ -21,7 +22,7 @@ Backend Implementations
 In-Memory
 ^^^^^^^^^
 
-.. autoclass:: freiner.storage.MemoryStorage
+.. autoclass:: freiner.storage.memory.MemoryStorage
 
 Redis
 ^^^^^
