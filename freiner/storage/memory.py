@@ -133,6 +133,8 @@ class MemoryStorage:
         for item in self.events.get(key, []):
             if item.atime >= timestamp - expiry:
                 return int(item.atime), acquired
+        # TODO: Change protocol to return float timestamp, not int timestamp
+        # Check git history to confirm it was supposed to be like this
         return int(timestamp), acquired
 
     def check(self) -> bool:
