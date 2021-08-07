@@ -21,7 +21,7 @@ def lint(c):
 
 @task
 def test(c, onefile=""):
-    pytest_args = ["pytest", "--cov=freiner", "--cov-branch", "--cov-report=term"]
+    pytest_args = ["pytest", "--cov-report=term"]
     if os.environ.get("CI", "false") == "true":
         pytest_args.append("--cov-report=xml")
         _pty = False

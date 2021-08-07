@@ -7,6 +7,30 @@ target-version = ["py37", "py38", "py39"]
 line-length = 100
 
 
+[tool.coverage.run]
+branch = true
+include = [
+    "freiner/*",
+]
+omit = [
+    "freiner/storage/redis_cluster.py",
+    "tests/*",
+    "setup.py",
+    "tasks.py",
+]
+
+
+[tool.coverage.report]
+fail_under = 98
+exclude_lines = [
+    "pragma: no cover",
+    "noqa",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if not HAS_",
+]
+
+
 [tool.isort]
 profile = "black"
 multi_line_output = 3
