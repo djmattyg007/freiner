@@ -5,11 +5,10 @@ from .limits import GRANULARITIES, RateLimitItem
 
 
 SEPARATORS = re.compile(r"[,;|]")
-# TODO: Mark second group as non-capturing, adjust parse_many to remove _ variable
 SINGLE_EXPR = re.compile(
     r"""
     \s*([0-9]+)
-    \s*(/|\s*per\s*)
+    \s*(?:/|\s*per\s*)
     \s*([0-9]+)
     *\s*(hour|minute|second|day|month|year)s?\s*""",
     re.IGNORECASE | re.VERBOSE,
@@ -42,7 +41,7 @@ def parse_many(limit_string: str) -> Sequence[RateLimitItem]:
         # This cast is fine because we already verified that it will match
         # in the EXPR.match check above.
         limit_match = cast(re.Match, SINGLE_EXPR.match(limit))
-        amount, _, multiples, granularity_string = limit_match.groups()
+        amount, multiples, granularity_string = limit_match.groups()
         granularity = granularity_from_string(granularity_string)
         limits.append(granularity(amount, multiples))
 
