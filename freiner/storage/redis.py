@@ -136,10 +136,7 @@ class RedisInteractor:
         """
         timestamp = time.time()
         window = self.lua_moving_window((key,), (timestamp - expiry, limit))
-        if window:
-            return MovingWindow(window[0], window[1])
-        else:
-            return MovingWindow(timestamp, 0)
+        return MovingWindow(window[0], window[1])
 
     def _acquire_entry(
         self, key: str, limit: int, expiry: int, connection: redis.Redis, no_add: bool = False
