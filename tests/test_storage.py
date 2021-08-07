@@ -15,8 +15,8 @@ def test_pluggable_storage_fixed_window():
         def get(self, key: str) -> int:
             return 0
 
-        def get_expiry(self, key: str) -> int:
-            return int(time.time())
+        def get_expiry(self, key: str) -> float:
+            return time.time()
 
         def clear(self, key: str):
             pass
