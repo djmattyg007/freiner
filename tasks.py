@@ -42,6 +42,7 @@ def test(c, onefile=""):
         c.run("rm .docker/memcached/freiner.memcached.sock", pty=_pty, warn=True)
         c.run("rm .docker/redis/freiner.redis.sock", pty=_pty, warn=True)
 
+
 @task
 def type_check(c):
     c.run("mypy freiner tests", pty=pty)

@@ -25,7 +25,9 @@ def test_pluggable_storage_fixed_window():
     strategy = FixedWindowRateLimiter(storage)
     assert strategy.storage is storage
 
-    errmsg = re.escape("Moving Window rate limiting is not implemented for storage of type MyStorage")
+    errmsg = re.escape(
+        "Moving Window rate limiting is not implemented for storage of type MyStorage"
+    )
     with pytest.raises(TypeError, match=errmsg):
         # Ignore the type error here because that's exactly what we're testing for.
         MovingWindowRateLimiter(storage)  # type: ignore
@@ -46,7 +48,9 @@ def test_pluggable_storage_moving_window():
     strategy = MovingWindowRateLimiter(storage)
     assert strategy.storage is storage
 
-    errmsg = re.escape("Fixed Window rate limiting is not implemented for storage of type MyStorage")
+    errmsg = re.escape(
+        "Fixed Window rate limiting is not implemented for storage of type MyStorage"
+    )
     with pytest.raises(TypeError, match=errmsg):
         # Ignore the type error here because that's exactly what we're testing for.
         FixedWindowRateLimiter(storage)  # type: ignore
