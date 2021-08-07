@@ -208,18 +208,3 @@ def test_clear(default_client: pymemcache.Client):
 
     limiter.clear(per_min)
     assert limiter.hit(per_min) is True
-
-
-@pytest.mark.xfail(reason="Reset isn't implemented for Memcached")
-def test_reset(default_client: pymemcache.Client):
-    storage = MemcachedStorage(default_client)
-    assert storage.check() is True
-
-    limiter = FixedWindowRateLimiter(storage)
-    per_min = RateLimitItemPerMinute(1)
-
-    assert limiter.hit(per_min) is True
-    assert limiter.hit(per_min) is False
-
-    storage.reset()
-    assert limiter.hit(per_min) is True

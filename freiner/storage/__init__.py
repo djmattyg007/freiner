@@ -6,10 +6,10 @@ from .memory import MemoryStorage
 
 
 @runtime_checkable
-class Storage(Protocol):
+class FixedWindowStorage(Protocol):
     def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
-        increments the counter for a given rate limit key
+        Increments the counter for a given rate limit key.
 
         :param str key: the key to increment
         :param int expiry: amount in seconds for the key to expire in
@@ -22,30 +22,22 @@ class Storage(Protocol):
         :param str key: the key to get the counter value for
         """
 
+    # This should be returning a float, in line with other time methods
     def get_expiry(self, key: str) -> int:
         """
         :param str key: the key to get the expiry for
         """
 
-    def check(self) -> bool:
-        """
-        check if storage is healthy
-        """
-
     def clear(self, key: str):
         """
-        resets the rate limit key
-        :param str key: the key to clear rate limits for
-        """
+        Resets the rate limit key.
 
-    def reset(self):
-        """
-        reset storage to clear limits
+        :param str key: the key to clear rate limits for
         """
 
 
 @runtime_checkable
-class MovingWindowStorage(Storage, Protocol):
+class MovingWindowStorage(Protocol):
     def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
         """
         :param str key: rate limit key to acquire an entry in
@@ -56,9 +48,10 @@ class MovingWindowStorage(Storage, Protocol):
         :rtype: bool
         """
 
+    # TODO: start of window should be a float
     def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[int, int]:
         """
-        returns the starting point and the number of entries in the moving window
+        Returns the starting point and the number of entries in the moving window.
 
         :param str key: rate limit key
         :param int limit: amount of entries allowed
@@ -66,9 +59,16 @@ class MovingWindowStorage(Storage, Protocol):
         :return: (start of window, number of acquired entries)
         """
 
+    def clear(self, key: str):
+        """
+        Resets the rate limit key.
+
+        :param str key: the key to clear rate limits for
+        """
+
 
 __all__ = [
-    "Storage",
+    "FixedWindowStorage",
     "MovingWindowStorage",
     "MemoryStorage",
 ]

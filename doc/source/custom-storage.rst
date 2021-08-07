@@ -8,38 +8,45 @@ TODO: This section is out of date. Gotta re-word it to discuss the Protocol clas
 The **Freiner** package ships with a few built-in storage implementations which allow you
 to get started with some common data stores (redis & memcached) used for rate limiting.
 
-Creating your own storage backend is relatively straightforward. The most important thing
-is to fulfil the contract set out by :class:`freiner.storage.Storage`. This is a
-:class:`typing.Protocol` class, so you don't need to extend it.
+Creating your own storage backend is relatively straightforward. Each type of strategy
+(fixed-window and moving-window) has its own storage requirements, and a storage backend
+can easily support both at the same time.
 
-Examples
-=======
+Fixed Window Storage
+====================
 
-The following example shows a simple storage backend.::
+You need to fulfil the contract set out by :class:`freiner.storage.FixedWindowStorage`.
+This is a :class:`typing.Protocol` class, so you don't need to extend it.
 
-    class AwesomeStorage:
+The following example shows a fixed-window storage backend.::
+
+    class MyFixedWindowStorage:
+        def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
+            return 1
+
         def get(self, key: str) -> int:
             return 0
 
         def get_expiry(self, key: str) -> int:
             return -1
 
-        def check(self) -> bool:
-            return True
-
         def clear(self, key: str):
             pass
 
-        def reset(self):
-            pass
+Moving Window Storage
+=====================
 
-If you want to make use of the :ref:`moving-window` strategy, you'll need to implement
-a couple of additional methods. These are detailed in the :class:`freiner.storage.MovingWindowStorage`
-:class:`typing.Protocol` class.::
+You need to fulfil the contract set out by :class:`freiner.storage.MovingWindowStorage`.
+This is a :class:`typing.Protocol` class, so you don't need to extend it.
 
-    class MovingAwesomeStorage(AwesomeStorage):
+The following example shows a moving-window storage backend.::
+
+    class MyMovingWindowStorage:
         def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
             return True
 
         def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[int, int]:
             return int(time.time()), 0
+
+        def clear(self, key: str):
+            pass

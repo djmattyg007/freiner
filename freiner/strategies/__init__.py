@@ -1,0 +1,56 @@
+from typing import Tuple
+
+from typing_extensions import Protocol, runtime_checkable
+
+from freiner.limits import RateLimitItem
+
+from .fixed_window import FixedWindowRateLimiter
+from .fixed_window_elastic import FixedWindowElasticExpiryRateLimiter
+from .moving_window import MovingWindowRateLimiter
+
+
+@runtime_checkable
+class RateLimiter(Protocol):
+    def hit(self, item: RateLimitItem, *identifiers) -> bool:
+        """
+        Creates a hit on the rate limit and returns True if successful.
+
+        :param item: a :class:`RateLimitItem` instance
+        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        :return: True/False
+        """
+
+    def test(self, item: RateLimitItem, *identifiers) -> bool:
+        """
+        Checks the rate limit and returns True if it is not currently exceeded.
+
+        :param item: a :class:`RateLimitItem` instance
+        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        :return: True/False
+        """
+
+    # TODO: reset time should be a float, not an int
+    def get_window_stats(self, item: RateLimitItem, *identifiers) -> Tuple[int, int]:
+        """
+        Returns the number of requests remaining within this limit.
+
+        :param item: a :class:`RateLimitItem` instance
+        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        :return: tuple (reset time (int), remaining (int))
+        """
+
+    def clear(self, item: RateLimitItem, *identifiers):
+        """
+        Resets the request counter for a given limit to zero.
+
+        :param item: a :class:`RateLimitItem` instance
+        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        """
+
+
+__all__ = [
+    "RateLimiter",
+    "FixedWindowRateLimiter",
+    "FixedWindowElasticExpiryRateLimiter",
+    "MovingWindowRateLimiter",
+]

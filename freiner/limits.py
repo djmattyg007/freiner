@@ -4,7 +4,8 @@ from typing import Dict, Type, cast
 
 def safe_string(value) -> str:
     """
-    consistently converts a value to a string
+    Consistently converts a value to a string.
+
     :param value:
     :return: str
     """

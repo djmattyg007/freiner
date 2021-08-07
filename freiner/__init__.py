@@ -7,6 +7,7 @@ from .limits import (
     RateLimitItemPerSecond,
     RateLimitItemPerYear,
 )
+from .strategies import RateLimiter
 from .util import parse, parse_many
 
 
@@ -20,6 +21,7 @@ __all__ = [
     "RateLimitItemPerHour",
     "RateLimitItemPerMinute",
     "RateLimitItemPerSecond",
+    "RateLimiter",
     "parse",
     "parse_many",
 ]

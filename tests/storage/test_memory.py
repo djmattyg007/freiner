@@ -3,7 +3,7 @@ import time
 import pytest
 
 from freiner import RateLimitItemPerMinute, RateLimitItemPerSecond
-from freiner.storage import MemoryStorage
+from freiner.storage.memory import MemoryStorage
 from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
 
 from tests import freeze_time

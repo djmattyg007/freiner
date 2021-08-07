@@ -6,7 +6,7 @@ Storage Backends
 In-Memory
 =========
 
-The in-memory storage (:class:`freiner.storage.MemoryStorage`) takes no parameters so the only relevant value is :code:`memory://`
+ The in-memory storage (:class:`freiner.storage.MemoryStorage`).
 
 .. _redis:
 

@@ -10,7 +10,7 @@ Storage
 Storage Protocol Classes
 ========================
 
-.. autoclass:: freiner.storage.Storage
+.. autoclass:: freiner.storage.FixedWindowStorage
 .. autoclass:: freiner.storage.MovingWindowStorage
 
 .. _storage-backend-implementations:
@@ -48,9 +48,9 @@ Strategies
 ==========
 
 .. autoclass:: freiner.strategies.RateLimiter
-.. autoclass:: freiner.strategies.FixedWindowRateLimiter
-.. autoclass:: freiner.strategies.FixedWindowElasticExpiryRateLimiter
-.. autoclass:: freiner.strategies.MovingWindowRateLimiter
+.. autoclass:: freiner.strategies.fixed_window.FixedWindowRateLimiter
+.. autoclass:: freiner.strategies.fixed_window_elastic.FixedWindowElasticExpiryRateLimiter
+.. autoclass:: freiner.strategies.moving_window.MovingWindowRateLimiter
 
 Rate Limits
 ===========
@@ -59,13 +59,13 @@ Rate Limits
 Rate Limit Granularities
 ========================
 
-.. autoclass:: RateLimitItem
-.. autoclass:: RateLimitItemPerYear
-.. autoclass:: RateLimitItemPerMonth
-.. autoclass:: RateLimitItemPerDay
-.. autoclass:: RateLimitItemPerHour
-.. autoclass:: RateLimitItemPerMinute
-.. autoclass:: RateLimitItemPerSecond
+.. autoclass:: freiner.limits.RateLimitItem
+.. autoclass:: freiner.limits.RateLimitItemPerYear
+.. autoclass:: freiner.limits.RateLimitItemPerMonth
+.. autoclass:: freiner.limits.RateLimitItemPerDay
+.. autoclass:: freiner.limits.RateLimitItemPerHour
+.. autoclass:: freiner.limits.RateLimitItemPerMinute
+.. autoclass:: freiner.limits.RateLimitItemPerSecond
 
 ===============
 Utility Methods

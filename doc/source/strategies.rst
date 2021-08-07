@@ -1,6 +1,6 @@
 .. _ratelimit-strategy:
 
-Rate limiting strategies
+Rate Limiting Strategies
 ------------------------
 
 .. _fixed-window:
