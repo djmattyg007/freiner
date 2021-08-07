@@ -85,3 +85,8 @@ class RedisSentinelStorage(RedisStorage):
         check if storage is healthy
         """
         return self._check(self._sentinel_slave)
+
+
+__all__  = [
+    "RedisSentinelStorage",
+]

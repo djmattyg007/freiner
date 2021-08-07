@@ -123,3 +123,9 @@ class MemcachedStorage:
             return True
         except:  # noqa
             return False
+
+
+__all__ = [
+    "MemcachedClient",
+    "MemcachedStorage",
+]

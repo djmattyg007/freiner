@@ -62,3 +62,8 @@ class RedisClusterStorage(RedisStorage):
         keys = self._client.keys("LIMITER*")
         for key in keys:
             self._client.delete(key.decode("utf-8"))
+
+
+__all__ = [
+    "RedisClusterStorage",
+]
