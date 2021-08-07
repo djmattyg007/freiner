@@ -3,6 +3,31 @@
 Changelog
 ---------
 
+v3.0.0
+------
+
+This release provides several improvements and resolves several issues that were
+only identified after the initial release of ``Freiner``. Unfortunately some of
+these changes necessitate another major version bump.
+
+* Moved strategy classes into separate files, one per strategy class.
+* Instead of a "base" ``Storage`` ``Protocol`` class and a ``MovingWindowStorage`` class that extends from it,
+  there are now two totally separate ``Protocol`` classes: :class:`FixedWindowStorage` and :class:`MovingWindowStorage`.
+  They are compatible with each other, so storage backends can (and do) implement both of them simultaneously.
+* All time values are now returned as floats.
+  Previously the interfaces claimed to only be returning integers, but I'm pretty sure floats were sometimes returned.
+* Some methods that previously returned tuples will now return named tuples.
+* Some timing issues that likely only arised in testing code have been resolved.
+* More symbols are available for import from the top-level ``freiner`` package.
+
+  * The only modules that aren't available should be ones that rely on external dependencies (eg. redis or memcached).
+* An internal locking mechanism has been renamed to properly indicate it is not part of the public API.
+* Cleaned up some quirks in the rate limit string parser.
+* Minor adjustments to some exception messages.
+
+Additionally, there have been many many updates to the documentation. I'm expecting
+to publish it in the very near future.
+
 v2.0.0 - 2021-08-05
 -------------------
 

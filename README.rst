@@ -1,11 +1,11 @@
 .. |ci| image:: https://github.com/djmattyg007/freiner/workflows/CI/badge.svg?branch=master
-    :target: https://github.com/djmattyg007/freiner/actions?query=branch%3Amaster+workflow%3ACI
+   :target: https://github.com/djmattyg007/freiner/actions?query=branch%3Amaster+workflow%3ACI
 .. |codecov| image:: https://codecov.io/gh/djmattyg007/freiner/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/djmattyg007/freiner
 .. |pypi| image:: https://img.shields.io/pypi/v/freiner.svg
-    :target: https://pypi.python.org/pypi/freiner
+   :target: https://pypi.python.org/pypi/freiner
 .. |license| image:: https://img.shields.io/pypi/l/freiner.svg
-    :target: https://pypi.python.org/pypi/freiner
+   :target: https://pypi.python.org/pypi/freiner
 
 *******
 Freiner
