@@ -60,7 +60,7 @@ def test_fixed_window_with_elastic_expiry(storage: MemoryStorage):
         assert limiter.get_window_stats(limit)[0] == start + 2
 
 
-def test_moving_window_in_memory(storage: MemoryStorage):
+def test_moving_window(storage: MemoryStorage):
     limiter = MovingWindowRateLimiter(storage)
     with freeze_time() as frozen_datetime:
         limit = RateLimitItemPerMinute(10)

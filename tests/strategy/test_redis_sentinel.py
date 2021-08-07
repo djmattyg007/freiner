@@ -28,7 +28,7 @@ def flush_client(client: redis.sentinel.Sentinel, service_name: str):
     client.master_for(service_name).flushall()
 
 
-def test_fixed_window_with_elastic_expiry_redis_sentinel(storage: RedisSentinelStorage):
+def test_fixed_window_with_elastic_expiry(storage: RedisSentinelStorage):
     limiter = FixedWindowElasticExpiryRateLimiter(storage)
     limit = RateLimitItemPerSecond(10, 2)
 
