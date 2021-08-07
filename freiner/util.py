@@ -4,8 +4,7 @@ from typing import Sequence, Type, cast
 from .limits import GRANULARITIES, RateLimitItem
 
 
-# TODO: Remove {1}
-SEPARATORS = re.compile(r"[,;|]{1}")
+SEPARATORS = re.compile(r"[,;|]")
 # TODO: Mark second group as non-capturing, adjust parse_many to remove _ variable
 SINGLE_EXPR = re.compile(
     r"""

@@ -6,70 +6,62 @@ from freiner import limits
 from freiner.util import granularity_from_string, parse, parse_many
 
 
-@pytest.mark.parametrize("rl_string", ("1 per second", "1/SECOND", "1 / Second"))
-def test_single_seconds(rl_string: str):
-    limit = limits.RateLimitItemPerSecond(1)
+def _test_single_rate(rl_string: str, limit: limits.RateLimitItem):
     assert parse(rl_string) == limit
 
     many = parse_many(rl_string)
     assert len(many) == 1
     assert many[0] == limit
+
+
+@pytest.mark.parametrize("rl_string", ("1 per second", "1/SECOND", "1 / Second"))
+def test_single_seconds(rl_string: str):
+    _test_single_rate(rl_string, limits.RateLimitItemPerSecond(1))
 
 
 @pytest.mark.parametrize("rl_string", ("1 per minute", "1/MINUTE", "1/Minute"))
 def test_single_minutes(rl_string: str):
-    limit = limits.RateLimitItemPerMinute(1)
-    assert parse(rl_string) == limit
-
-    many = parse_many(rl_string)
-    assert len(many) == 1
-    assert many[0] == limit
+    _test_single_rate(rl_string, limits.RateLimitItemPerMinute(1))
 
 
 @pytest.mark.parametrize("rl_string", ("1 per hour", "1/HOUR", "1/Hour"))
 def test_single_hours(rl_string: str):
-    limit = limits.RateLimitItemPerHour(1)
-    assert parse(rl_string) == limit
-
-    many = parse_many(rl_string)
-    assert len(many) == 1
-    assert many[0] == limit
+    _test_single_rate(rl_string, limits.RateLimitItemPerHour(1))
 
 
 @pytest.mark.parametrize("rl_string", ("1 per day", "1/DAY", "1 / Day"))
 def test_single_days(rl_string: str):
-    limit = limits.RateLimitItemPerDay(1)
-    assert parse(rl_string) == limit
-
-    many = parse_many(rl_string)
-    assert len(many) == 1
-    assert many[0] == limit
+    _test_single_rate(rl_string, limits.RateLimitItemPerDay(1))
 
 
 @pytest.mark.parametrize("rl_string", ("1 per month", "1/MONTH", "1 / Month"))
 def test_single_months(rl_string: str):
-    limit = limits.RateLimitItemPerMonth(1)
-    assert parse(rl_string) == limit
-
-    many = parse_many(rl_string)
-    assert len(many) == 1
-    assert many[0] == limit
+    _test_single_rate(rl_string, limits.RateLimitItemPerMonth(1))
 
 
 @pytest.mark.parametrize("rl_string", ("1 per year", "1/Year", "1 / year"))
 def test_single_years(rl_string: str):
-    limit = limits.RateLimitItemPerYear(1)
-    assert parse(rl_string) == limit
-
-    many = parse_many(rl_string)
-    assert len(many) == 1
-    assert many[0] == limit
+    _test_single_rate(rl_string, limits.RateLimitItemPerYear(1))
 
 
-def test_multiples():
-    assert parse("1 per 3 hour").get_expiry() == 3 * 60 * 60
-    assert parse("1 per 2 hours").get_expiry() == 2 * 60 * 60
-    assert parse("1/2 day").get_expiry() == 2 * 24 * 60 * 60
+@pytest.mark.parametrize(
+    ("rl_string", "expiry"),
+    (
+        ("2 per 6 second", 6),
+        ("10 per 5 minute", 5 * 60),
+        ("1 per 3 hour", 3 * 60 * 60),
+        ("400 per 3 day", 3 * 24 * 60 * 60),
+        ("10000 per 6 month", 6 * 30 * 24 * 60 * 60),
+        ("100000 per 2 year", 2 * 12 * 30 * 24 * 60 * 60),
+    )
+)
+def test_multiples(rl_string: str, expiry: int):
+    assert parse(rl_string).get_expiry() == expiry
+    assert parse(rl_string + "s").get_expiry() == expiry
+    assert parse(rl_string.replace("per", "/")).get_expiry() == expiry
+    assert parse(rl_string.replace(" per ", "/")).get_expiry() == expiry
+    assert parse(rl_string.replace("per", "/") + "s").get_expiry() == expiry
+    assert parse(rl_string.replace(" per ", "/") + "s").get_expiry() == expiry
 
 
 @pytest.mark.parametrize("sep", (",", ";", "|"))
@@ -84,6 +76,9 @@ def test_parse_two_limits(sep: str):
 
         assert parsed[1].amount == 2
         assert parsed[1].get_expiry() == 1
+
+        single_parsed = parse(limit_string)
+        assert single_parsed == parsed[0]
 
     inputs = ("5 per 3 hour", "2 per second")
     for i in range(3):
@@ -108,6 +103,9 @@ def test_parse_three_limits(sep):
 
         assert parsed[2].amount == 5
         assert parsed[2].get_expiry() == 2 * 60
+
+        single_parsed = parse(limit_string)
+        assert single_parsed == parsed[0]
 
     inputs = ("1000 per month", "200 per 4 days", "5 per 2 minutes")
     for i in range(3):
