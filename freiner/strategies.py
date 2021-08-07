@@ -1,7 +1,3 @@
-"""
-rate limiting strategies
-"""
-
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING
 
