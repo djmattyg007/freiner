@@ -4,8 +4,8 @@ include LICENSE.txt
 include MANIFEST.in
 include pyproject.toml
 
-recursive-include doc/source *
-recursive-include doc *.py Make*
+recursive-include docs/source *
+recursive-include docs *.py Make*
 
 include .coveragerc
 include docker-compose.yml
