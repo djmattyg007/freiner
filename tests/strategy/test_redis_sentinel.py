@@ -1,7 +1,7 @@
 import time
 
 import pytest
-import redis.sentinel
+from redis.sentinel import Sentinel
 
 from freiner.limits import RateLimitItemPerSecond
 from freiner.storage.redis_sentinel import RedisSentinelStorage
@@ -9,8 +9,8 @@ from freiner.strategies.fixed_window_elastic import FixedWindowElasticExpiryRate
 
 
 @pytest.fixture
-def client() -> redis.sentinel.Sentinel:
-    return redis.sentinel.Sentinel([("localhost", 26379)])
+def client() -> Sentinel:
+    return Sentinel([("localhost", 26379)])
 
 
 @pytest.fixture
@@ -19,12 +19,12 @@ def service_name() -> str:
 
 
 @pytest.fixture
-def storage(client: redis.sentinel.Sentinel, service_name: str) -> RedisSentinelStorage:
+def storage(client: Sentinel, service_name: str) -> RedisSentinelStorage:
     return RedisSentinelStorage(client, service_name)
 
 
 @pytest.fixture(autouse=True)
-def flush_client(client: redis.sentinel.Sentinel, service_name: str):
+def flush_client(client: Sentinel, service_name: str):
     client.master_for(service_name).flushall()
 
 

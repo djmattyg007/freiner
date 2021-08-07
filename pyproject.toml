@@ -33,7 +33,6 @@ exclude_lines = [
     "noqa",
     "raise NotImplementedError",
     "if TYPE_CHECKING:",
-    "if not HAS_",
 ]
 
 

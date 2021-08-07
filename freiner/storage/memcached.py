@@ -2,15 +2,9 @@ import time
 from typing import List, Tuple, Union
 from urllib.parse import urlparse
 
+import pymemcache
+
 from freiner.errors import FreinerConfigurationError
-
-
-try:
-    import pymemcache
-
-    HAS_MEMCACHED = True
-except ImportError:  # pragma: no cover
-    HAS_MEMCACHED = False
 
 
 MemcachedClient = Union[pymemcache.Client, pymemcache.PooledClient, pymemcache.HashClient]
@@ -35,11 +29,8 @@ class MemcachedStorage:
          `memcached://host:port,host:port`, `memcached:///run/path/to/sock`
         :param options: all remaining keyword arguments are passed
          directly to the constructor of :class:`pymemcache.client.base.Client`
-        :raise FreinerConfigurationError: when `pymemcache` dependency is not available
+        :raise FreinerConfigurationError: when no hosts could be parsed from the supplied URI
         """
-
-        if not HAS_MEMCACHED:
-            raise FreinerConfigurationError("Dependency 'pymemcache' is not available.")
 
         parsed_uri = urlparse(uri)
         hosts: List[Union[Tuple[str, int], str]] = []

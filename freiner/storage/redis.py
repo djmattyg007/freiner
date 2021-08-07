@@ -1,17 +1,9 @@
 import time
 from typing import Callable, Tuple, cast
 
-from freiner.errors import FreinerConfigurationError
+import redis
 
 from . import MovingWindow
-
-
-try:
-    import redis
-
-    HAS_REDIS = True
-except ImportError:  # pragma: no cover
-    HAS_REDIS = False
 
 
 class RedisInteractor:
@@ -195,11 +187,7 @@ class RedisStorage(RedisInteractor):
          This uri is passed directly to :func:`redis.from_url`.
         :param options: all remaining keyword arguments are passed
          directly to the constructor of :class:`redis.Redis`
-        :raise FreinerConfigurationError: when `redis` dependency is not available
         """
-
-        if not HAS_REDIS:
-            raise FreinerConfigurationError("Dependency 'redis' is not available.")
 
         client: redis.Redis = redis.from_url(uri, **options)
         return cls(client)

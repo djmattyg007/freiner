@@ -1,16 +1,8 @@
 from urllib.parse import urlparse
 
-from freiner.errors import FreinerConfigurationError
+from rediscluster import RedisCluster
 
 from .redis import RedisStorage
-
-
-try:
-    import rediscluster
-
-    HAS_REDISCLUSTER = True
-except ImportError:  # pragma: no cover
-    HAS_REDISCLUSTER = False
 
 
 class RedisClusterStorage(RedisStorage):
@@ -27,12 +19,7 @@ class RedisClusterStorage(RedisStorage):
          `redis+cluster://[:password]@host:port,host:port`
         :param options: all remaining keyword arguments are passed
          directly to the constructor of :class:`rediscluster.RedisCluster`
-        :raise FreinerConfigurationError: when the rediscluster library is not
-         available or if the redis host cannot be pinged.
         """
-
-        if not HAS_REDISCLUSTER:
-            raise FreinerConfigurationError("Dependency 'redis-py-cluster' is not available.")
 
         parsed_uri = urlparse(uri)
         cluster_hosts = []
@@ -43,7 +30,7 @@ class RedisClusterStorage(RedisStorage):
         options.setdefault("max_connections", 1000)
         options["startup_nodes"] = cluster_hosts
 
-        client = rediscluster.RedisCluster(**options)
+        client = RedisCluster(**options)
         return cls(client)
 
     def reset(self) -> None:
