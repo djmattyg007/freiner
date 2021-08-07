@@ -42,7 +42,7 @@ class RedisInteractor:
         end
         local limit = tonumber(ARGV[2])
         local no_add = tonumber(ARGV[4])
-        if 0 == no_add then
+        if no_add == 0 then
             redis.call('lpush', KEYS[1], timestamp)
             redis.call('ltrim', KEYS[1], 0, limit - 1)
             redis.call('expire', KEYS[1], expiry)
