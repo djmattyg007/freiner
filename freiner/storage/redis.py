@@ -21,7 +21,7 @@ class RedisInteractor:
         local a = 0
         local oldest = nil
         for idx=1,#items do
-            if tonumber(items[idx]) >= expiry then
+            if tonumber(items[idx]) > expiry then
                 a = a + 1
                 if oldest == nil then
                     oldest = tonumber(items[idx])
@@ -37,7 +37,7 @@ class RedisInteractor:
         local entry = redis.call('lindex', KEYS[1], tonumber(ARGV[2]) - 1)
         local timestamp = tonumber(ARGV[1])
         local expiry = tonumber(ARGV[3])
-        if entry and tonumber(entry) >= timestamp - expiry then
+        if entry and tonumber(entry) > timestamp - expiry then
             return false
         end
         local limit = tonumber(ARGV[2])

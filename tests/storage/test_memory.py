@@ -26,7 +26,7 @@ def test_in_memory(storage: MemoryStorage):
             assert limiter.hit(per_min) is True
         assert limiter.hit(per_min) is False
 
-        frozen_datetime.tick(61)
+        frozen_datetime.tick(60)
         assert limiter.hit(per_min) is True
 
 
@@ -69,18 +69,20 @@ def test_reset(storage: MemoryStorage):
         assert limiter.hit(per_min) is False
 
 
-def test_expiry(storage: MemoryStorage):
+def test_expiry_fixed_window(storage: MemoryStorage):
     limiter = FixedWindowRateLimiter(storage)
     with freeze_time() as frozen_datetime:
         per_min = RateLimitItemPerMinute(10)
+        per_sec = RateLimitItemPerSecond(1)
 
         for _ in range(0, 10):
             assert limiter.hit(per_min) is True
+        assert limiter.hit(per_min) is False
 
         frozen_datetime.tick(60)
         # touch another key and yield
-        limiter.hit(RateLimitItemPerSecond(1))
-        time.sleep(0.1)
+        assert limiter.hit(per_sec) is True
+        time.sleep(0.01)
         assert per_min.key_for() not in storage.storage
 
 
@@ -95,8 +97,7 @@ def test_expiry_moving_window(storage: MemoryStorage):
                 assert limiter.hit(per_min) is True
 
             frozen_datetime.tick(60)
+            # touch another key and yield
             assert limiter.hit(per_sec) is True
-
-            frozen_datetime.tick(1)
-            time.sleep(0.1)
+            time.sleep(0.01)
             assert storage.events[per_min.key_for()] == []

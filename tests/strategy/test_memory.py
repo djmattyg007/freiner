@@ -93,6 +93,7 @@ def test_moving_window(storage: MemoryStorage):
     limiter = MovingWindowRateLimiter(storage)
     with freeze_time() as frozen_datetime:
         limit = RateLimitItemPerMinute(10)
+
         for i in range(0, 5):
             assert limiter.hit(limit) is True
             assert limiter.hit(limit) is True
@@ -105,7 +106,7 @@ def test_moving_window(storage: MemoryStorage):
         frozen_datetime.tick(20)
         window_stats = limiter.get_window_stats(limit)
         assert window_stats.reset_time == time.time() + 30
-        assert window_stats.remaining_count == 2
+        assert window_stats.remaining_count == 4
 
-        frozen_datetime.tick(31)
+        frozen_datetime.tick(30)
         assert limiter.get_window_stats(limit).remaining_count == 10

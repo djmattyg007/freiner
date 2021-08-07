@@ -111,7 +111,8 @@ class MemoryStorage:
             entry = self.events[key][limit - 1]
         except IndexError:
             entry = None
-        if entry and entry.atime >= timestamp - expiry:
+
+        if entry and entry.atime > timestamp - expiry:
             return False
         else:
             if not no_add:
@@ -133,7 +134,7 @@ class MemoryStorage:
         """
         timestamp = time.time()
         if self.events.get(key):
-            return len([k for k in self.events[key] if k.atime >= timestamp - expiry])
+            return len([k for k in self.events[key] if k.atime > timestamp - expiry])
         else:
             return 0
 
@@ -149,7 +150,7 @@ class MemoryStorage:
         timestamp = time.time()
         acquired = self.get_num_acquired(key, expiry)
         for item in self.events.get(key, []):
-            if item.atime >= timestamp - expiry:
+            if item.atime > timestamp - expiry:
                 return MovingWindow(item.atime, acquired)
         return MovingWindow(timestamp, acquired)
 
