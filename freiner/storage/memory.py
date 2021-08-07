@@ -27,7 +27,7 @@ class _LockableEntry:
         self.release()
 
     def __repr__(self) -> str:
-        return f"MemoryLockableEntry(atime={self.atime}, expiry={self.expiry})"
+        return f"MemoryLockableEntry<atime={self.atime}, expiry={self.expiry}>"  # pragma: no cover
 
 
 class MemoryStorage:
