@@ -3,7 +3,7 @@ import unittest.mock
 from typing import Tuple
 
 import pytest
-import redis.sentinel
+from redis.sentinel import Sentinel
 
 from freiner.errors import FreinerConfigurationError
 from freiner.storage.redis_sentinel import RedisSentinelStorage
@@ -36,12 +36,12 @@ def default_host_uri(default_host: Host) -> str:
 
 
 @pytest.fixture
-def default_client(default_host: Host) -> redis.sentinel.Sentinel:
-    return redis.sentinel.Sentinel((default_host,))
+def default_client(default_host: Host) -> Sentinel:
+    return Sentinel((default_host,))
 
 
 @pytest.fixture(autouse=True)
-def flush_default_host(default_client: redis.sentinel.Sentinel, default_service_name: str):
+def flush_default_host(default_client: Sentinel, default_service_name: str):
     default_client.master_for(default_service_name).flushall()
 
 
@@ -56,7 +56,7 @@ def storage(request) -> RedisSentinelStorage:
 def test_from_default_uri(default_host_uri: str, default_service_name: str):
     storage = RedisSentinelStorage.from_uri(default_host_uri, service_name=default_service_name)
     assert isinstance(storage, RedisSentinelStorage)
-    assert isinstance(storage._sentinel, redis.sentinel.Sentinel)
+    assert isinstance(storage._sentinel, Sentinel)
     assert storage.check() is True
 
 
@@ -64,25 +64,25 @@ def test_from_default_uri_with_service_name(default_host_uri: str, default_servi
     uri = default_host_uri + "/" + default_service_name
     storage = RedisSentinelStorage.from_uri(uri)
     assert isinstance(storage, RedisSentinelStorage)
-    assert isinstance(storage._sentinel, redis.sentinel.Sentinel)
+    assert isinstance(storage._sentinel, Sentinel)
     assert storage.check() is True
 
 
 def test_from_default_uri_with_options(default_host_uri: str, default_service_name: str):
-    with unittest.mock.patch("freiner.storage.redis_sentinel.redis.sentinel") as mock_sentinel:
+    with unittest.mock.patch("freiner.storage.redis_sentinel.Sentinel") as mock_sentinel:
         storage = RedisSentinelStorage.from_uri(
             default_host_uri, service_name=default_service_name, connection_timeout=1
         )
         assert isinstance(storage, RedisSentinelStorage)
-        assert mock_sentinel.Sentinel.call_args[1]["connection_timeout"] == 1
+        assert mock_sentinel.call_args[1]["connection_timeout"] == 1
 
 
 def test_from_uri_with_password(default_host: Host, default_service_name: str):
     uri = f"redis+sentinel://:sekret@{default_host[0]}:{default_host[1]}/{default_service_name}"
-    with unittest.mock.patch("freiner.storage.redis_sentinel.redis.sentinel") as mock_sentinel:
+    with unittest.mock.patch("freiner.storage.redis_sentinel.Sentinel") as mock_sentinel:
         storage = RedisSentinelStorage.from_uri(uri)
         assert isinstance(storage, RedisSentinelStorage)
-        assert mock_sentinel.Sentinel.call_args[1]["password"] == "sekret"
+        assert mock_sentinel.call_args[1]["password"] == "sekret"
 
 
 def test_from_default_uri_with_no_service_name(default_host_uri: str):
