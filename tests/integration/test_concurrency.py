@@ -5,8 +5,9 @@ from uuid import uuid4
 import pytest
 
 from freiner.limits import RateLimitItemPerSecond
-from freiner.storage import MemoryStorage
-from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
+from freiner.storage.memory import MemoryStorage
+from freiner.strategies.fixed_window import FixedWindowRateLimiter
+from freiner.strategies.moving_window import MovingWindowRateLimiter
 
 
 @pytest.fixture

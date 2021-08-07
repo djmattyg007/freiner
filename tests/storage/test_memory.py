@@ -4,7 +4,8 @@ import pytest
 
 from freiner import RateLimitItemPerMinute, RateLimitItemPerSecond
 from freiner.storage.memory import MemoryStorage
-from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
+from freiner.strategies.fixed_window import FixedWindowRateLimiter
+from freiner.strategies.moving_window import MovingWindowRateLimiter
 
 from tests import freeze_time
 

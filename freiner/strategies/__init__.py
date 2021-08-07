@@ -1,12 +1,13 @@
-from typing import Tuple
+from typing import NamedTuple
 
 from typing_extensions import Protocol, runtime_checkable
 
 from freiner.limits import RateLimitItem
 
-from .fixed_window import FixedWindowRateLimiter
-from .fixed_window_elastic import FixedWindowElasticExpiryRateLimiter
-from .moving_window import MovingWindowRateLimiter
+
+class WindowStats(NamedTuple):
+    reset_time: float
+    remaining_count: int
 
 
 @runtime_checkable
@@ -29,7 +30,7 @@ class RateLimiter(Protocol):
         :return: True/False
         """
 
-    def get_window_stats(self, item: RateLimitItem, *identifiers) -> Tuple[float, int]:
+    def get_window_stats(self, item: RateLimitItem, *identifiers) -> WindowStats:
         """
         Returns the number of requests remaining within this limit.
 
@@ -49,7 +50,5 @@ class RateLimiter(Protocol):
 
 __all__ = [
     "RateLimiter",
-    "FixedWindowRateLimiter",
-    "FixedWindowElasticExpiryRateLimiter",
-    "MovingWindowRateLimiter",
+    "WindowStats",
 ]

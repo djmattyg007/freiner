@@ -1,8 +1,6 @@
-from typing import Tuple
+from typing import NamedTuple
 
 from typing_extensions import Protocol, runtime_checkable
-
-from .memory import MemoryStorage
 
 
 @runtime_checkable
@@ -35,6 +33,11 @@ class FixedWindowStorage(Protocol):
         """
 
 
+class MovingWindow(NamedTuple):
+    start_time: float
+    acquired_count: int
+
+
 @runtime_checkable
 class MovingWindowStorage(Protocol):
     def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
@@ -47,7 +50,7 @@ class MovingWindowStorage(Protocol):
         :rtype: bool
         """
 
-    def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[float, int]:
+    def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
         """
         Returns the starting point and the number of entries in the moving window.
 
@@ -67,6 +70,7 @@ class MovingWindowStorage(Protocol):
 
 __all__ = [
     "FixedWindowStorage",
+    "MovingWindow",
     "MovingWindowStorage",
     "MemoryStorage",
 ]

@@ -6,7 +6,7 @@ Storage Backends
 In-Memory
 =========
 
- The in-memory storage (:class:`freiner.storage.MemoryStorage`).
+ The in-memory storage (:class:`freiner.storage.memory.MemoryStorage`).
 
 .. _redis:
 

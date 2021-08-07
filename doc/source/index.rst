@@ -21,8 +21,8 @@ Quickstart
 
 Initialize the storage backend::
 
-    from freiner import storage
-    memory_storage = storage.MemoryStorage()
+    from freiner.storage import memory
+    memory_storage = memory.MemoryStorage()
 
 Initialize a rate limiter with the :ref:`moving-window` strategy::
 

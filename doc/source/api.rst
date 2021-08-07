@@ -11,6 +11,7 @@ Storage Protocol Classes
 ========================
 
 .. autoclass:: freiner.storage.FixedWindowStorage
+.. autoclass:: freiner.storage.MovingWindow
 .. autoclass:: freiner.storage.MovingWindowStorage
 
 .. _storage-backend-implementations:
@@ -48,6 +49,7 @@ Strategies
 ==========
 
 .. autoclass:: freiner.strategies.RateLimiter
+.. autoclass:: freiner.strategies.WindowStats
 .. autoclass:: freiner.strategies.fixed_window.FixedWindowRateLimiter
 .. autoclass:: freiner.strategies.fixed_window_elastic.FixedWindowElasticExpiryRateLimiter
 .. autoclass:: freiner.strategies.moving_window.MovingWindowRateLimiter

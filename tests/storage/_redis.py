@@ -2,7 +2,8 @@ import time
 
 from freiner.limits import RateLimitItemPerMinute, RateLimitItemPerSecond
 from freiner.storage.redis import RedisStorage
-from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
+from freiner.strategies.fixed_window import FixedWindowRateLimiter
+from freiner.strategies.moving_window import MovingWindowRateLimiter
 
 
 # TODO: Rewrite this to use freezegun. Will require fakeredis.

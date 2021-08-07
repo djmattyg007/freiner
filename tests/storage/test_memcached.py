@@ -10,7 +10,8 @@ import pytest
 from freiner import RateLimitItemPerMinute, RateLimitItemPerSecond
 from freiner.errors import FreinerConfigurationError
 from freiner.storage.memcached import MemcachedStorage
-from freiner.strategies import FixedWindowElasticExpiryRateLimiter, FixedWindowRateLimiter
+from freiner.strategies.fixed_window import FixedWindowRateLimiter
+from freiner.strategies.fixed_window_elastic import FixedWindowElasticExpiryRateLimiter
 
 from tests import DOCKERDIR, fixed_start
 

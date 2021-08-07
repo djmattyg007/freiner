@@ -1,7 +1,8 @@
 import threading
 import time
 from collections import Counter
-from typing import Tuple
+
+from . import MovingWindow
 
 
 class _LockableEntry:
@@ -136,7 +137,7 @@ class MemoryStorage:
         else:
             return 0
 
-    def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[float, int]:
+    def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
         """
         returns the starting point and the number of entries in the moving window
 
@@ -149,8 +150,8 @@ class MemoryStorage:
         acquired = self.get_num_acquired(key, expiry)
         for item in self.events.get(key, []):
             if item.atime >= timestamp - expiry:
-                return item.atime, acquired
-        return timestamp, acquired
+                return MovingWindow(item.atime, acquired)
+        return MovingWindow(timestamp, acquired)
 
     def check(self) -> bool:
         """

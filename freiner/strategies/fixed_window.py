@@ -1,7 +1,7 @@
-from typing import Tuple
-
 from freiner.limits import RateLimitItem
 from freiner.storage import FixedWindowStorage
+
+from . import WindowStats
 
 
 class FixedWindowRateLimiter:
@@ -37,7 +37,7 @@ class FixedWindowRateLimiter:
         """
         return self.storage.get(item.key_for(*identifiers)) < item.amount
 
-    def get_window_stats(self, item: RateLimitItem, *identifiers) -> Tuple[float, int]:
+    def get_window_stats(self, item: RateLimitItem, *identifiers) -> WindowStats:
         """
         returns the number of requests remaining and reset of this limit.
 
@@ -47,7 +47,7 @@ class FixedWindowRateLimiter:
         """
         remaining = max(0, item.amount - self.storage.get(item.key_for(*identifiers)))
         reset = self.storage.get_expiry(item.key_for(*identifiers))
-        return reset, remaining
+        return WindowStats(reset, remaining)
 
     def clear(self, item: RateLimitItem, *identifiers):
         self.storage.clear(item.key_for(*identifiers))

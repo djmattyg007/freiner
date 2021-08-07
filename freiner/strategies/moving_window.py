@@ -1,7 +1,7 @@
-from typing import Tuple
-
 from freiner.limits import RateLimitItem
 from freiner.storage import MovingWindowStorage
+
+from . import WindowStats
 
 
 class MovingWindowRateLimiter:
@@ -44,19 +44,19 @@ class MovingWindowRateLimiter:
 
         return acquired_count < item.amount
 
-    def get_window_stats(self, item: RateLimitItem, *identifiers) -> Tuple[float, int]:
+    def get_window_stats(self, item: RateLimitItem, *identifiers) -> WindowStats:
         """
         returns the number of requests remaining within this limit.
 
         :param item: a :class:`RateLimitItem` instance
         :param identifiers: variable list of strings to uniquely identify the limit
-        :return: tuple (reset time (int), remaining (int))
+        :return: tuple (reset time (float), remaining (int))
         """
         window_start, window_items = self.storage.get_moving_window(
             item.key_for(*identifiers), item.amount, item.get_expiry()
         )
         reset = window_start + item.get_expiry()
-        return reset, item.amount - window_items
+        return WindowStats(reset, item.amount - window_items)
 
     def clear(self, item: RateLimitItem, *identifiers):
         self.storage.clear(item.key_for(*identifiers))

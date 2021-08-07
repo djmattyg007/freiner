@@ -8,7 +8,8 @@ import pytest
 
 from freiner.limits import RateLimitItemPerSecond
 from freiner.storage.memcached import MemcachedStorage
-from freiner.strategies import FixedWindowElasticExpiryRateLimiter, MovingWindowRateLimiter
+from freiner.strategies.fixed_window_elastic import FixedWindowElasticExpiryRateLimiter
+from freiner.strategies.moving_window import MovingWindowRateLimiter
 
 
 Host = Tuple[str, int]
@@ -73,8 +74,8 @@ def test_fixed_window_with_elastic_expiry_concurrency(pooled_client: pymemcache.
     t2.join()
 
     window_stats = limiter.get_window_stats(limit)
-    assert window_stats[1] == 0
-    assert start + 2 <= window_stats[0] <= start + 3
+    assert window_stats.remaining_count == 0
+    assert start + 2 <= window_stats.reset_time <= start + 3
     assert storage.get(limit.key_for()) == 10
 
 

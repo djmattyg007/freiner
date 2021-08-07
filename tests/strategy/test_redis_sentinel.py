@@ -5,7 +5,7 @@ import redis.sentinel
 
 from freiner.limits import RateLimitItemPerSecond
 from freiner.storage.redis_sentinel import RedisSentinelStorage
-from freiner.strategies import FixedWindowElasticExpiryRateLimiter
+from freiner.strategies.fixed_window_elastic import FixedWindowElasticExpiryRateLimiter
 
 
 @pytest.fixture
@@ -39,4 +39,4 @@ def test_fixed_window_with_elastic_expiry(storage: RedisSentinelStorage):
 
     time.sleep(1)
     assert limiter.hit(limit) is False
-    assert limiter.get_window_stats(limit)[1] == 0
+    assert limiter.get_window_stats(limit).remaining_count == 0

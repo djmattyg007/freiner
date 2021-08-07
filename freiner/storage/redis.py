@@ -3,6 +3,8 @@ from typing import Callable, Tuple, cast
 
 from freiner.errors import FreinerConfigurationError
 
+from . import MovingWindow
+
 
 try:
     import redis
@@ -123,7 +125,7 @@ class RedisInteractor:
     def _reset(self):
         return self.lua_clear_keys(("LIMITER*",))
 
-    def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[float, int]:
+    def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
         """
         returns the starting point and the number of entries in the moving
         window
@@ -135,7 +137,10 @@ class RedisInteractor:
         """
         timestamp = time.time()
         window = self.lua_moving_window((key,), (timestamp - expiry, limit))
-        return window or (timestamp, 0)
+        if window:
+            return MovingWindow(window[0], window[1])
+        else:
+            return MovingWindow(timestamp, 0)
 
     def _acquire_entry(
         self, key: str, limit: int, expiry: int, connection: redis.Redis, no_add: bool = False

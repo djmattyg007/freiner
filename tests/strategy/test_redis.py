@@ -5,7 +5,8 @@ import redis
 
 from freiner.limits import RateLimitItemPerSecond
 from freiner.storage.redis import RedisStorage
-from freiner.strategies import FixedWindowElasticExpiryRateLimiter, MovingWindowRateLimiter
+from freiner.strategies.fixed_window_elastic import FixedWindowElasticExpiryRateLimiter
+from freiner.strategies.moving_window import MovingWindowRateLimiter
 
 
 @pytest.fixture
@@ -34,7 +35,7 @@ def test_fixed_window_with_elastic_expiry(storage: RedisStorage):
 
     time.sleep(1)
     assert limiter.hit(limit) is False
-    assert limiter.get_window_stats(limit)[1] == 0
+    assert limiter.get_window_stats(limit).remaining_count == 0
 
 
 def test_moving_window(storage: RedisStorage):
@@ -43,7 +44,7 @@ def test_moving_window(storage: RedisStorage):
 
     for i in range(0, 10):
         assert limiter.hit(limit) is True
-        assert limiter.get_window_stats(limit)[1] == 10 - (i + 1)
+        assert limiter.get_window_stats(limit).remaining_count == 10 - (i + 1)
         time.sleep(2 * 0.095)
 
     assert limiter.hit(limit) is False
@@ -51,4 +52,4 @@ def test_moving_window(storage: RedisStorage):
     time.sleep(0.4)
     assert limiter.hit(limit) is True
     assert limiter.hit(limit) is True
-    assert limiter.get_window_stats(limit)[1] == 0
+    assert limiter.get_window_stats(limit).remaining_count == 0

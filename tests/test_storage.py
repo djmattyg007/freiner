@@ -1,10 +1,11 @@
 import re
 import time
-from typing import Tuple
 
 import pytest
 
-from freiner.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
+from freiner.storage import MovingWindow
+from freiner.strategies.fixed_window import FixedWindowRateLimiter
+from freiner.strategies.moving_window import MovingWindowRateLimiter
 
 
 def test_pluggable_storage_fixed_window():
@@ -38,8 +39,8 @@ def test_pluggable_storage_moving_window():
         def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
             return True
 
-        def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[float, int]:
-            return time.time(), 1
+        def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
+            return MovingWindow(time.time(), 0)
 
         def clear(self, key: str):
             pass
