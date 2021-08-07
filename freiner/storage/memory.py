@@ -4,13 +4,26 @@ from collections import Counter
 from typing import Tuple
 
 
-class LockableEntry(threading._RLock):
-    __slots__ = ["atime", "expiry"]
+class _LockableEntry:
+    __slots__ = ("atime", "expiry", "_lock")
 
-    def __init__(self, expiry):
-        self.atime = time.time()
-        self.expiry = self.atime + expiry
-        super(LockableEntry, self).__init__()
+    def __init__(self, expiry: float):
+        self.atime: float = time.time()
+        self.expiry: float = self.atime + expiry
+
+        self._lock = threading.RLock()
+
+    def acquire(self):
+        self._lock.acquire()
+
+    def release(self):
+        self._lock.release()
+
+    def __enter__(self):
+        self.acquire()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.release()
 
 
 class MemoryStorage:
@@ -24,6 +37,7 @@ class MemoryStorage:
         self.storage = Counter()
         self.expirations = {}
         self.events = {}
+
         self.timer = threading.Timer(0.01, self.__expire_events)
         self.timer.start()
 
@@ -97,7 +111,7 @@ class MemoryStorage:
             return False
         else:
             if not no_add:
-                self.events[key].insert(0, LockableEntry(expiry))
+                self.events[key].insert(0, _LockableEntry(expiry))
             return True
 
     def get_expiry(self, key: str) -> int:
