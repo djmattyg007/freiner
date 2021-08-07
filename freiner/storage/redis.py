@@ -253,7 +253,7 @@ class RedisStorage(RedisInteractor):
     def reset(self):
         """
         This function calls a Lua Script to delete keys prefixed with 'LIMITER'
-        in block of 5000.
+        in blocks of 5000.
 
         .. warning::
            This operation was designed to be fast, but was not tested
