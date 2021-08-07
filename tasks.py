@@ -51,4 +51,4 @@ def type_check(c):
 @task
 def docs(c):
     with c.cd("docs"):
-        c.run("sphinx-build -M html source build -a")
+        c.run("sphinx-build -M html source build -a -W")

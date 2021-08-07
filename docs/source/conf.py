@@ -37,6 +37,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
+    "sphinx_search.extension",
 ]
 
 # List of patterns, relative to source directory, that match files and
@@ -59,10 +60,11 @@ html_theme = 'alabaster'
 
 autodoc_default_options = {
     "members": True,
+    "member-order": "bysource",
     "show-inheritance": True,
 }
-
 autoclass_content = "both"
+autodoc_typehints = "both"
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),

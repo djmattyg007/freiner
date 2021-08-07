@@ -1,0 +1,12 @@
+version: 2
+formats: "all"
+python:
+  version: "3.8"
+  install:
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs
+sphinx:
+  builder: html
+  fail_on_warning: true
