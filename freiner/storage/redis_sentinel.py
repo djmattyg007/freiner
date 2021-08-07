@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 from urllib.parse import urlparse
 
 from redis import Redis
@@ -27,7 +27,7 @@ class RedisSentinelStorage(RedisStorage):
 
     @classmethod
     def from_uri(
-        cls, uri: str, service_name: Optional[str] = None, **options
+        cls, uri: str, service_name: Optional[str] = None, **options: Any
     ) -> "RedisSentinelStorage":
         """
         :param str uri: url of the form

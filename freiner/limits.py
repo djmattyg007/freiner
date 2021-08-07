@@ -70,7 +70,7 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
         """
         return self.granularity[0] * self.multiples
 
-    def key_for(self, *identifiers) -> str:
+    def key_for(self, *identifiers: Any) -> str:
         """
         :param identifiers: a list of strings to append to the key
         :return: a string key identifying this resource with

@@ -1,5 +1,5 @@
 import time
-from typing import List, Tuple, Union
+from typing import Any, List, Tuple, Union
 from urllib.parse import urlparse
 
 import pymemcache
@@ -23,7 +23,7 @@ class MemcachedStorage:
         self._client: MemcachedClient = client
 
     @classmethod
-    def from_uri(cls, uri: str, **options) -> "MemcachedStorage":
+    def from_uri(cls, uri: str, **options: Any) -> "MemcachedStorage":
         """
         :param str uri: memcached location of the form
          `memcached://host:port,host:port`, `memcached:///run/path/to/sock`

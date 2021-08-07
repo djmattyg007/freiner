@@ -1,3 +1,5 @@
+from typing import Any
+
 from freiner.limits import RateLimitItem
 from freiner.storage import MovingWindowStorage
 
@@ -16,7 +18,7 @@ class MovingWindowRateLimiter:
 
         self.storage: MovingWindowStorage = storage
 
-    def hit(self, item: RateLimitItem, *identifiers) -> bool:
+    def hit(self, item: RateLimitItem, *identifiers: Any) -> bool:
         """
         creates a hit on the rate limit and returns True if successful.
 
@@ -28,7 +30,7 @@ class MovingWindowRateLimiter:
             item.key_for(*identifiers), item.amount, item.get_expiry()
         )
 
-    def test(self, item: RateLimitItem, *identifiers) -> bool:
+    def test(self, item: RateLimitItem, *identifiers: Any) -> bool:
         """
         checks  the rate limit and returns True if it is not
         currently exceeded.
@@ -44,7 +46,7 @@ class MovingWindowRateLimiter:
 
         return acquired_count < item.amount
 
-    def get_window_stats(self, item: RateLimitItem, *identifiers) -> WindowStats:
+    def get_window_stats(self, item: RateLimitItem, *identifiers: Any) -> WindowStats:
         """
         returns the number of requests remaining within this limit.
 
@@ -58,7 +60,7 @@ class MovingWindowRateLimiter:
         reset = window_start + item.get_expiry()
         return WindowStats(reset, item.amount - window_items)
 
-    def clear(self, item: RateLimitItem, *identifiers) -> None:
+    def clear(self, item: RateLimitItem, *identifiers: Any) -> None:
         self.storage.clear(item.key_for(*identifiers))
 
 

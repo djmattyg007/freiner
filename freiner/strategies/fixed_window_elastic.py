@@ -1,3 +1,5 @@
+from typing import Any
+
 from freiner.limits import RateLimitItem
 
 from .fixed_window import FixedWindowRateLimiter
@@ -8,7 +10,7 @@ class FixedWindowElasticExpiryRateLimiter(FixedWindowRateLimiter):
     Reference: :ref:`fixed-window-elastic`
     """
 
-    def hit(self, item: RateLimitItem, *identifiers) -> bool:
+    def hit(self, item: RateLimitItem, *identifiers: Any) -> bool:
         """
         creates a hit on the rate limit and returns True if successful.
 

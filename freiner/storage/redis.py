@@ -1,5 +1,5 @@
 import time
-from typing import Callable, Tuple, cast
+from typing import Any, Callable, Tuple, cast
 
 import redis
 
@@ -179,7 +179,7 @@ class RedisStorage(RedisInteractor):
         self.initialize_storage(self._client)
 
     @classmethod
-    def from_uri(cls, uri: str, **options) -> "RedisStorage":
+    def from_uri(cls, uri: str, **options: Any) -> "RedisStorage":
         """
         :param str uri: uri of the form `redis://[:password]@host:port`,
          `redis://[:password]@host:port/db`,

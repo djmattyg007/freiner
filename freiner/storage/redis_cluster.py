@@ -1,3 +1,4 @@
+from typing import Any
 from urllib.parse import urlparse
 
 from rediscluster import RedisCluster
@@ -13,7 +14,7 @@ class RedisClusterStorage(RedisStorage):
     """
 
     @classmethod
-    def from_uri(cls, uri: str, **options) -> "RedisClusterStorage":
+    def from_uri(cls, uri: str, **options: Any) -> "RedisClusterStorage":
         """
         :param str uri: url of the form
          `redis+cluster://[:password]@host:port,host:port`
