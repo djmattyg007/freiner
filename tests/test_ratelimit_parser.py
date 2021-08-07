@@ -53,7 +53,7 @@ def test_single_years(rl_string: str):
         ("400 per 3 day", 3 * 24 * 60 * 60),
         ("10000 per 6 month", 6 * 30 * 24 * 60 * 60),
         ("100000 per 2 year", 2 * 12 * 30 * 24 * 60 * 60),
-    )
+    ),
 )
 def test_multiples(rl_string: str, expiry: int):
     assert parse(rl_string).get_expiry() == expiry
