@@ -115,14 +115,14 @@ class RedisInteractor:
         """
         return int(connection.get(key) or 0)
 
-    def _clear(self, key: str, connection: redis.Redis):
+    def _clear(self, key: str, connection: redis.Redis) -> None:
         """
         :param str key: the key to clear rate limits for
         :param connection: Redis connection
         """
         connection.delete(key)
 
-    def _reset(self):
+    def _reset(self) -> int:
         return self.lua_clear_keys(("LIMITER*",))
 
     def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
@@ -222,11 +222,11 @@ class RedisStorage(RedisInteractor):
         """
         return self._get(key, self._client)
 
-    def clear(self, key: str):
+    def clear(self, key: str) -> None:
         """
         :param str key: the key to clear rate limits for
         """
-        return self._clear(key, self._client)
+        self._clear(key, self._client)
 
     def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
         """
@@ -235,7 +235,7 @@ class RedisStorage(RedisInteractor):
         :param int expiry: expiry of the entry
         :param bool no_add: if False an entry is not actually acquired but
          instead serves as a 'check'
-        :return: True/False
+        :rtype: bool
         """
         return self._acquire_entry(key, limit, expiry, self._client, no_add=no_add)
 
@@ -251,7 +251,7 @@ class RedisStorage(RedisInteractor):
         """
         return self._check(self._client)
 
-    def reset(self):
+    def reset(self) -> None:
         """
         This function calls a Lua Script to delete keys prefixed with 'LIMITER'
         in blocks of 5000.

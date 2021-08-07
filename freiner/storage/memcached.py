@@ -69,7 +69,7 @@ class MemcachedStorage:
         """
         return int(self._client.get(key) or 0)
 
-    def clear(self, key: str):
+    def clear(self, key: str) -> None:
         """
         :param str key: the key to clear rate limits for
         """

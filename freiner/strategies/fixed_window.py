@@ -49,7 +49,7 @@ class FixedWindowRateLimiter:
         reset = self.storage.get_expiry(item.key_for(*identifiers))
         return WindowStats(reset, remaining)
 
-    def clear(self, item: RateLimitItem, *identifiers):
+    def clear(self, item: RateLimitItem, *identifiers) -> None:
         self.storage.clear(item.key_for(*identifiers))
 
 

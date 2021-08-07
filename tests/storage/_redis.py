@@ -7,7 +7,7 @@ from freiner.strategies.moving_window import MovingWindowRateLimiter
 
 
 # TODO: Rewrite this to use freezegun. Will require fakeredis.
-def _test_fixed_window(storage: RedisStorage):
+def _test_fixed_window(storage: RedisStorage) -> None:
     limiter = FixedWindowRateLimiter(storage)
     per_second = RateLimitItemPerSecond(10)
 
@@ -25,7 +25,7 @@ def _test_fixed_window(storage: RedisStorage):
         assert limiter.hit(per_second) is True
 
 
-def _test_fixed_window_clear(storage: RedisStorage):
+def _test_fixed_window_clear(storage: RedisStorage) -> None:
     limiter = FixedWindowRateLimiter(storage)
     per_min = RateLimitItemPerMinute(1)
 
@@ -37,7 +37,7 @@ def _test_fixed_window_clear(storage: RedisStorage):
 
 
 # TODO: Rewrite this to use freezegun. Will require fakeredis.
-def _test_moving_window_expiry(storage: RedisStorage):
+def _test_moving_window_expiry(storage: RedisStorage) -> None:
     limiter = MovingWindowRateLimiter(storage)
     limit = RateLimitItemPerSecond(2)
 
@@ -56,7 +56,7 @@ def _test_moving_window_expiry(storage: RedisStorage):
     assert storage._client.keys(limit.namespace + "/*") == []
 
 
-def _test_moving_window_clear(storage: RedisStorage):
+def _test_moving_window_clear(storage: RedisStorage) -> None:
     limiter = MovingWindowRateLimiter(storage)
     per_min = RateLimitItemPerMinute(1)
 
@@ -67,7 +67,7 @@ def _test_moving_window_clear(storage: RedisStorage):
     assert limiter.hit(per_min) is True
 
 
-def _test_reset(storage):
+def _test_reset(storage) -> None:
     limiter = FixedWindowRateLimiter(storage)
     rate = RateLimitItemPerMinute(1)
 

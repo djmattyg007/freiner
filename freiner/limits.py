@@ -1,13 +1,13 @@
 from functools import total_ordering
-from typing import Dict, Type, cast
+from typing import Any, Dict, Type, cast
 
 
-def safe_string(value) -> str:
+def safe_string(value: Any) -> str:
     """
     Consistently converts a value to a string.
 
     :param value:
-    :return: str
+    :rtype: str
     """
     if isinstance(value, bytes):
         return value.decode()
@@ -60,7 +60,7 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
         checks if this instance matches a granularity string
         of type 'n per hour' etc.
 
-        :return: True/False
+        :rtype: bool
         """
         return granularity_string.lower() in cls.granularity[1:]
 

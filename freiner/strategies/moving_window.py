@@ -58,7 +58,7 @@ class MovingWindowRateLimiter:
         reset = window_start + item.get_expiry()
         return WindowStats(reset, item.amount - window_items)
 
-    def clear(self, item: RateLimitItem, *identifiers):
+    def clear(self, item: RateLimitItem, *identifiers) -> None:
         self.storage.clear(item.key_for(*identifiers))
 
 

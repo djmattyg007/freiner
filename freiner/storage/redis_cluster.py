@@ -46,7 +46,7 @@ class RedisClusterStorage(RedisStorage):
         client = rediscluster.RedisCluster(**options)
         return cls(client)
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Redis Clusters are sharded and deleting across shards
         can't be done atomically. Because of this, this reset loops over all

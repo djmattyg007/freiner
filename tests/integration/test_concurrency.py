@@ -1,5 +1,6 @@
 import threading
 import time
+from typing import List
 from uuid import uuid4
 
 import pytest
@@ -23,9 +24,9 @@ def test_memory_storage_fixed_window(storage: MemoryStorage):
         limiter.hit(per_second, uuid4().hex)
 
     key = uuid4().hex
-    hits = []
+    hits: List[None] = []
 
-    def hit():
+    def hit() -> None:
         if limiter.hit(per_second, key):
             hits.append(None)
 
@@ -51,9 +52,9 @@ def test_memory_storage_moving_window(storage: MemoryStorage):
         limiter.hit(per_second, uuid4().hex)
 
     key = uuid4().hex
-    hits = []
+    hits: List[None] = []
 
-    def hit():
+    def hit() -> None:
         if limiter.hit(per_second, key):
             hits.append(None)
 

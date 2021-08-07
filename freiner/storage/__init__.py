@@ -25,7 +25,7 @@ class FixedWindowStorage(Protocol):
         :param str key: the key to get the expiry for
         """
 
-    def clear(self, key: str):
+    def clear(self, key: str) -> None:
         """
         Resets the rate limit key.
 
@@ -60,7 +60,7 @@ class MovingWindowStorage(Protocol):
         :return: (start of window, number of acquired entries)
         """
 
-    def clear(self, key: str):
+    def clear(self, key: str) -> None:
         """
         Resets the rate limit key.
 

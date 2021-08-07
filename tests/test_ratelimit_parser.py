@@ -6,7 +6,7 @@ from freiner import limits
 from freiner.util import granularity_from_string, parse, parse_many
 
 
-def _test_single_rate(rl_string: str, limit: limits.RateLimitItem):
+def _test_single_rate(rl_string: str, limit: limits.RateLimitItem) -> None:
     assert parse(rl_string) == limit
 
     many = parse_many(rl_string)
@@ -66,7 +66,7 @@ def test_multiples(rl_string: str, expiry: int):
 
 @pytest.mark.parametrize("sep", (",", ";", "|"))
 def test_parse_two_limits(sep: str):
-    def _run(limit_string: str):
+    def _run(limit_string: str) -> None:
         parsed = parse_many(limit_string)
 
         assert len(parsed) == 2
@@ -90,7 +90,7 @@ def test_parse_two_limits(sep: str):
 
 @pytest.mark.parametrize("sep", (",", ";", "|"))
 def test_parse_three_limits(sep):
-    def _run(limit_string: str):
+    def _run(limit_string: str) -> None:
         parsed = parse_many(limit_string)
 
         assert len(parsed) == 3

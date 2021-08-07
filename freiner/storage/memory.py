@@ -1,6 +1,7 @@
 import threading
 import time
 from collections import Counter
+from typing import Counter as CounterType
 
 from . import MovingWindow
 
@@ -14,10 +15,10 @@ class _LockableEntry:
 
         self._lock = threading.RLock()
 
-    def acquire(self):
+    def acquire(self) -> None:
         self._lock.acquire()
 
-    def release(self):
+    def release(self) -> None:
         self._lock.release()
 
     def __enter__(self):
@@ -38,14 +39,14 @@ class MemoryStorage:
     """
 
     def __init__(self):
-        self.storage = Counter()
+        self.storage: CounterType[str] = Counter()
         self.expirations = {}
         self.events = {}
 
         self.timer = threading.Timer(0.01, self.__expire_events)
         self.timer.start()
 
-    def __expire_events(self):
+    def __expire_events(self) -> None:
         for key in list(self.events.keys()):
             for event in list(self.events[key]):
                 with event:
@@ -57,7 +58,7 @@ class MemoryStorage:
                 self.storage.pop(key, None)
                 self.expirations.pop(key, None)
 
-    def __schedule_expiry(self):
+    def __schedule_expiry(self) -> None:
         if not self.timer.is_alive():
             self.timer = threading.Timer(0.01, self.__expire_events)
             self.timer.start()
@@ -87,7 +88,7 @@ class MemoryStorage:
             self.expirations.pop(key, None)
         return self.storage.get(key, 0)
 
-    def clear(self, key: str):
+    def clear(self, key: str) -> None:
         """
         :param str key: the key to clear rate limits for
         """
@@ -160,7 +161,7 @@ class MemoryStorage:
         """
         return True
 
-    def reset(self):
+    def reset(self) -> None:
         self.storage.clear()
         self.expirations.clear()
         self.events.clear()

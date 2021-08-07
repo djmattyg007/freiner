@@ -39,7 +39,7 @@ class RateLimiter(Protocol):
         :return: tuple (reset time (float), remaining (int))
         """
 
-    def clear(self, item: RateLimitItem, *identifiers):
+    def clear(self, item: RateLimitItem, *identifiers) -> None:
         """
         Resets the request counter for a given limit to zero.
 
