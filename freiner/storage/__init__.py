@@ -22,8 +22,7 @@ class FixedWindowStorage(Protocol):
         :param str key: the key to get the counter value for
         """
 
-    # This should be returning a float, in line with other time methods
-    def get_expiry(self, key: str) -> int:
+    def get_expiry(self, key: str) -> float:
         """
         :param str key: the key to get the expiry for
         """
@@ -48,8 +47,7 @@ class MovingWindowStorage(Protocol):
         :rtype: bool
         """
 
-    # TODO: start of window should be a float
-    def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[int, int]:
+    def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[float, int]:
         """
         Returns the starting point and the number of entries in the moving window.
 

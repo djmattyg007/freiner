@@ -71,7 +71,7 @@ class RedisInteractor:
     def initialize_storage(self, connection: redis.Redis):
         moving_window_script = connection.register_script(self.SCRIPT_MOVING_WINDOW)
         self.lua_moving_window = cast(
-            Callable[[Tuple[str], Tuple[int, int]], Tuple[int, int]],
+            Callable[[Tuple[str], Tuple[float, int]], Tuple[float, int]],
             moving_window_script,
         )
 
@@ -123,7 +123,7 @@ class RedisInteractor:
     def _reset(self):
         return self.lua_clear_keys(("LIMITER*",))
 
-    def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[int, int]:
+    def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[float, int]:
         """
         returns the starting point and the number of entries in the moving
         window
@@ -134,8 +134,8 @@ class RedisInteractor:
         :return: (start of window, number of acquired entries)
         """
         timestamp = time.time()
-        window = self.lua_moving_window((key,), (int(timestamp - expiry), limit))
-        return window or (int(timestamp), 0)
+        window = self.lua_moving_window((key,), (timestamp - expiry, limit))
+        return window or (timestamp, 0)
 
     def _acquire_entry(
         self, key: str, limit: int, expiry: int, connection: redis.Redis, no_add: bool = False
@@ -156,12 +156,12 @@ class RedisInteractor:
         )
         return bool(acquired)
 
-    def _get_expiry(self, key: str, connection: redis.Redis) -> int:
+    def _get_expiry(self, key: str, connection: redis.Redis) -> float:
         """
         :param str key: the key to get the expiry for
         :param connection: Redis connection
         """
-        return int(max(connection.ttl(key), 0) + time.time())
+        return max(connection.ttl(key), 0) + time.time()
 
     def _check(self, connection: redis.Redis) -> bool:
         """
@@ -238,7 +238,7 @@ class RedisStorage(RedisInteractor):
         """
         return self._acquire_entry(key, limit, expiry, self._client, no_add=no_add)
 
-    def get_expiry(self, key: str) -> int:
+    def get_expiry(self, key: str) -> float:
         """
         :param str key: the key to get the expiry for
         """

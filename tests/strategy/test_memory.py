@@ -22,7 +22,7 @@ def test_fixed_window(storage: MemoryStorage):
     limiter = FixedWindowRateLimiter(storage)
     with freeze_time() as frozen_datetime:
         limit = RateLimitItemPerSecond(10, 2)
-        start = int(time.time())
+        start = time.time()
 
         assert all([limiter.hit(limit) for _ in range(0, 10)]) is True
 
@@ -40,7 +40,7 @@ def test_fixed_window_with_elastic_expiry(storage: MemoryStorage):
     limiter = FixedWindowElasticExpiryRateLimiter(storage)
     with freeze_time() as frozen_datetime:
         limit = RateLimitItemPerSecond(10, 2)
-        start = int(time.time())
+        start = time.time()
 
         assert all([limiter.hit(limit) for _ in range(0, 10)]) is True
 
@@ -54,7 +54,7 @@ def test_fixed_window_with_elastic_expiry(storage: MemoryStorage):
         assert limiter.hit(limit) is False
 
         frozen_datetime.tick(3)
-        start = int(time.time())
+        start = time.time()
         assert limiter.hit(limit) is True
         assert limiter.get_window_stats(limit)[1] == 9
         assert limiter.get_window_stats(limit)[0] == start + 2
@@ -75,7 +75,7 @@ def test_moving_window(storage: MemoryStorage):
 
         frozen_datetime.tick(20)
         assert limiter.get_window_stats(limit)[1] == 2
-        assert limiter.get_window_stats(limit)[0] == int(time.time() + 30)
+        assert limiter.get_window_stats(limit)[0] == time.time() + 30
 
         frozen_datetime.tick(31)
         assert limiter.get_window_stats(limit)[1] == 10

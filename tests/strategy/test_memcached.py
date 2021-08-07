@@ -53,7 +53,7 @@ def test_fixed_window_with_elastic_expiry_concurrency(pooled_client: pymemcache.
     limiter = FixedWindowElasticExpiryRateLimiter(storage)
     limit = RateLimitItemPerSecond(10, 2)
 
-    start = int(time.time())
+    start = time.time()
 
     def _c():
         for _ in range(0, 5):

@@ -36,8 +36,8 @@ def test_pluggable_storage_moving_window():
         def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
             return True
 
-        def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[int, int]:
-            return int(time.time()), 1
+        def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[float, int]:
+            return time.time(), 1
 
         def clear(self, key: str):
             pass

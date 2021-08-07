@@ -29,14 +29,13 @@ class RateLimiter(Protocol):
         :return: True/False
         """
 
-    # TODO: reset time should be a float, not an int
-    def get_window_stats(self, item: RateLimitItem, *identifiers) -> Tuple[int, int]:
+    def get_window_stats(self, item: RateLimitItem, *identifiers) -> Tuple[float, int]:
         """
         Returns the number of requests remaining within this limit.
 
         :param item: a :class:`RateLimitItem` instance
         :param identifiers: variable list of stringable objects to uniquely identify the limit
-        :return: tuple (reset time (int), remaining (int))
+        :return: tuple (reset time (float), remaining (int))
         """
 
     def clear(self, item: RateLimitItem, *identifiers):

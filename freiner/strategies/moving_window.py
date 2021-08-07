@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from freiner.limits import RateLimitItem
 from freiner.storage import MovingWindowStorage
 
@@ -42,7 +44,7 @@ class MovingWindowRateLimiter:
 
         return acquired_count < item.amount
 
-    def get_window_stats(self, item: RateLimitItem, *identifiers):
+    def get_window_stats(self, item: RateLimitItem, *identifiers) -> Tuple[float, int]:
         """
         returns the number of requests remaining within this limit.
 

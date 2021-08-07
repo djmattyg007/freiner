@@ -105,11 +105,11 @@ class MemcachedStorage:
         self._client.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
         return 1
 
-    def get_expiry(self, key: str) -> int:
+    def get_expiry(self, key: str) -> float:
         """
         :param str key: the key to get the expiry for
         """
-        return int(float(self._client.get(key + "/expires") or time.time()))
+        return float(self._client.get(key + "/expires") or time.time())
 
     def check(self) -> bool:
         """

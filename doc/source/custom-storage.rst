@@ -45,8 +45,8 @@ The following example shows a moving-window storage backend.::
         def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
             return True
 
-        def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[int, int]:
-            return int(time.time()), 0
+        def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[float, int]:
+            return time.time(), 0
 
         def clear(self, key: str):
             pass

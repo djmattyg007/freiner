@@ -114,11 +114,11 @@ class MemoryStorage:
                 self.events[key].insert(0, _LockableEntry(expiry))
             return True
 
-    def get_expiry(self, key: str) -> int:
+    def get_expiry(self, key: str) -> float:
         """
         :param str key: the key to get the expiry for
         """
-        return int(self.expirations.get(key, -1))
+        return self.expirations.get(key, -1)
 
     def get_num_acquired(self, key: str, expiry: int) -> int:
         """
@@ -133,7 +133,7 @@ class MemoryStorage:
         else:
             return 0
 
-    def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[int, int]:
+    def get_moving_window(self, key: str, limit: int, expiry: int) -> Tuple[float, int]:
         """
         returns the starting point and the number of entries in the moving window
 
@@ -146,10 +146,8 @@ class MemoryStorage:
         acquired = self.get_num_acquired(key, expiry)
         for item in self.events.get(key, []):
             if item.atime >= timestamp - expiry:
-                return int(item.atime), acquired
-        # TODO: Change protocol to return float timestamp, not int timestamp
-        # Check git history to confirm it was supposed to be like this
-        return int(timestamp), acquired
+                return item.atime, acquired
+        return timestamp, acquired
 
     def check(self) -> bool:
         """
