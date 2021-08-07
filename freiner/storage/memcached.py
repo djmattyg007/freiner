@@ -77,7 +77,7 @@ class MemcachedStorage:
 
     def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
-        increments the counter for a given rate limit key
+        Increments the counter for a given rate limit key
 
         :param str key: the key to increment
         :param int expiry: amount in seconds for the key to expire in
@@ -85,25 +85,28 @@ class MemcachedStorage:
          window every hit.
         """
 
-        if not self._client.add(key, 1, expiry, noreply=False):
-            if not elastic_expiry:
-                return self._client.incr(key, 1) or 1
+        if self._client.add(key, 1, expiry, noreply=False):
+            self._set_expiry(key, expiry)
+            return 1
 
+        if not elastic_expiry:
+            return self._client.incr(key, 1) or 1
+
+        value, cas = self._client.gets(key)
+        retry = 0
+
+        while (
+            not self._client.cas(key, int(value or 0) + 1, cas, expiry)
+            and retry < self.MAX_CAS_RETRIES
+        ):
             value, cas = self._client.gets(key)
-            retry = 0
+            retry += 1
 
-            while (
-                not self._client.cas(key, int(value or 0) + 1, cas, expiry)
-                and retry < self.MAX_CAS_RETRIES
-            ):
-                value, cas = self._client.gets(key)
-                retry += 1
+        self._set_expiry(key, expiry)
+        return int(value or 0) + 1
 
-            self._client.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
-            return int(value or 0) + 1
-
+    def _set_expiry(self, key: str, expiry: int):
         self._client.set(key + "/expires", expiry + time.time(), expire=expiry, noreply=False)
-        return 1
 
     def get_expiry(self, key: str) -> float:
         """
