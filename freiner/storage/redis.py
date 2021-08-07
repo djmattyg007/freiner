@@ -127,8 +127,7 @@ class RedisInteractor:
 
     def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
         """
-        returns the starting point and the number of entries in the moving
-        window
+        Returns the starting point and the number of entries in the moving window.
 
         :param str key: rate limit key
         :param int limit: amount of entries allowed
