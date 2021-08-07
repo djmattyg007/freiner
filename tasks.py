@@ -10,7 +10,7 @@ pty = util.isatty(sys.stdout) and util.isatty(sys.stderr)
 @task
 def reformat(c):
     c.run("isort freiner tests setup.py tasks.py", pty=pty)
-    c.run("black freiner tests setup.py tasks.py doc/source/conf.py", pty=pty)
+    c.run("black freiner tests setup.py tasks.py docs/source/conf.py", pty=pty)
 
 
 @task

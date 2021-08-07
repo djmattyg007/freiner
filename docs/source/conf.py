@@ -14,15 +14,15 @@ import os
 import sphinx_rtd_theme
 import sys
 
-sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(0, os.path.abspath("../../"))
 import freiner
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'Freiner'
-copyright = '2021, Matthew Gamble'
-author = 'Matthew Gamble'
+project = "Freiner"
+copyright = "2021, Matthew Gamble"
+author = "Matthew Gamble"
 
 # The full version, including alpha/beta/rc tags
 version = release = freiner.__version__
