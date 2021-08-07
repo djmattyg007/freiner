@@ -53,7 +53,7 @@ def _test_moving_window_expiry(storage: RedisStorage):
     last = time.time()
     while time.time() - last <= 1:
         time.sleep(0.05)
-    assert storage._client.keys("%s/*" % limit.namespace) == []
+    assert storage._client.keys(limit.namespace + "/*") == []
 
 
 def _test_moving_window_clear(storage: RedisStorage):
