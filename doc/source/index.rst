@@ -42,28 +42,29 @@ Initialize a rate limit explicitly using a subclass of :class:`RateLimitItem`::
 
 Test the limits::
 
-    assert moving_window.hit(one_per_minute, "test_namespace", "foo") == True
-    assert moving_window.hit(one_per_minute, "test_namespace", "foo") == False
-    assert moving_window.hit(one_per_minute, "test_namespace", "bar") == True
+    ns = "test_namespace"
+    assert moving_window.hit(one_per_minute, ns, "foo") == True
+    assert moving_window.hit(one_per_minute, ns, "foo") == False
+    assert moving_window.hit(one_per_minute, ns, "bar") == True
 
-    assert moving_window.hit(one_per_second, "test_namespace", "foo") == True
-    assert moving_window.hit(one_per_second, "test_namespace", "foo") == False
+    assert moving_window.hit(one_per_second, ns, "foo") == True
+    assert moving_window.hit(one_per_second, ns, "foo") == False
     time.sleep(1)
-    assert moving_window.hit(one_per_second, "test_namespace", "foo") == True
+    assert moving_window.hit(one_per_second, ns, "foo") == True
 
 Check specific limits without hitting them::
 
-    assert moving_window.hit(one_per_second, "test_namespace", "foo") == True
-    while not moving_window.test(one_per_second, "test_namespace", "foo"):
+    assert moving_window.hit(one_per_second, ns, "foo") == True
+    while not moving_window.test(one_per_second, ns, "foo"):
         time.sleep(0.01)
-    assert moving_window.hit(one_per_second, "test_namespace", "foo") == True
+    assert moving_window.hit(one_per_second, ns, "foo") == True
 
 Clear a limit::
 
-    assert moving_window.hit(one_per_minute, "test_namespace", "foo") == True
-    assert moving_window.hit(one_per_minute, "test_namespace", "foo") == False
-    moving_window.clear(one_per_minute", "test_namespace", "foo")
-    assert moving_window.hit(one_per_minute, "test_namespace", "foo") == True
+    assert moving_window.hit(one_per_minute, ns, "foo") == True
+    assert moving_window.hit(one_per_minute, ns, "foo") == False
+    moving_window.clear(one_per_minute", ns, "foo")
+    assert moving_window.hit(one_per_minute, ns, "foo") == True
 
 Development
 -----------
