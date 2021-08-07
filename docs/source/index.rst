@@ -1,5 +1,6 @@
+=====================
 Freiner Documentation
---------------------
+=====================
 
 **Freiner** provides utilities to implement rate limiting using various strategies
 and storage backends such as redis & memcached.
@@ -8,16 +9,16 @@ and storage backends such as redis & memcached.
     :hidden:
 
     string-notation
-    custom-storage
-    storage
     strategies
+    storage
+    custom-storage
     api
     changelog
 
 .. currentmodule:: freiner
 
 Quickstart
-----------
+==========
 
 Initialize the storage backend::
 
@@ -67,7 +68,7 @@ Clear a limit::
     assert moving_window.hit(one_per_minute, ns, "foo") == True
 
 Development
------------
+===========
 
 Since `Freiner` integrates with various backend storages, local development and running tests
 can require some setup. These are all scaffolded using ``docker`` and ``docker-compose``. Everything

@@ -20,7 +20,7 @@ class MovingWindowRateLimiter:
         """
         creates a hit on the rate limit and returns True if successful.
 
-        :param item: a :class:`RateLimitItem` instance
+        :param item: a :class:`freiner.limits.RateLimitItem` instance
         :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
@@ -33,7 +33,7 @@ class MovingWindowRateLimiter:
         checks  the rate limit and returns True if it is not
         currently exceeded.
 
-        :param item: a :class:`RateLimitItem` instance
+        :param item: a :class:`freiner.limits.RateLimitItem` instance
         :param identifiers: variable list of strings to uniquely identify the limit
         :return: True/False
         """
@@ -48,7 +48,7 @@ class MovingWindowRateLimiter:
         """
         returns the number of requests remaining within this limit.
 
-        :param item: a :class:`RateLimitItem` instance
+        :param item: a :class:`freiner.limits.RateLimitItem` instance
         :param identifiers: variable list of strings to uniquely identify the limit
         :return: tuple (reset time (float), remaining (int))
         """

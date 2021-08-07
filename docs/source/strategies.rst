@@ -1,7 +1,8 @@
 .. _ratelimit-strategy:
 
+========================
 Rate Limiting Strategies
-------------------------
+========================
 
 .. _fixed-window:
 
@@ -43,9 +44,8 @@ Moving Window
     storage backends. The strategy requires using a list with fast random access which
     is not very convenient to implement with ``memcached``.
 
-This strategy is the most effective for preventing bursts from by-passing the
-rate limit as the window for each limit is not fixed at the start and end of each time unit
-(i.e. N/second for a moving window means N in the last 1000 milliseconds). There is
+This strategy is the most effective for preventing bursts from by-passing the rate limit
+as the window for each limit is not fixed at the start and end of each time unit (i.e.
+``N/second`` for a moving window means ``N`` in the last 1000 milliseconds). There is
 however a higher memory cost associated with this strategy as it requires ``N`` items to
 be maintained in memory per resource and rate limit.
-

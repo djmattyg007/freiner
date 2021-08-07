@@ -46,3 +46,9 @@ def test(c, onefile=""):
 @task
 def type_check(c):
     c.run("mypy freiner tests", pty=pty)
+
+
+@task
+def docs(c):
+    with c.cd("docs"):
+        c.run("sphinx-build -M html source build -a")

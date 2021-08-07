@@ -28,7 +28,7 @@ def parse_many(limit_string: str) -> Sequence[RateLimitItem]:
 
     :param string limit_string: rate limit string using :ref:`ratelimit-string`
     :raise ValueError: if the string notation is invalid.
-    :return: a list of :class:`RateLimitItem` instances.
+    :return: a list of :class:`freiner.limits.RateLimitItem` instances.
     """
     if not isinstance(limit_string, str):
         raise TypeError("Invalid rate limit string supplied.")
@@ -55,7 +55,7 @@ def parse(limit_string: str) -> RateLimitItem:
 
     :param string limit_string: rate limit string using :ref:`ratelimit-string`
     :raise ValueError: if the string notation is invalid.
-    :return: an instance of :class:`RateLimitItem`
+    :return: an instance of :class:`freiner.limits.RateLimitItem`
     """
     return parse_many(limit_string)[0]
 
@@ -63,7 +63,7 @@ def parse(limit_string: str) -> RateLimitItem:
 def granularity_from_string(granularity_string: str) -> Type[RateLimitItem]:
     """
     :param granularity_string:
-    :return: a subclass of :class:`RateLimitItem`
+    :return: a subclass of :class:`freiner.limits.RateLimitItem`
     :raise ValueError:
     """
     for granularity in GRANULARITIES.values():

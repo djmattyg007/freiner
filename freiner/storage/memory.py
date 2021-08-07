@@ -32,7 +32,7 @@ class _LockableEntry:
 
 class MemoryStorage:
     """
-    rate limit storage using :class:`collections.Counter`
+    rate limit storage using :py:class:`collections.Counter`
     as an in memory storage for fixed and elastic window strategies,
     and a simple list to implement moving window strategy.
     """
