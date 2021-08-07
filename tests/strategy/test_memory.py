@@ -18,6 +18,19 @@ def storage() -> MemoryStorage:
     return MemoryStorage()
 
 
+def test_fixed_window_simple(storage: MemoryStorage):
+    limiter = FixedWindowRateLimiter(storage)
+    with freeze_time():
+        limit = RateLimitItemPerSecond(2, 1)
+
+        assert limiter.test(limit) is True
+        assert limiter.hit(limit) is True
+        assert limiter.test(limit) is True
+        assert limiter.hit(limit) is True
+        assert limiter.test(limit) is False
+        assert limiter.hit(limit) is False
+
+
 def test_fixed_window(storage: MemoryStorage):
     limiter = FixedWindowRateLimiter(storage)
     with freeze_time() as frozen_datetime:
@@ -60,6 +73,19 @@ def test_fixed_window_with_elastic_expiry(storage: MemoryStorage):
         assert limiter.get_window_stats(limit)[0] == start + 2
 
 
+def test_moving_window_simple(storage: MemoryStorage):
+    limiter = MovingWindowRateLimiter(storage)
+    with freeze_time():
+        limit = RateLimitItemPerSecond(2, 1)
+
+        assert limiter.test(limit) is True
+        assert limiter.hit(limit) is True
+        assert limiter.test(limit) is True
+        assert limiter.hit(limit) is True
+        assert limiter.test(limit) is False
+        assert limiter.hit(limit) is False
+
+
 def test_moving_window(storage: MemoryStorage):
     limiter = MovingWindowRateLimiter(storage)
     with freeze_time() as frozen_datetime:
@@ -79,29 +105,3 @@ def test_moving_window(storage: MemoryStorage):
 
         frozen_datetime.tick(31)
         assert limiter.get_window_stats(limit)[1] == 10
-
-
-def test_test_fixed_window(storage: MemoryStorage):
-    limiter = FixedWindowRateLimiter(storage)
-    with freeze_time():
-        limit = RateLimitItemPerSecond(2, 1)
-
-        assert limiter.test(limit) is True
-        assert limiter.hit(limit) is True
-        assert limiter.test(limit) is True
-        assert limiter.hit(limit) is True
-        assert limiter.test(limit) is False
-        assert limiter.hit(limit) is False
-
-
-def test_test_moving_window(storage: MemoryStorage):
-    limiter = MovingWindowRateLimiter(storage)
-    with freeze_time():
-        limit = RateLimitItemPerSecond(2, 1)
-
-        assert limiter.test(limit) is True
-        assert limiter.hit(limit) is True
-        assert limiter.test(limit) is True
-        assert limiter.hit(limit) is True
-        assert limiter.test(limit) is False
-        assert limiter.hit(limit) is False
