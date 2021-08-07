@@ -15,7 +15,7 @@ SINGLE_EXPR = re.compile(
     re.IGNORECASE | re.VERBOSE,
 )
 EXPR = re.compile(
-    r"^{SINGLE}(:?{SEPARATORS}{SINGLE})*$".format(
+    r"^{SINGLE}(?:{SEPARATORS}{SINGLE})*$".format(
         SINGLE=SINGLE_EXPR.pattern, SEPARATORS=SEPARATORS.pattern
     ),
     re.IGNORECASE | re.VERBOSE,
