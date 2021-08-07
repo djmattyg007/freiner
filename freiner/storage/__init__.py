@@ -72,5 +72,4 @@ __all__ = [
     "FixedWindowStorage",
     "MovingWindow",
     "MovingWindowStorage",
-    "MemoryStorage",
 ]
