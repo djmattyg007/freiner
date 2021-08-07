@@ -25,6 +25,9 @@ class _LockableEntry:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.release()
 
+    def __repr__(self) -> str:
+        return f"MemoryLockableEntry(atime={self.atime}, expiry={self.expiry})"
+
 
 class MemoryStorage:
     """
