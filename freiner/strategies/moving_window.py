@@ -9,7 +9,7 @@ class MovingWindowRateLimiter:
 
     def __init__(self, storage: MovingWindowStorage):
         if not isinstance(storage, MovingWindowStorage):
-            msg = f"MovingWindowRateLimiting is not implemented for storage of type {storage.__class__.__name__}"
+            msg = f"Moving Window rate limiting is not implemented for storage of type {storage.__class__.__name__}"
             raise TypeError(msg)
 
         self.storage: MovingWindowStorage = storage
