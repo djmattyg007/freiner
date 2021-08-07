@@ -87,6 +87,6 @@ class RedisSentinelStorage(RedisStorage):
         return self._check(self._sentinel_slave)
 
 
-__all__  = [
+__all__ = [
     "RedisSentinelStorage",
 ]
