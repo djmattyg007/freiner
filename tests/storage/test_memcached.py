@@ -12,11 +12,9 @@ from freiner.errors import FreinerConfigurationError
 from freiner.storage.memcached import MemcachedStorage
 from freiner.strategies.fixed_window import FixedWindowRateLimiter
 from freiner.strategies.fixed_window_elastic import FixedWindowElasticExpiryRateLimiter
+from freiner.types import Host
 
 from tests import DOCKERDIR, fixed_start
-
-
-Host = Tuple[str, int]
 
 
 @pytest.fixture

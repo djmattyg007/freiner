@@ -1,7 +1,6 @@
 import threading
 import time
 import traceback
-from typing import Tuple
 
 import pymemcache
 import pytest
@@ -10,9 +9,7 @@ from freiner.limits import RateLimitItemPerSecond
 from freiner.storage.memcached import MemcachedStorage
 from freiner.strategies.fixed_window_elastic import FixedWindowElasticExpiryRateLimiter
 from freiner.strategies.moving_window import MovingWindowRateLimiter
-
-
-Host = Tuple[str, int]
+from freiner.types import Host
 
 
 @pytest.fixture

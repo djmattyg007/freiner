@@ -1,12 +1,12 @@
 import re
 import unittest.mock
-from typing import Tuple
 
 import pytest
 from redis.sentinel import Sentinel
 
 from freiner.errors import FreinerConfigurationError
 from freiner.storage.redis_sentinel import RedisSentinelStorage
+from freiner.types import Host
 
 from ._redis import (
     _test_fixed_window,
@@ -15,9 +15,6 @@ from ._redis import (
     _test_moving_window_expiry,
     _test_reset,
 )
-
-
-Host = Tuple[str, int]
 
 
 @pytest.fixture

@@ -1,10 +1,11 @@
 import time
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Union
 from urllib.parse import urlparse
 
 import pymemcache
 
 from freiner.errors import FreinerConfigurationError
+from freiner.types import Host
 
 
 MemcachedClient = Union[pymemcache.Client, pymemcache.PooledClient, pymemcache.HashClient]
@@ -33,7 +34,7 @@ class MemcachedStorage:
         """
 
         parsed_uri = urlparse(uri)
-        hosts: List[Union[Tuple[str, int], str]] = []
+        hosts: List[Union[Host, str]] = []
         for loc in parsed_uri.netloc.strip().split(","):
             if not loc:
                 continue

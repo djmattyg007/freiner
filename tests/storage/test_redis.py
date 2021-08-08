@@ -7,6 +7,7 @@ import pytest
 import redis
 
 from freiner.storage.redis import RedisStorage
+from freiner.types import Host
 
 from tests import DOCKERDIR
 
@@ -19,7 +20,6 @@ from ._redis import (
 )
 
 
-Host = Tuple[str, int]
 ProtectedHost = Tuple[str, int, str]
 
 
