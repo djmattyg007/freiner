@@ -37,7 +37,7 @@ def test_comparison():
 
 
 def test_no_granularity():
-    def _define_class():
+    def _define_class() -> None:
         class NoGranularity(limits.RateLimitItem):
             pass
 
