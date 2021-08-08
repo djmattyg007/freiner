@@ -4,7 +4,11 @@ import sys
 from invoke import task, util
 
 
-pty = util.isatty(sys.stdout) and util.isatty(sys.stderr)
+in_ci = os.environ.get("CI", "false") == "true"
+if in_ci:
+    pty = False
+else:
+    pty = util.isatty(sys.stdout) and util.isatty(sys.stderr)
 
 
 @task
@@ -18,29 +22,35 @@ def lint(c):
     c.run("flake8 --show-source --statistics --max-line-length 100 freiner tests", pty=pty)
     c.run("check-manifest", pty=pty)
 
+    bandit_args = ["bandit", "--configfile", "bandit.yaml", "-r"]
+    if pty:
+        bandit_args.extend(("-f", "screen"))
+    if not in_ci:
+        bandit_args.append("--quiet")
+    bandit_args.extend(("freiner", "tests"))
+    c.run(" ".join(bandit_args), pty=pty)
+
 
 @task
 def test(c, onefile=""):
     pytest_args = ["pytest", "--cov-report=term"]
-    if os.environ.get("CI", "false") == "true":
+    if in_ci:
         pytest_args.append("--cov-report=xml")
-        _pty = False
     else:
         pytest_args.append("--cov-report=html")
-        _pty = pty
 
     if onefile:
         pytest_args.append(onefile)
 
-    c.run("docker-compose down --remove-orphans --volumes", pty=_pty)
-    c.run("docker-compose up -d", pty=_pty)
+    c.run("docker-compose down --remove-orphans --volumes", pty=pty)
+    c.run("docker-compose up -d", pty=pty)
     try:
-        c.run(" ".join(pytest_args), pty=_pty)
+        c.run(" ".join(pytest_args), pty=pty)
     finally:
-        c.run("docker-compose down --remove-orphans --volumes", pty=_pty)
+        c.run("docker-compose down --remove-orphans --volumes", pty=pty)
 
-        c.run("rm .docker/memcached/freiner.memcached.sock", pty=_pty, warn=True)
-        c.run("rm .docker/redis/freiner.redis.sock", pty=_pty, warn=True)
+        c.run("rm .docker/memcached/freiner.memcached.sock", pty=pty, warn=True)
+        c.run("rm .docker/redis/freiner.redis.sock", pty=pty, warn=True)
 
 
 @task
