@@ -30,11 +30,17 @@ def pooled_client(default_host: Host) -> pymemcache.PooledClient:
     return pymemcache.PooledClient(default_host)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def flush_default_host(client: pymemcache.Client):
     client.flush_all()
 
 
+@pytest.fixture
+def flush_pooled_host(client: pymemcache.PooledClient):
+    client.flush_all()
+
+
+@pytest.mark.usefixtures("flush_default_host")
 def test_fixed_window_with_elastic_expiry(client: pymemcache.Client):
     storage = MemcachedStorage(client)
     limiter = FixedWindowElasticExpiryRateLimiter(storage)
@@ -49,6 +55,7 @@ def test_fixed_window_with_elastic_expiry(client: pymemcache.Client):
     assert limiter.hit(limit) is False
 
 
+@pytest.mark.usefixtures("flush_pooled_host")
 def test_fixed_window_with_elastic_expiry_concurrency(pooled_client: pymemcache.PooledClient):
     storage = MemcachedStorage(pooled_client)
     limiter = FixedWindowElasticExpiryRateLimiter(storage)
@@ -79,6 +86,7 @@ def test_fixed_window_with_elastic_expiry_concurrency(pooled_client: pymemcache.
     assert storage.get(limit.key_for()) == 10
 
 
+@pytest.mark.usefixtures("flush_default_host")
 def test_moving_window(client: pymemcache.Client):
     storage = MemcachedStorage(client)
     with pytest.raises(TypeError):

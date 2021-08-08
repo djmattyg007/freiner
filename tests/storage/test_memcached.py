@@ -59,21 +59,22 @@ def unix_socket_client(unix_socket_host_uri: str) -> pymemcache.Client:
     return pymemcache.Client(unix_socket_host_uri)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def flush_default_host(default_client: pymemcache.Client):
     default_client.flush_all()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def flush_hash_host(hash_client: pymemcache.HashClient):
     hash_client.flush_all()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def flush_unix_socket_host(unix_socket_client: pymemcache.Client):
     unix_socket_client.flush_all()
 
 
+@pytest.mark.usefixtures("flush_default_host")
 def test_from_plain_uri(default_host: Host):
     plain_uri = f"memcached://{default_host[0]}:{default_host[1]}"
     plain_storage = MemcachedStorage.from_uri(plain_uri)
@@ -89,6 +90,7 @@ def test_from_plain_uri_with_options(default_host: Host):
         assert mock_pymemcache.Client.call_args[1]["connect_timeout"] == 1
 
 
+@pytest.mark.usefixtures("flush_hash_host")
 def test_from_hash_uri(hash_hosts: Tuple[Host, ...]):
     uri_hosts = []
     for host in hash_hosts:
@@ -101,6 +103,7 @@ def test_from_hash_uri(hash_hosts: Tuple[Host, ...]):
     assert hash_storage.check() is True
 
 
+@pytest.mark.usefixtures("_flush_unix_socket_host")
 def test_from_unix_socket_uri(unix_socket_host_uri: str):
     storage = MemcachedStorage.from_uri(unix_socket_host_uri)
     assert isinstance(storage, MemcachedStorage)
@@ -115,6 +118,7 @@ def test_uri_with_no_hosts():
         MemcachedStorage.from_uri(uri)
 
 
+@pytest.mark.usefixtures("flush_default_host")
 @fixed_start
 def test_fixed_window(default_client: pymemcache.Client):
     storage = MemcachedStorage(default_client)
@@ -135,6 +139,7 @@ def test_fixed_window(default_client: pymemcache.Client):
     assert limiter.hit(per_min) is True
 
 
+@pytest.mark.usefixtures("flush_hash_host")
 @fixed_start
 def test_fixed_window_cluster(hash_client: pymemcache.HashClient):
     storage = MemcachedStorage(hash_client)
@@ -155,6 +160,7 @@ def test_fixed_window_cluster(hash_client: pymemcache.HashClient):
     assert limiter.hit(per_min) is True
 
 
+@pytest.mark.usefixtures("flush_default_host")
 @fixed_start
 def test_fixed_window_with_elastic_expiry(default_client: pymemcache.Client):
     storage = MemcachedStorage(default_client)
@@ -176,6 +182,7 @@ def test_fixed_window_with_elastic_expiry(default_client: pymemcache.Client):
     assert limiter.test(per_sec) is True
 
 
+@pytest.mark.usefixtures("flush_hash_host")
 @fixed_start
 def test_fixed_window_with_elastic_expiry_cluster(hash_client: pymemcache.HashClient):
     storage = MemcachedStorage(hash_client)
@@ -197,6 +204,7 @@ def test_fixed_window_with_elastic_expiry_cluster(hash_client: pymemcache.HashCl
     assert limiter.test(per_sec) is True
 
 
+@pytest.mark.usefixtures("flush_default_host")
 def test_clear(default_client: pymemcache.Client):
     storage = MemcachedStorage(default_client)
     assert storage.check() is True
