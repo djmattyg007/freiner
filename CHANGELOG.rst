@@ -13,7 +13,7 @@ these changes necessitate another major version bump.
 
 * Moved strategy classes into separate files, one per strategy class.
 * Instead of a "base" ``Storage`` ``Protocol`` class and a ``MovingWindowStorage`` class that extends from it,
-  there are now two totally separate ``Protocol`` classes: :class:`FixedWindowStorage` and :class:`MovingWindowStorage`.
+  there are now two totally separate ``Protocol`` classes: ``FixedWindowStorage`` and ``MovingWindowStorage``.
   They are compatible with each other, so storage backends can (and do) implement both of them simultaneously.
 * All time values are now returned as floats.
   Previously the interfaces claimed to only be returning integers, but I'm pretty sure floats were sometimes returned.
