@@ -7,7 +7,7 @@ include pyproject.toml
 recursive-include docs/source *
 recursive-include docs *.py Make*
 
-include .coveragerc
+include bandit.yaml
 include docker-compose.yml
 include pytest.ini
 include spellcheck-allowlist.txt
