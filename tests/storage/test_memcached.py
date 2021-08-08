@@ -101,7 +101,7 @@ def test_from_hash_uri(hash_hosts: Tuple[Host, ...]):
     assert hash_storage.check() is True
 
 
-@pytest.mark.usefixtures("_flush_unix_socket_host")
+@pytest.mark.usefixtures("flush_unix_socket_host")
 def test_from_unix_socket_uri(unix_socket_host_uri: str):
     storage = MemcachedStorage.from_uri(unix_socket_host_uri)
     assert isinstance(storage, MemcachedStorage)
