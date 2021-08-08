@@ -86,7 +86,11 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
         return "{}/{}".format(self.namespace, remainder)
 
     def __eq__(self, other) -> bool:
-        return self.amount == other.amount and self.granularity == other.granularity
+        return (
+            isinstance(other, RateLimitItem)
+            and self.amount == other.amount
+            and self.granularity == other.granularity
+        )
 
     def __str__(self) -> str:
         return "{} per {} {}".format(self.amount, self.multiples, self.granularity[1])
@@ -95,7 +99,7 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
         return "{}<{}>".format(self.__class__.__name__, str(self))
 
     def __lt__(self, other) -> bool:
-        return self.granularity[0] < other.granularity[0]
+        return isinstance(other, RateLimitItem) and self.granularity[0] < other.granularity[0]
 
 
 class RateLimitItemPerYear(RateLimitItem):

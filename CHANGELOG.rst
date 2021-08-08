@@ -23,6 +23,7 @@ these changes necessitate another major version bump.
 
   * The only modules that aren't available should be ones that rely on external dependencies (eg. redis or memcached).
 * An internal locking mechanism has been renamed to properly indicate it is not part of the public API.
+* Tightened up the comparison logic for rate limit items.
 * Cleaned up some quirks in the rate limit string parser.
 * Massive improvements to the documentation, including class and method docstrings.
 * Documentation published at https://freiner.readthedocs.io
