@@ -87,6 +87,19 @@ class RedisInteractor:
             incr_expire_script,
         )
 
+    def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
+        """
+        Returns the starting point and the number of entries in the moving window.
+
+        :param str key: rate limit key
+        :param int limit: amount of entries allowed
+        :param int expiry: expiry of entry
+        :return: (start of window, number of acquired entries)
+        """
+        timestamp = time.time()
+        window = self.lua_moving_window((key,), (timestamp - expiry, limit))
+        return MovingWindow(window[0], window[1])
+
     def _incr(self, key: str, expiry: int, connection: redis.Redis, elastic_expiry: bool = False):
         """
         increments the counter for a given rate limit key
@@ -116,19 +129,6 @@ class RedisInteractor:
 
     def _reset(self) -> int:
         return self.lua_clear_keys(("LIMITER*",))
-
-    def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
-        """
-        Returns the starting point and the number of entries in the moving window.
-
-        :param str key: rate limit key
-        :param int limit: amount of entries allowed
-        :param int expiry: expiry of entry
-        :return: (start of window, number of acquired entries)
-        """
-        timestamp = time.time()
-        window = self.lua_moving_window((key,), (timestamp - expiry, limit))
-        return MovingWindow(window[0], window[1])
 
     def _acquire_entry(
         self, key: str, limit: int, expiry: int, connection: redis.Redis, no_add: bool = False
