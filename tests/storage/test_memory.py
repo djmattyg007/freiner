@@ -82,7 +82,7 @@ def test_expiry_fixed_window(storage: MemoryStorage):
         frozen_datetime.tick(60)
         # touch another key and yield
         assert limiter.hit(per_sec) is True
-        time.sleep(0.01)
+        time.sleep(0.02)
         assert per_min.key_for() not in storage.storage
 
 
@@ -99,5 +99,5 @@ def test_expiry_moving_window(storage: MemoryStorage):
             frozen_datetime.tick(60)
             # touch another key and yield
             assert limiter.hit(per_sec) is True
-            time.sleep(0.01)
+            time.sleep(0.02)
             assert storage.events[per_min.key_for()] == []
