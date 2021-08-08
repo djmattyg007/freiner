@@ -4,8 +4,8 @@
 Changelog
 =========
 
-v3.0.0
-======
+v3.0.0 - 2021-08-08
+===================
 
 This release provides several improvements and resolves several issues that were
 only identified after the initial release of ``Freiner``. Unfortunately some of
