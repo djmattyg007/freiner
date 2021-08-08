@@ -87,6 +87,16 @@ class MemcachedStorage:
         if not elastic_expiry:
             return self._client.incr(key, 1) or 1
 
+        # TODO: There is a timing issue here.
+        # This code makes the assumption that because client.add() failed, the key must exist.
+        # That isn't necessarily true. It can expire between us calling client.add() and us
+        # calling client.gets(). If that happens, 'cas' will be None. If we pass cas=None to
+        # client.cas(), it gets very unhappy.
+        # This issue shows up occasionally in the test suite, both locally and on Github Actions.
+        # If it shows up in testing, it absolutely will show up in the real world.
+        # I believe the solution will be to "restart" the logic flow if 'cas is None'. However,
+        # that will require rewriting the method so that that can be achieved without recursion,
+        # and without the code looking like a nightmare.
         value, cas = self._client.gets(key)
         retry = 0
 
