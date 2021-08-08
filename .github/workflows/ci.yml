@@ -44,14 +44,14 @@ jobs:
             ${{ runner.os }}-${{ matrix.python }}-pip-
       - name: "Install dependencies"
         run: |
-          python -m pip install --upgrade pip setuptools wheel
-          python -m pip install .[dev]
+          python3 -m pip install --upgrade pip setuptools wheel
+          python3 -m pip install .[dev]
       - name: "Run linting"
-        run: python -m invoke lint
+        run: python3 -m invoke lint
       - name: "Run type checking"
-        run: python -m invoke type-check
+        run: python3 -m invoke type-check
       - name: "Run tests"
-        run: python -m invoke test
+        run: python3 -m invoke test
       - name: "Upload coverage data to Codecov"
         uses: codecov/codecov-action@v2
         if: ${{ matrix.coverage }}
