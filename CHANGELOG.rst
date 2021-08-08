@@ -24,10 +24,9 @@ these changes necessitate another major version bump.
   * The only modules that aren't available should be ones that rely on external dependencies (eg. redis or memcached).
 * An internal locking mechanism has been renamed to properly indicate it is not part of the public API.
 * Cleaned up some quirks in the rate limit string parser.
+* Massive improvements to the documentation, including class and method docstrings.
+* Documentation published at https://freiner.readthedocs.io
 * Minor adjustments to some exception messages.
-
-Additionally, there have been many many updates to the documentation. I'm expecting
-to publish it in the very near future.
 
 v2.0.0 - 2021-08-05
 ===================
