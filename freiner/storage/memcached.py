@@ -26,11 +26,10 @@ class MemcachedStorage:
     @classmethod
     def from_uri(cls, uri: str, **options: Any) -> "MemcachedStorage":
         """
-        :param str uri: memcached location of the form
-         `memcached://host:port,host:port`, `memcached:///run/path/to/sock`
-        :param options: all remaining keyword arguments are passed
-         directly to the constructor of :class:`pymemcache.client.base.Client`
-        :raise FreinerConfigurationError: when no hosts could be parsed from the supplied URI
+        :param uri: URI of the form `memcached://host:port,host:port`or `memcached:///run/path/to/sock`.
+        :param options: All remaining keyword arguments are passed directly to the constructor
+                        of :class:`pymemcache.client.base.Client`.
+        :raises FreinerConfigurationError: When no hosts could be parsed from the supplied URI.
         """
 
         parsed_uri = urlparse(uri)
@@ -57,24 +56,28 @@ class MemcachedStorage:
 
     def get(self, key: str) -> int:
         """
-        :param str key: the key to get the counter value for
+        Retrieve the current request count for the given rate limit key.
+
+        :param key: The key to get the counter value for.
         """
+
         return int(self._client.get(key) or 0)
 
     def clear(self, key: str) -> None:
         """
-        :param str key: the key to clear rate limits for
+        Resets the rate limit for the given key.
+
+        :param key: The key to clear rate limits for.
         """
         self._client.delete(key)
 
     def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
-        Increments the counter for a given rate limit key
+        Increments the counter for the given rate limit key.
 
-        :param str key: the key to increment
-        :param int expiry: amount in seconds for the key to expire in
-        :param bool elastic_expiry: whether to keep extending the rate limit
-         window every hit.
+        :param key: The key to increment.
+        :param expiry: Amount in seconds for the key to expire in.
+        :param elastic_expiry: Whether to keep extending the rate limit window every hit.
         """
 
         if self._client.add(key, 1, expiry, noreply=False):
@@ -102,14 +105,18 @@ class MemcachedStorage:
 
     def get_expiry(self, key: str) -> float:
         """
-        :param str key: the key to get the expiry for
+        Retrieve the expected expiry time for the given rate limit key.
+
+        :param key: The key to get the expiry time for.
         """
+
         return float(self._client.get(key + "/expires") or time.time())
 
     def check(self) -> bool:
         """
-        check if storage is healthy
+        Check if the connection to the storage backend is healthy.
         """
+
         try:
             self._client.get("freiner-check")
             return True

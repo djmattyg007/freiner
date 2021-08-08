@@ -65,13 +65,13 @@ class MemoryStorage:
 
     def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
-        increments the counter for a given rate limit key
+        Increments the counter for the given rate limit key.
 
-        :param str key: the key to increment
-        :param int expiry: amount in seconds for the key to expire in
-        :param bool elastic_expiry: whether to keep extending the rate limit
-         window every hit.
+        :param key: The key to increment.
+        :param expiry: Amount in seconds for the key to expire in.
+        :param elastic_expiry: Whether to keep extending the rate limit window every hit.
         """
+
         self.get(key)
         self.__schedule_expiry()
         self.storage[key] += 1
@@ -81,8 +81,11 @@ class MemoryStorage:
 
     def get(self, key: str) -> int:
         """
-        :param str key: the key to get the counter value for
+        Retrieve the current request count for the given rate limit key.
+
+        :param key: The key to get the counter value for.
         """
+
         if self.expirations.get(key, 0) <= time.time():
             self.storage.pop(key, None)
             self.expirations.pop(key, None)
@@ -90,7 +93,9 @@ class MemoryStorage:
 
     def clear(self, key: str) -> None:
         """
-        :param str key: the key to clear rate limits for
+        Resets the rate limit for the given key.
+
+        :param key: The key to clear rate limits for.
         """
         self.storage.pop(key, None)
         self.expirations.pop(key, None)
@@ -98,13 +103,13 @@ class MemoryStorage:
 
     def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
         """
-        :param str key: rate limit key to acquire an entry in
-        :param int limit: amount of entries allowed
-        :param int expiry: expiry of the entry
-        :param bool no_add: if False an entry is not actually acquired
-         but instead serves as a 'check'
+        :param key: The rate limit key to acquire an entry in.
+        :param limit: The total amount of entries allowed before hitting the rate limit.
+        :param expiry: Amount in seconds for the acquired entry to expire in.
+        :param no_add: If False, an entry is not actually acquired but instead serves as a 'check'.
         :rtype: bool
         """
+
         self.events.setdefault(key, [])
         self.__schedule_expiry()
         timestamp = time.time()
@@ -122,17 +127,21 @@ class MemoryStorage:
 
     def get_expiry(self, key: str) -> float:
         """
-        :param str key: the key to get the expiry for
+        Retrieve the expected expiry time for the given rate limit key.
+
+        :param key: The key to get the expiry time for.
         """
+
         return self.expirations.get(key, -1)
 
     def get_num_acquired(self, key: str, expiry: int) -> int:
         """
         returns the number of entries already acquired
 
-        :param str key: rate limit key to acquire an entry in
-        :param int expiry: expiry of the entry
+        :param key: rate limit key to acquire an entry in
+        :param expiry: expiry of the entry
         """
+
         timestamp = time.time()
         if self.events.get(key):
             return len([k for k in self.events[key] if k.atime > timestamp - expiry])
@@ -141,13 +150,14 @@ class MemoryStorage:
 
     def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
         """
-        returns the starting point and the number of entries in the moving window
+        Retrieves the starting point and the number of entries in the moving window.
 
-        :param str key: rate limit key
-        :param int limit: amount of entries allowed
-        :param int expiry: expiry of entry
+        :param key: The rate limit key to retrieve statistics about.
+        :param limit: The total amount of entries allowed before hitting the rate limit.
+        :param expiry: Amount in seconds for the acquired entry to expire in.
         :return: (start of window, number of acquired entries)
         """
+
         timestamp = time.time()
         acquired = self.get_num_acquired(key, expiry)
         for item in self.events.get(key, []):
@@ -157,8 +167,9 @@ class MemoryStorage:
 
     def check(self) -> bool:
         """
-        check if storage is healthy
+        Check if the connection to the storage backend is healthy.
         """
+
         return True
 
     def reset(self) -> None:

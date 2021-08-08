@@ -20,24 +20,26 @@ class MovingWindowRateLimiter:
 
     def hit(self, item: RateLimitItem, *identifiers: Any) -> bool:
         """
-        creates a hit on the rate limit and returns True if successful.
+        Creates a hit on the rate limit and returns ``True`` if successful.
 
-        :param item: a :class:`freiner.limits.RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the limit
-        :return: True/False
+        :param item: A :class:`freiner.limits.RateLimitItem` instance.
+        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        :rtype: bool
+        :return: ``True`` if the request was successful, or ``False`` if the rate limit had been exceeded.
         """
+
         return self.storage.acquire_entry(
             item.key_for(*identifiers), item.amount, item.get_expiry()
         )
 
     def test(self, item: RateLimitItem, *identifiers: Any) -> bool:
         """
-        checks  the rate limit and returns True if it is not
-        currently exceeded.
+        Checks the rate limit and returns ``True`` if it is not currently exceeded.
 
-        :param item: a :class:`freiner.limits.RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the limit
-        :return: True/False
+        :param item: A :class:`freiner.limits.RateLimitItem` instance.
+        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        :rtype: bool
+        :return: ``True`` if the rate limit has not yet been exceeded, or ``False`` if it has.
         """
 
         _, acquired_count = self.storage.get_moving_window(
@@ -48,12 +50,13 @@ class MovingWindowRateLimiter:
 
     def get_window_stats(self, item: RateLimitItem, *identifiers: Any) -> WindowStats:
         """
-        returns the number of requests remaining within this limit.
+        Returns the number of requests remaining within this limit.
 
         :param item: a :class:`freiner.limits.RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the limit
+        :param identifiers: variable list of stringable objects to uniquely identify the limit
         :return: tuple (reset time (float), remaining (int))
         """
+
         window_start, window_items = self.storage.get_moving_window(
             item.key_for(*identifiers), item.amount, item.get_expiry()
         )
@@ -61,6 +64,13 @@ class MovingWindowRateLimiter:
         return WindowStats(reset, item.amount - window_items)
 
     def clear(self, item: RateLimitItem, *identifiers: Any) -> None:
+        """
+        Resets the request counter for a given limit to zero.
+
+        :param item: a :class:`freiner.limits.RateLimitItem` instance
+        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        """
+
         self.storage.clear(item.key_for(*identifiers))
 
 

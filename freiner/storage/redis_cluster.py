@@ -16,10 +16,9 @@ class RedisClusterStorage(RedisStorage):
     @classmethod
     def from_uri(cls, uri: str, **options: Any) -> "RedisClusterStorage":
         """
-        :param str uri: url of the form
-         `redis+cluster://[:password]@host:port,host:port`
-        :param options: all remaining keyword arguments are passed
-         directly to the constructor of :class:`rediscluster.RedisCluster`
+        :param uri: URI of the form `redis+cluster://[:password]@host:port,host:port`
+        :param options: All remaining keyword arguments are passed directly to the constructor
+                        of :class:`rediscluster.RedisCluster`.
         """
 
         parsed_uri = urlparse(uri)

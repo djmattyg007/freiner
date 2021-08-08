@@ -7,29 +7,32 @@ from typing_extensions import Protocol, runtime_checkable
 class FixedWindowStorage(Protocol):
     def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
-        Increments the counter for a given rate limit key.
+        Increments the counter for the given rate limit key.
 
-        :param str key: the key to increment
-        :param int expiry: amount in seconds for the key to expire in
-        :param bool elastic_expiry: whether to keep extending the rate limit
-         window every hit.
+        :param key: The key to increment.
+        :param expiry: Amount in seconds for the key to expire in.
+        :param elastic_expiry: Whether to keep extending the rate limit window every hit.
         """
 
     def get(self, key: str) -> int:
         """
-        :param str key: the key to get the counter value for
+        Retrieve the current request count for the given rate limit key.
+
+        :param key: The key to get the counter value for.
         """
 
     def get_expiry(self, key: str) -> float:
         """
-        :param str key: the key to get the expiry for
+        Retrieve the expected expiry time for the given rate limit key.
+
+        :param key: The key to get the expiry time for.
         """
 
     def clear(self, key: str) -> None:
         """
-        Resets the rate limit key.
+        Resets the rate limit for the given key.
 
-        :param str key: the key to clear rate limits for
+        :param key: The key to clear rate limits for.
         """
 
 
@@ -42,29 +45,30 @@ class MovingWindow(NamedTuple):
 class MovingWindowStorage(Protocol):
     def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
         """
-        :param str key: rate limit key to acquire an entry in
-        :param int limit: amount of entries allowed
-        :param int expiry: expiry of the entry
-        :param bool no_add: if False an entry is not actually acquired
-         but instead serves as a 'check'
+        :param key: The rate limit key to acquire an entry in.
+        :param limit: The total amount of entries allowed before hitting the rate limit.
+        :param expiry: Amount in seconds for the acquired entry to expire in.
+        :param no_add: If False, an entry is not actually acquired but instead serves as a 'check'.
         :rtype: bool
         """
 
     def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
         """
-        Returns the starting point and the number of entries in the moving window.
+        Retrieves the starting point and the number of entries in the moving window.
 
-        :param str key: rate limit key
-        :param int limit: amount of entries allowed
-        :param int expiry: expiry of entry
+        # noqa: DAR202
+
+        :param key: The rate limit key to retrieve statistics about.
+        :param limit: The total amount of entries allowed before hitting the rate limit.
+        :param expiry: Amount in seconds for the acquired entry to expire in.
         :return: (start of window, number of acquired entries)
         """
 
     def clear(self, key: str) -> None:
         """
-        Resets the rate limit key.
+        Resets the rate limit for the given key.
 
-        :param str key: the key to clear rate limits for
+        :param key: The key to clear rate limits for.
         """
 
 

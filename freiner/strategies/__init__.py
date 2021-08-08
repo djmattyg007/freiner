@@ -14,27 +14,35 @@ class WindowStats(NamedTuple):
 class RateLimiter(Protocol):
     def hit(self, item: RateLimitItem, *identifiers: Any) -> bool:
         """
-        Creates a hit on the rate limit and returns True if successful.
+        Creates a hit on the rate limit and returns ``True`` if successful.
 
-        :param item: a :class:`freiner.limits.RateLimitItem` instance
+        # noqa: DAR202
+
+        :param item: A :class:`freiner.limits.RateLimitItem` instance.
         :param identifiers: variable list of stringable objects to uniquely identify the limit
-        :return: True/False
+        :rtype: bool
+        :return: ``True`` if the request was successful, or ``False`` if the rate limit had been exceeded.
         """
 
     def test(self, item: RateLimitItem, *identifiers: Any) -> bool:
         """
-        Checks the rate limit and returns True if it is not currently exceeded.
+        Checks the rate limit and returns ``True`` if it is not currently exceeded.
 
-        :param item: a :class:`freiner.limits.RateLimitItem` instance
+        # noqa: DAR202
+
+        :param item: A :class:`freiner.limits.RateLimitItem` instance.
         :param identifiers: variable list of stringable objects to uniquely identify the limit
-        :return: True/False
+        :rtype: bool
+        :return: ``True`` if the rate limit has not yet been exceeded, or ``False`` if it has.
         """
 
     def get_window_stats(self, item: RateLimitItem, *identifiers: Any) -> WindowStats:
         """
-        Returns the number of requests remaining within this limit.
+        Retrieve statistics about the number of requests remaining within the given limit.
 
-        :param item: a :class:`freiner.limits.RateLimitItem` instance
+        # noqa: DAR202
+
+        :param item: A :class:`freiner.limits.RateLimitItem` instance.
         :param identifiers: variable list of stringable objects to uniquely identify the limit
         :return: tuple (reset time (float), remaining (int))
         """

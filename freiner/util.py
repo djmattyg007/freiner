@@ -23,13 +23,15 @@ EXPR = re.compile(
 
 def parse_many(limit_string: str) -> Sequence[RateLimitItem]:
     """
-    parses rate limits in string notation containing multiple rate limits
-    (e.g. '1/second; 5/minute')
+    Parses rate limits in string notation containing multiple rate limits
+    (e.g. '1/second; 5/minute').
 
-    :param string limit_string: rate limit string using :ref:`ratelimit-string`
-    :raise ValueError: if the string notation is invalid.
-    :return: a list of :class:`freiner.limits.RateLimitItem` instances.
+    :param limit_string: The rate limit string. using :ref:`ratelimit-string`.
+    :raises TypeError: If something other than a string was supplied.
+    :raises ValueError: If the string notation is invalid.
+    :return: A sequence of :class:`freiner.limits.RateLimitItem` instances.
     """
+
     if not isinstance(limit_string, str):
         raise TypeError("Invalid rate limit string supplied.")
 
@@ -50,22 +52,26 @@ def parse_many(limit_string: str) -> Sequence[RateLimitItem]:
 
 def parse(limit_string: str) -> RateLimitItem:
     """
-    parses a single rate limit in string notation
-    (e.g. '1/second' or '1 per second'
+    Parses a single rate limit in string notation (e.g. '1/second' or '1 per second').
 
-    :param string limit_string: rate limit string using :ref:`ratelimit-string`
-    :raise ValueError: if the string notation is invalid.
-    :return: an instance of :class:`freiner.limits.RateLimitItem`
+    # noqa: DAR402
+
+    :param limit_string: The rate limit string. using :ref:`ratelimit-string`.
+    :raises TypeError: If something other than a string was supplied.
+    :raises ValueError: If the string notation is invalid.
+    :return: An instance of :class:`freiner.limits.RateLimitItem`.
     """
+
     return parse_many(limit_string)[0]
 
 
 def granularity_from_string(granularity_string: str) -> Type[RateLimitItem]:
     """
-    :param granularity_string:
-    :return: a subclass of :class:`freiner.limits.RateLimitItem`
-    :raise ValueError:
+    :param granularity_string: A representation of the granularity (eg. "second", "minute").
+    :raises ValueError: If the supplied granularity is unknown.
+    :return: A subclass of :class:`freiner.limits.RateLimitItem`.
     """
+
     for granularity in GRANULARITIES.values():
         if granularity.check_granularity_string(granularity_string):
             return granularity

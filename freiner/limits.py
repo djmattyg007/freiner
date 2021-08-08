@@ -6,9 +6,10 @@ def safe_string(value: Any) -> str:
     """
     Consistently converts a value to a string.
 
-    :param value:
+    :param value: The value to stringify.
     :rtype: str
     """
+
     if isinstance(value, bytes):
         return value.decode()
     return str(value)
@@ -57,25 +58,27 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
     @classmethod
     def check_granularity_string(cls, granularity_string: str) -> bool:
         """
-        checks if this instance matches a granularity string
-        of type 'n per hour' etc.
+        Check if this class matches a granularity string of type 'N per hour' etc.
 
+        :param granularity_string: The granularity to match against.
         :rtype: bool
         """
+
         return granularity_string.lower() in cls.granularity[1:]
 
     def get_expiry(self) -> int:
         """
-        :return: the size of the window in seconds.
+        :return: The length of the expiry window in seconds.
         """
+
         return self.granularity[0] * self.multiples
 
     def key_for(self, *identifiers: Any) -> str:
         """
-        :param identifiers: a list of strings to append to the key
-        :return: a string key identifying this resource with
-         each identifier appended with a '/' delimiter.
+        :param identifiers: A list of arbitrary strings to append to the key.
+        :return: A string key identifying this resource with each identifier appended with a '/' delimiter.
         """
+
         identifier_strings = [safe_string(k) for k in identifiers]
         limit_strings = [safe_string(self.amount), safe_string(self.multiples), self.granularity[1]]
 
@@ -97,7 +100,7 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
 
 class RateLimitItemPerYear(RateLimitItem):
     """
-    per year rate limited resource.
+    Per year rate limited resource.
     """
 
     granularity = TIME_TYPES["year"]
@@ -105,7 +108,7 @@ class RateLimitItemPerYear(RateLimitItem):
 
 class RateLimitItemPerMonth(RateLimitItem):
     """
-    per month rate limited resource.
+    Per month rate limited resource.
     """
 
     granularity = TIME_TYPES["month"]
@@ -113,7 +116,7 @@ class RateLimitItemPerMonth(RateLimitItem):
 
 class RateLimitItemPerDay(RateLimitItem):
     """
-    per day rate limited resource.
+    Per day rate limited resource.
     """
 
     granularity = TIME_TYPES["day"]
@@ -121,7 +124,7 @@ class RateLimitItemPerDay(RateLimitItem):
 
 class RateLimitItemPerHour(RateLimitItem):
     """
-    per hour rate limited resource.
+    Per hour rate limited resource.
     """
 
     granularity = TIME_TYPES["hour"]
@@ -129,7 +132,7 @@ class RateLimitItemPerHour(RateLimitItem):
 
 class RateLimitItemPerMinute(RateLimitItem):
     """
-    per minute rate limited resource.
+    Per minute rate limited resource.
     """
 
     granularity = TIME_TYPES["minute"]
@@ -137,7 +140,7 @@ class RateLimitItemPerMinute(RateLimitItem):
 
 class RateLimitItemPerSecond(RateLimitItem):
     """
-    per second rate limited resource.
+    Per second rate limited resource.
     """
 
     granularity = TIME_TYPES["second"]

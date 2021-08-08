@@ -12,11 +12,12 @@ class FixedWindowElasticExpiryRateLimiter(FixedWindowRateLimiter):
 
     def hit(self, item: RateLimitItem, *identifiers: Any) -> bool:
         """
-        creates a hit on the rate limit and returns True if successful.
+        Creates a hit on the rate limit and returns ``True`` if successful.
 
-        :param item: a :class:`freiner.limits.RateLimitItem` instance
-        :param identifiers: variable list of strings to uniquely identify the limit
-        :return: True/False
+        :param item: A :class:`freiner.limits.RateLimitItem` instance.
+        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        :rtype: bool
+        :return: ``True`` if the request was successful, or ``False`` if the rate limit had been exceeded.
         """
 
         counter = self.storage.incr(

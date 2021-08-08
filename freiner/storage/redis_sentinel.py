@@ -30,13 +30,11 @@ class RedisSentinelStorage(RedisStorage):
         cls, uri: str, service_name: Optional[str] = None, **options: Any
     ) -> "RedisSentinelStorage":
         """
-        :param str uri: url of the form
-         `redis+sentinel://host:port,host:port/service_name`
-        :param Optional[str] service_name: sentinel service name
-         (if not provided in `uri`)
-        :param options: all remaining keyword arguments are passed
-         directly to the constructor of :class:`redis.sentinel.Sentinel`
-        :raise FreinerConfigurationError: when no service name is provided
+        :param uri: URI of the form `redis+sentinel://host:port,host:port/service_name`
+        :param service_name: Sentinel service name (if not provided in `uri`).
+        :param options: All remaining keyword arguments are passed directly to the constructor
+                        of :class:`redis.sentinel.Sentinel`.
+        :raises FreinerConfigurationError: When no service name is provided.
         """
 
         parsed_uri = urlparse(uri)
@@ -61,20 +59,27 @@ class RedisSentinelStorage(RedisStorage):
 
     def get(self, key: str) -> int:
         """
-        :param str key: the key to get the counter value for
+        Retrieve the current request count for the given rate limit key.
+
+        :param key: The key to get the counter value for.
         """
+
         return self._get(key, self._sentinel_slave)
 
     def get_expiry(self, key: str) -> float:
         """
-        :param str key: the key to get the expiry for
+        Retrieve the expected expiry time for the given rate limit key.
+
+        :param key: The key to get the expiry time for.
         """
+
         return self._get_expiry(key, self._sentinel_slave)
 
     def check(self) -> bool:
         """
-        check if storage is healthy
+        Check if the connection to the storage backend is healthy.
         """
+
         return self._check(self._sentinel_slave)
 
 

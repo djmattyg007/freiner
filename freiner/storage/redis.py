@@ -89,25 +89,28 @@ class RedisInteractor:
 
     def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
         """
-        Returns the starting point and the number of entries in the moving window.
+        Retrieves the starting point and the number of entries in the moving window.
 
-        :param str key: rate limit key
-        :param int limit: amount of entries allowed
-        :param int expiry: expiry of entry
+        :param key: The rate limit key to retrieve statistics about.
+        :param limit: The total amount of entries allowed before hitting the rate limit.
+        :param expiry: Amount in seconds for the acquired entry to expire in.
         :return: (start of window, number of acquired entries)
         """
+
         timestamp = time.time()
         window = self.lua_moving_window((key,), (timestamp - expiry, limit))
         return MovingWindow(window[0], window[1])
 
     def _incr(self, key: str, expiry: int, connection: redis.Redis, elastic_expiry: bool = False):
         """
-        increments the counter for a given rate limit key
+        Increments the counter for the given rate limit key.
 
-        :param connection: Redis connection
-        :param str key: the key to increment
-        :param int expiry: amount in seconds for the key to expire in
+        :param key: The key to increment.
+        :param expiry: Amount in seconds for the key to expire in.
+        :param connection: Redis connection.
+        :param elastic_expiry: Whether to keep extending the rate limit window every hit.
         """
+
         value = connection.incr(key)
         if elastic_expiry or value == 1:
             connection.expire(key, expiry)
@@ -115,16 +118,22 @@ class RedisInteractor:
 
     def _get(self, key: str, connection: redis.Redis) -> int:
         """
-        :param connection: Redis connection
-        :param str key: the key to get the counter value for
+        Retrieve the current request count for the given rate limit key.
+
+        :param key: The key to get the counter value for.
+        :param connection: Redis connection.
         """
+
         return int(connection.get(key) or 0)
 
     def _clear(self, key: str, connection: redis.Redis) -> None:
         """
-        :param str key: the key to clear rate limits for
-        :param connection: Redis connection
+        Resets the rate limit for the given key.
+
+        :param key: The key to clear rate limits for.
+        :param connection: Redis connection.
         """
+
         connection.delete(key)
 
     def _reset(self) -> int:
@@ -134,14 +143,14 @@ class RedisInteractor:
         self, key: str, limit: int, expiry: int, connection: redis.Redis, no_add: bool = False
     ) -> bool:
         """
-        :param str key: rate limit key to acquire an entry in
-        :param int limit: amount of entries allowed
-        :param int expiry: expiry of the entry
-        :param bool no_add: if False an entry is not actually acquired but
-         instead serves as a 'check'
-        :param connection: Redis connection
-        :return: True/False
+        :param key: The rate limit key to acquire an entry in.
+        :param limit: The total amount of entries allowed before hitting the rate limit.
+        :param expiry: Amount in seconds for the acquired entry to expire in.
+        :param connection: Redis connection.
+        :param no_add: If False, an entry is not actually acquired but instead serves as a 'check'.
+        :rtype: bool
         """
+
         timestamp = time.time()
         acquired = self.lua_acquire_window(
             (key,),
@@ -151,16 +160,21 @@ class RedisInteractor:
 
     def _get_expiry(self, key: str, connection: redis.Redis) -> float:
         """
-        :param str key: the key to get the expiry for
-        :param connection: Redis connection
+        Retrieve the expected expiry time for the given rate limit key.
+
+        :param key: The key to get the expiry time for.
+        :param connection: Redis connection.
         """
+
         return max(connection.ttl(key), 0) + time.time()
 
     def _check(self, connection: redis.Redis) -> bool:
         """
-        :param connection: Redis connection
-        check if storage is healthy
+        Check if the connection to the storage backend is healthy.
+
+        :param connection: Redis connection.
         """
+
         try:
             return connection.ping()
         except:  # noqa
@@ -181,12 +195,11 @@ class RedisStorage(RedisInteractor):
     @classmethod
     def from_uri(cls, uri: str, **options: Any) -> "RedisStorage":
         """
-        :param str uri: uri of the form `redis://[:password]@host:port`,
-         `redis://[:password]@host:port/db`,
-         `rediss://[:password]@host:port`, `unix:///path/to/sock` etc.
-         This uri is passed directly to :func:`redis.from_url`.
-        :param options: all remaining keyword arguments are passed
-         directly to the constructor of :class:`redis.Redis`
+        :param uri: URI of the form `redis://[:password]@host:port`, `redis://[:password]@host:port/db`,
+                    `rediss://[:password]@host:port`, `unix:///path/to/sock` etc. This uri is passed
+                    directly to :func:`redis.from_url`.
+        :param options: All remaining keyword arguments are passed directly to the constructor
+                        of :class:`redis.Redis`.
         """
 
         client: redis.Redis = redis.from_url(uri, **options)
@@ -194,11 +207,13 @@ class RedisStorage(RedisInteractor):
 
     def incr(self, key: str, expiry: int, elastic_expiry: bool = False) -> int:
         """
-        increments the counter for a given rate limit key
+        Increments the counter for the given rate limit key.
 
-        :param str key: the key to increment
-        :param int expiry: amount in seconds for the key to expire in
+        :param key: The key to increment.
+        :param expiry: Amount in seconds for the key to expire in.
+        :param elastic_expiry: Whether to keep extending the rate limit window every hit.
         """
+
         if elastic_expiry:
             return self._incr(key, expiry, self._client, elastic_expiry)
         else:
@@ -206,37 +221,47 @@ class RedisStorage(RedisInteractor):
 
     def get(self, key: str) -> int:
         """
-        :param str key: the key to get the counter value for
+        Retrieve the current request count for the given rate limit key.
+
+        :param key: The key to get the counter value for.
         """
+
         return self._get(key, self._client)
 
     def clear(self, key: str) -> None:
         """
-        :param str key: the key to clear rate limits for
+        Resets the rate limit for the given key.
+
+        :param key: The key to clear rate limits for.
         """
+
         self._clear(key, self._client)
 
     def acquire_entry(self, key: str, limit: int, expiry: int, no_add: bool = False) -> bool:
         """
-        :param str key: rate limit key to acquire an entry in
-        :param int limit: amount of entries allowed
-        :param int expiry: expiry of the entry
-        :param bool no_add: if False an entry is not actually acquired but
-         instead serves as a 'check'
+        :param key: The rate limit key to acquire an entry in.
+        :param limit: The total amount of entries allowed before hitting the rate limit.
+        :param expiry: Amount in seconds for the acquired entry to expire in.
+        :param no_add: If False, an entry is not actually acquired but instead serves as a 'check'.
         :rtype: bool
         """
+
         return self._acquire_entry(key, limit, expiry, self._client, no_add=no_add)
 
     def get_expiry(self, key: str) -> float:
         """
-        :param str key: the key to get the expiry for
+        Retrieve the expected expiry time for the given rate limit key.
+
+        :param key: The key to get the expiry time for.
         """
+
         return self._get_expiry(key, self._client)
 
     def check(self) -> bool:
         """
-        check if storage is healthy
+        Check if the connection to the storage backend is healthy.
         """
+
         return self._check(self._client)
 
     def reset(self) -> None:
