@@ -20,6 +20,10 @@ def reformat(c):
 @task
 def lint(c):
     c.run("flake8 --show-source --statistics --max-line-length 100 freiner tests", pty=pty)
+    # TODO: start using pydocstyle
+    # Gotta use pydocstyle directly rather than through the flake8 config, because the flake8
+    # plugin doesn't support configuring pydocstyle sensibly.
+
     c.run("check-manifest", pty=pty)
 
     bandit_args = ["bandit", "--configfile", "bandit.yaml", "-r"]
