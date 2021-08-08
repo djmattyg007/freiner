@@ -9,7 +9,7 @@ import redis
 from freiner.storage.redis import RedisStorage
 from freiner.types import Host
 
-from tests import DOCKERDIR
+from ..util import DOCKERDIR
 
 from ._redis import (
     _test_fixed_window,

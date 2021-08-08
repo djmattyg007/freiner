@@ -14,7 +14,7 @@ from freiner.strategies.fixed_window import FixedWindowRateLimiter
 from freiner.strategies.fixed_window_elastic import FixedWindowElasticExpiryRateLimiter
 from freiner.types import Host
 
-from tests import DOCKERDIR, fixed_start
+from ..util import DOCKERDIR, fixed_start
 
 
 @pytest.fixture

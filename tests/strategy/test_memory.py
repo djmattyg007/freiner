@@ -8,7 +8,7 @@ from freiner.strategies.fixed_window import FixedWindowRateLimiter
 from freiner.strategies.fixed_window_elastic import FixedWindowElasticExpiryRateLimiter
 from freiner.strategies.moving_window import MovingWindowRateLimiter
 
-from tests import freeze_time
+from ..util import freeze_time
 
 
 @pytest.fixture
