@@ -4,6 +4,11 @@
 Changelog
 =========
 
+v3.0.1 - 2021-08-09
+===================
+
+Various small updates to documentation and docstrings.
+
 v3.0.0 - 2021-08-08
 ===================
 
