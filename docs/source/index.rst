@@ -8,6 +8,7 @@ and storage backends such as redis & memcached.
 .. toctree::
     :hidden:
 
+    Home <self>
     string-notation
     strategies
     storage
