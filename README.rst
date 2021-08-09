@@ -29,5 +29,6 @@ to add type hints, and to resolve several outstanding problems at the time.
 Links
 -----
 
-* `Documentation <http://limits.readthedocs.org>`_
-* `Changelog <http://limits.readthedocs.org/en/stable/changelog.html>`_
+* `Documentation <https://freiner.readthedocs.io/>`_
+* `PyPI <https://pypi.org/project/freiner/>`_
+* `Changelog <https://freiner.readthedocs.io/en/latest/changelog.html>`_
