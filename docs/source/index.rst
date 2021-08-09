@@ -22,20 +22,20 @@ Quickstart
 
 Initialize the storage backend::
 
-    from freiner.storage import memory
-    memory_storage = memory.MemoryStorage()
+    from freiner import MemoryStorage()
+    memory_storage = MemoryStorage()
 
 Initialize a rate limiter with the :ref:`moving-window` strategy::
 
-    from freiner import strategies
-    moving_window = strategies.MovingWindowRateLimiter(memory_storage)
+    from freiner import MovingWindowRateLimiter
+    moving_window = MovingWindowRateLimiter(memory_storage)
 
 Initialize a rate limit using the :ref:`ratelimit-string`::
 
     from freiner import parse
     one_per_minute = parse("1/minute")
 
-Initialize a rate limit explicitly using a subclass of :class:`RateLimitItem`::
+Initialize a rate limit explicitly using a subclass of :class:`freiner.limits.RateLimitItem`::
 
     from freiner import RateLimitItemPerSecond, RateLimitPerMinute
     one_per_second = RateLimitItemPerSecond(1, 1)
