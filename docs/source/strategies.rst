@@ -9,6 +9,8 @@ Rate Limiting Strategies
 Fixed Window
 ============
 
+Implemented using :class:`freiner.strategies.fixed_window.FixedWindowRateLimiter`.
+
 This is the most memory efficient strategy to use as it maintains one counter
 per resource and rate limit. It does however have its drawbacks as it allows
 bursts within each window - thus allowing an 'attacker' to bypass the limits.
@@ -26,6 +28,8 @@ for access.
 Fixed Window with Elastic Expiry
 ================================
 
+Implemented using :class:`freiner.strategies.fixed_window_elastic.FixedWindowElasticExpiryRateLimiter`.
+
 This strategy works almost identically to the Fixed Window strategy with the exception
 that each hit results in the extension of the window. This strategy works well for
 creating large penalties for breaching a rate limit.
@@ -40,7 +44,9 @@ bursts.
 Moving Window
 =============
 
-.. warning:: The moving window strategy is only implemented for the ``redis`` and ``in-memory``
+Implemented using :class:`freiner.strategies.moving_window.MovingWindowRateLimiter`.
+
+.. note:: The moving window strategy is only implemented for the ``redis`` and ``in-memory``
     storage backends. The strategy requires using a list with fast random access which
     is not very convenient to implement with ``memcached``.
 
