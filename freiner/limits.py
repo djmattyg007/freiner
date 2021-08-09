@@ -7,7 +7,6 @@ def safe_string(value: Any) -> str:
     Consistently converts a value to a string.
 
     :param value: The value to stringify.
-    :rtype: str
     """
 
     if isinstance(value, bytes):
@@ -43,9 +42,9 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
     defines a Rate limited resource which contains the characteristic
     namespace, amount and granularity multiples of the rate limiting window.
 
-    :param int amount: the rate limit amount
-    :param int multiples: multiple of the 'per' granularity (e.g. 'n' per 'm' seconds)
-    :param string namespace: category for the specific rate limit
+    :param amount: The amount of hits that can be sustained within the given period (e.g. X in 'x per y seconds').
+    :param multiples: Multiple of the 'per' granularity (e.g. Y in 'x per y seconds').
+    :param namespace: An arbitrary namespace for this rate limit.
     """
 
     granularity = (0, "")
@@ -61,7 +60,7 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
         Check if this class matches a granularity string of type 'N per hour' etc.
 
         :param granularity_string: The granularity to match against.
-        :rtype: bool
+        :return: Does the supplied granularity identifier match this class' granularity?
         """
 
         return granularity_string.lower() in cls.granularity[1:]

@@ -15,8 +15,7 @@ class FixedWindowElasticExpiryRateLimiter(FixedWindowRateLimiter):
         Creates a hit on the rate limit and returns ``True`` if successful.
 
         :param item: A :class:`freiner.limits.RateLimitItem` instance.
-        :param identifiers: variable list of stringable objects to uniquely identify the limit
-        :rtype: bool
+        :param identifiers: A variable list of stringable objects to uniquely identify the limit.
         :return: ``True`` if the request was successful, or ``False`` if the rate limit had been exceeded.
         """
 

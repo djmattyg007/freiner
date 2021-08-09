@@ -23,8 +23,7 @@ class FixedWindowRateLimiter:
         Creates a hit on the rate limit and returns ``True`` if successful.
 
         :param item: A :class:`freiner.limits.RateLimitItem` instance.
-        :param identifiers: variable list of stringable objects to uniquely identify the limit
-        :rtype: bool
+        :param identifiers: A variable list of stringable objects to uniquely identify the limit.
         :return: ``True`` if the request was successful, or ``False`` if the rate limit had been exceeded.
         """
 
@@ -35,8 +34,7 @@ class FixedWindowRateLimiter:
         Checks the rate limit and returns ``True`` if it is not currently exceeded.
 
         :param item: A :class:`freiner.limits.RateLimitItem` instance.
-        :param identifiers: variable list of stringable objects to uniquely identify the limit
-        :rtype: bool
+        :param identifiers: A variable list of stringable objects to uniquely identify the limit.
         :return: ``True`` if the rate limit has not yet been exceeded, or ``False`` if it has.
         """
 
@@ -47,7 +45,7 @@ class FixedWindowRateLimiter:
         Returns the number of requests remaining within this limit.
 
         :param item: a :class:`freiner.limits.RateLimitItem` instance
-        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        :param identifiers: A variable list of stringable objects to uniquely identify the limit.
         :return: tuple (reset time (float), remaining (int))
         """
 
@@ -60,7 +58,7 @@ class FixedWindowRateLimiter:
         Resets the request counter for a given limit to zero.
 
         :param item: a :class:`freiner.limits.RateLimitItem` instance
-        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        :param identifiers: A variable list of stringable objects to uniquely identify the limit.
         """
 
         self.storage.clear(item.key_for(*identifiers))

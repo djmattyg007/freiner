@@ -70,6 +70,7 @@ class MemoryStorage:
         :param key: The key to increment.
         :param expiry: Amount in seconds for the key to expire in.
         :param elastic_expiry: Whether to keep extending the rate limit window every hit.
+        :return: The number of hits currently on the rate limit for the given key.
         """
 
         self.get(key)
@@ -107,7 +108,6 @@ class MemoryStorage:
         :param limit: The total amount of entries allowed before hitting the rate limit.
         :param expiry: Amount in seconds for the acquired entry to expire in.
         :param no_add: If False, an entry is not actually acquired but instead serves as a 'check'.
-        :rtype: bool
         """
 
         self.events.setdefault(key, [])

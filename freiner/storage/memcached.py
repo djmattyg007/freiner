@@ -78,6 +78,7 @@ class MemcachedStorage:
         :param key: The key to increment.
         :param expiry: Amount in seconds for the key to expire in.
         :param elastic_expiry: Whether to keep extending the rate limit window every hit.
+        :return: The number of hits currently on the rate limit for the given key.
         """
 
         if self._client.add(key, 1, expiry, noreply=False):

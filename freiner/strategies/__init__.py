@@ -19,8 +19,7 @@ class RateLimiter(Protocol):
         # noqa: DAR202
 
         :param item: A :class:`freiner.limits.RateLimitItem` instance.
-        :param identifiers: variable list of stringable objects to uniquely identify the limit
-        :rtype: bool
+        :param identifiers: A variable list of stringable objects to uniquely identify the limit.
         :return: ``True`` if the request was successful, or ``False`` if the rate limit had been exceeded.
         """
 
@@ -31,8 +30,7 @@ class RateLimiter(Protocol):
         # noqa: DAR202
 
         :param item: A :class:`freiner.limits.RateLimitItem` instance.
-        :param identifiers: variable list of stringable objects to uniquely identify the limit
-        :rtype: bool
+        :param identifiers: A variable list of stringable objects to uniquely identify the limit.
         :return: ``True`` if the rate limit has not yet been exceeded, or ``False`` if it has.
         """
 
@@ -43,7 +41,7 @@ class RateLimiter(Protocol):
         # noqa: DAR202
 
         :param item: A :class:`freiner.limits.RateLimitItem` instance.
-        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        :param identifiers: A variable list of stringable objects to uniquely identify the limit.
         :return: tuple (reset time (float), remaining (int))
         """
 
@@ -52,7 +50,7 @@ class RateLimiter(Protocol):
         Resets the request counter for a given limit to zero.
 
         :param item: a :class:`freiner.limits.RateLimitItem` instance
-        :param identifiers: variable list of stringable objects to uniquely identify the limit
+        :param identifiers: A variable list of stringable objects to uniquely identify the limit.
         """
 
 

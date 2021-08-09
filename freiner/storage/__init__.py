@@ -12,6 +12,7 @@ class FixedWindowStorage(Protocol):
         :param key: The key to increment.
         :param expiry: Amount in seconds for the key to expire in.
         :param elastic_expiry: Whether to keep extending the rate limit window every hit.
+        :return: The number of hits currently on the rate limit for the given key.
         """
 
     def get(self, key: str) -> int:
@@ -49,7 +50,6 @@ class MovingWindowStorage(Protocol):
         :param limit: The total amount of entries allowed before hitting the rate limit.
         :param expiry: Amount in seconds for the acquired entry to expire in.
         :param no_add: If False, an entry is not actually acquired but instead serves as a 'check'.
-        :rtype: bool
         """
 
     def get_moving_window(self, key: str, limit: int, expiry: int) -> MovingWindow:
