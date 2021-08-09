@@ -76,6 +76,12 @@ should be started and stopped automatically when running tests::
 
     invoke test
 
+Useful Links
+============
+
+* `Freiner on Github <https://github.com/djmattyg007/freiner>`_
+* `Freiner on PyPI <https://pypi.org/project/freiner/>`_
+
 References
 ----------
 
