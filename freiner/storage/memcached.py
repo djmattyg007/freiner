@@ -119,6 +119,7 @@ class MemcachedStorage:
         Retrieve the expected expiry time for the given rate limit key.
 
         :param key: The key to get the expiry time for.
+        :return: The time at which the current rate limit for the given key ends.
         """
 
         return float(self._client.get(key + "/expires") or time.time())

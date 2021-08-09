@@ -9,6 +9,8 @@ class FixedWindowStorage(Protocol):
         """
         Increments the counter for the given rate limit key.
 
+        # noqa: DAR202
+
         :param key: The key to increment.
         :param expiry: Amount in seconds for the key to expire in.
         :param elastic_expiry: Whether to keep extending the rate limit window every hit.
@@ -26,7 +28,10 @@ class FixedWindowStorage(Protocol):
         """
         Retrieve the expected expiry time for the given rate limit key.
 
+        # noqa: DAR202
+
         :param key: The key to get the expiry time for.
+        :return: The time at which the current rate limit for the given key ends.
         """
 
     def clear(self, key: str) -> None:

@@ -71,6 +71,7 @@ class RedisSentinelStorage(RedisStorage):
         Retrieve the expected expiry time for the given rate limit key.
 
         :param key: The key to get the expiry time for.
+        :return: The time at which the current rate limit for the given key ends.
         """
 
         return self._get_expiry(key, self._sentinel_slave)
