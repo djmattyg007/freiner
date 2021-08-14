@@ -37,9 +37,9 @@ def lint(c):
 
 @task
 def test(c, onefile=""):
-    pytest_args = ["pytest", "--cov=freiner", "--cov-report=term"]
+    pytest_args = ["pytest", "--strict-config", "--cov=freiner", "--cov-report=term"]
     if in_ci:
-        pytest_args.append("--cov-report=xml")
+        pytest_args.extend(("--cov-report=xml", "--strict-markers"))
     else:
         pytest_args.append("--cov-report=html")
 
