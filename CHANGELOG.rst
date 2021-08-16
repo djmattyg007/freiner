@@ -4,6 +4,11 @@
 Changelog
 =========
 
+v3.0.2 - 2021-08-16
+===================
+
+Add py.typed file so that mypy recognises this package as having type annotations.
+
 v3.0.1 - 2021-08-09
 ===================
 
