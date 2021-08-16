@@ -4,6 +4,11 @@
 Changelog
 =========
 
+v3.0.3 - 2021-08-16
+===================
+
+Ensure py.typed file is actually included in built packages.
+
 v3.0.2 - 2021-08-16
 ===================
 
