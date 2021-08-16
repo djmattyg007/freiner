@@ -4,6 +4,11 @@
 Changelog
 =========
 
+v3.0.4 - 2021-08-16
+===================
+
+Resolve more issues with using this library when mypy's ``strict`` option is enabled.
+
 v3.0.3 - 2021-08-16
 ===================
 

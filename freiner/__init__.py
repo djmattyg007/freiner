@@ -16,7 +16,7 @@ from .strategies.moving_window import MovingWindowRateLimiter
 from .util import parse, parse_many
 
 
-__version__ = "3.0.3"
+__version__ = "3.0.4"
 
 __all__ = [
     "FixedWindowStorage",
