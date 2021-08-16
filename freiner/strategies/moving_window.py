@@ -11,7 +11,7 @@ class MovingWindowRateLimiter:
     Reference: :ref:`moving-window`
     """
 
-    def __init__(self, storage: MovingWindowStorage):
+    def __init__(self, storage: MovingWindowStorage) -> None:
         if not isinstance(storage, MovingWindowStorage):
             msg = f"Moving Window rate limiting is not implemented for storage of type {storage.__class__.__name__}"
             raise TypeError(msg)

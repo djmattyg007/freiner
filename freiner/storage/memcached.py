@@ -20,7 +20,7 @@ class MemcachedStorage:
 
     MAX_CAS_RETRIES = 10
 
-    def __init__(self, client: MemcachedClient):
+    def __init__(self, client: MemcachedClient) -> None:
         self._client: MemcachedClient = client
 
     @classmethod

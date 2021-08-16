@@ -2,6 +2,7 @@ import threading
 import time
 from collections import Counter
 from typing import Counter as CounterType
+from typing import Dict, List, Optional
 
 from . import MovingWindow
 
@@ -38,10 +39,10 @@ class MemoryStorage:
     and a simple list to implement moving window strategy.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.storage: CounterType[str] = Counter()
-        self.expirations = {}
-        self.events = {}
+        self.expirations: Dict[str, float] = {}
+        self.events: Dict[str, List[_LockableEntry]] = {}
 
         self.timer = threading.Timer(0.01, self.__expire_events)
         self.timer.start()
@@ -113,6 +114,7 @@ class MemoryStorage:
         self.events.setdefault(key, [])
         self.__schedule_expiry()
         timestamp = time.time()
+        entry: Optional[_LockableEntry]
         try:
             entry = self.events[key][limit - 1]
         except IndexError:

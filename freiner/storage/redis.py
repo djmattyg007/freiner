@@ -189,7 +189,7 @@ class RedisStorage(RedisInteractor):
     Depends on the `redis` library.
     """
 
-    def __init__(self, client: redis.Redis):
+    def __init__(self, client: redis.Redis) -> None:
         self._client = client
         self.initialize_storage(self._client)
 

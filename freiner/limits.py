@@ -49,7 +49,7 @@ class RateLimitItem(metaclass=RateLimitItemMeta):
 
     granularity = (0, "")
 
-    def __init__(self, amount: int, multiples: int = 1, namespace: str = "LIMITER"):
+    def __init__(self, amount: int, multiples: int = 1, namespace: str = "LIMITER") -> None:
         self.namespace = namespace
         self.amount = int(amount)
         self.multiples = int(multiples or 1)

@@ -16,7 +16,7 @@ class RedisSentinelStorage(RedisStorage):
     Depends on `redis` library.
     """
 
-    def __init__(self, sentinel: Sentinel, service_name: str):
+    def __init__(self, sentinel: Sentinel, service_name: str) -> None:
         self._sentinel: Sentinel = sentinel
         self._service_name: str = service_name
 

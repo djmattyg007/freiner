@@ -11,7 +11,7 @@ class FixedWindowRateLimiter:
     Reference: :ref:`fixed-window`
     """
 
-    def __init__(self, storage: FixedWindowStorage):
+    def __init__(self, storage: FixedWindowStorage) -> None:
         if not isinstance(storage, FixedWindowStorage):
             msg = f"Fixed Window rate limiting is not implemented for storage of type {storage.__class__.__name__}"
             raise TypeError(msg)
