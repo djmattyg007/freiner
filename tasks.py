@@ -1,4 +1,5 @@
 import os
+import shlex
 import sys
 
 from invoke import task, util
@@ -44,7 +45,7 @@ def test(c, onefile=""):
         pytest_args.append("--cov-report=html")
 
     if onefile:
-        pytest_args.append(onefile)
+        pytest_args.append(shlex.quote(onefile))
 
     c.run("docker-compose down --remove-orphans --volumes", pty=pty)
     c.run("docker-compose up -d", pty=pty)
