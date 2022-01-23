@@ -39,7 +39,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-${{ matrix.python }}-pip-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tasks.py') }}
+          key: ${{ runner.os }}-${{ matrix.python }}-pip-${{ hashFiles('setup.cfg') }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tasks.py') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.python }}-pip-
       - name: "Install dependencies"
