@@ -4,6 +4,13 @@
 Changelog
 =========
 
+v3.0.5 - 2022-01-23
+===================
+
+- Formally declare support for python3.10
+- Many minor updates to dev/test code and configuration
+- Upgrade to newer versions of sphinx-related libraries
+
 v3.0.4 - 2021-08-16
 ===================
 
