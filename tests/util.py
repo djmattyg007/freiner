@@ -2,7 +2,7 @@ import functools
 import math
 import time
 from pathlib import Path
-from typing import Any, Callable, ContextManager
+from typing import Any, Callable, ContextManager, cast
 
 from freezegun import freeze_time as _freeze_time
 from freezegun.api import FrozenDateTimeFactory
@@ -27,4 +27,5 @@ def freeze_time() -> ContextManager[FrozenDateTimeFactory]:
     f = _freeze_time()
     # This is a necessary fix for our testing, and the third-party type hints aren't sufficient
     f.ignore = tuple(set(f.ignore) - {"threading"})  # type: ignore
-    return f
+    # mypy can't handle the fact that I'm narrowing the return type on purpose, so this has to be casted manually
+    return cast(ContextManager[FrozenDateTimeFactory], f)
