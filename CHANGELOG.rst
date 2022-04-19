@@ -4,6 +4,13 @@
 Changelog
 =========
 
+v3.1.0 - 2022-04-19
+===================
+
+- Drop support for Python 3.7.
+- The ``typing_extensions`` package is no longer a dependency.
+- Use Python 3.10 for building release artifacts.
+
 v3.0.5 - 2022-01-23
 ===================
 
