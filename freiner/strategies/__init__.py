@@ -1,6 +1,4 @@
-from typing import Any, NamedTuple
-
-from typing_extensions import Protocol, runtime_checkable
+from typing import Any, NamedTuple, Protocol, runtime_checkable
 
 from freiner.limits import RateLimitItem
 

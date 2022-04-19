@@ -18,7 +18,7 @@ backends such as Redis & Memcached.
 The French word "freiner" means "to slow down", which is what you'll need to do if you are
 rate-limited :)
 
-Currently this project supports Python 3.7, 3.8 and 3.9.
+Currently this project supports Python 3.8, 3.9 and 3.10.
 
 History
 -------
